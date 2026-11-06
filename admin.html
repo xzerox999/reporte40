@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrativo — Reporte 40</title>
+
+  <!-- Bootstrap 5 CSS & Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+
+  <!-- Datos del Sistema (Soporte offline / doble clic) -->
+  <script src="data/demo_data.js"></script>
+</head>
+<body>
+
+  <!-- Barra de Navegación -->
+  <nav class="navbar-custom">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <span class="brand-badge" style="background: linear-gradient(135deg, #d97706, #b45309);">
+          <i class="bi bi-shield-lock-fill"></i> PANEL ADMINISTRADOR
+        </span>
+        <span class="d-none d-md-inline text-muted small">Reporte 40 • Red Cusco Sur</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button class="theme-toggle-btn shadow-sm" type="button" aria-label="Cambiar tema">
+          <i class="bi bi-moon-stars-fill text-primary"></i> <span>Oscuro</span>
+        </button>
+
+        <a href="dashboard.html" class="btn btn-sm btn-secondary-custom d-flex align-items-center gap-1">
+          <i class="bi bi-person"></i> <span class="d-none d-sm-inline">Mi Producción</span>
+        </a>
+
+        <button id="adminLogoutBtn" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+          <i class="bi bi-box-arrow-right"></i> <span class="d-none d-sm-inline">Salir</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido Principal -->
+  <main class="container-xl py-4 flex-grow-1">
+
+    <!-- Encabezado y Estadísticas Generales -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 fade-in">
+      <div>
+        <h1 class="h4 fw-bold text-main mb-1">Supervisión y Control Administrativo</h1>
+        <p class="text-muted small mb-0">Gestión de personal, auditoría de descargas de reportes y exportación de datos.</p>
+      </div>
+
+      <button id="btnExportAllExcel" class="btn-primary-custom shadow-sm">
+        <i class="bi bi-file-earmark-excel-fill text-success"></i> Exportar Toda la Información a Excel
+      </button>
+    </div>
+
+    <!-- Tarjetas KPI -->
+    <div class="row g-3 mb-4 fade-in">
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <div id="statTotalUsers" class="stat-number">-</div>
+            <div class="stat-label">Personal Registrado</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.15); color: #10b981;">
+            <i class="bi bi-cloud-arrow-down-fill"></i>
+          </div>
+          <div>
+            <div id="statTotalDownloads" class="stat-number">-</div>
+            <div class="stat-label">Descargas de Reportes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+            <i class="bi bi-building"></i>
+          </div>
+          <div>
+            <div id="statTotalEstabs" class="stat-number">-</div>
+            <div class="stat-label">Establecimientos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.15); color: #6366f1;">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <div>
+            <div id="statTodayDownloads" class="stat-number">-</div>
+            <div class="stat-label">Descargas de Hoy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pestañas de Navegación -->
+    <ul class="nav nav-pills mb-3 gap-2" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-logs-btn" data-bs-toggle="pill" data-bs-target="#tab-logs" type="button" role="tab">
+          <i class="bi bi-journal-text me-1"></i> Log de Auditoría de Descargas
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-users-btn" data-bs-toggle="pill" data-bs-target="#tab-users" type="button" role="tab">
+          <i class="bi bi-person-gear me-1"></i> Gestión de Personal y Contraseñas
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-upload-btn" data-bs-toggle="pill" data-bs-target="#tab-upload" type="button" role="tab">
+          <i class="bi bi-cloud-arrow-up-fill me-1"></i> Actualizar Base de Datos (Excel)
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-notice-btn" data-bs-toggle="pill" data-bs-target="#tab-notice" type="button" role="tab">
+          <i class="bi bi-megaphone-fill me-1"></i> Comunicado Institucional
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabContent">
+      
+      <!-- PESTAÑA 1: LOG DE DESCARGAS -->
+      <div class="tab-pane fade show active" id="tab-logs" role="tabpanel">
+        <div class="app-card fade-in">
+          <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h2 class="h6 fw-bold mb-0 text-main">
+              <i class="bi bi-clock-history text-primary me-2"></i>Historial de Descargas de Reportes
+            </h2>
+            <div class="d-flex gap-2">
+              <div class="input-group input-group-sm" style="max-width: 260px;">
+                <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="logSearchInput" class="form-control" placeholder="Buscar por DNI o nombre...">
+              </div>
+              <button id="btnExportLogsExcel" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Log
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Fecha y Hora</th>
+                  <th>DNI</th>
+                  <th>Personal</th>
+                  <th>Establecimiento</th>
+                  <th>Meses Descargados</th>
+                  <th>Tipo Reporte</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr><td colspan="6" class="text-center text-muted py-4">Cargando registros de auditoría...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
+            <span id="logsCountText">Mostrando 0 registros</span>
+            <span>Registrado en tiempo real</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 2: GESTIÓN DE PERSONAL Y CONTRASEÑAS -->
+      <div class="tab-pane fade" id="tab-users" role="tabpanel">
+        <div class="app-card fade-in">
+          <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h2 class="h6 fw-bold mb-0 text-main">
+              <i class="bi bi-person-lines-fill text-primary me-2"></i>Padrón de Personal de Salud
+            </h2>
+            <div class="input-group input-group-sm" style="max-width: 280px;">
+              <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
+              <input type="text" id="userSearchInput" class="form-control" placeholder="Filtrar por DNI, nombre o IPRESS...">
+            </div>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>DNI</th>
+                  <th>Apellidos y Nombres</th>
+                  <th>Establecimiento</th>
+                  <th>MicroRed</th>
+                  <th>Colegio Profesional</th>
+                  <th class="text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="6" class="text-center text-muted py-4">Cargando lista de personal...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
+            <span id="usersCountText">Cargando usuarios...</span>
+            <span>Acción: Restablece la contraseña si el profesional la olvidó</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 3: ACTUALIZAR BASE DE DATOS (EXCEL) -->
+      <div class="tab-pane fade" id="tab-upload" role="tabpanel">
+        <div class="app-card fade-in mb-4">
+          <div class="app-card-header">
+            <h2 class="h6 fw-bold mb-0 text-main">
+              <i class="bi bi-cloud-arrow-up text-primary me-2"></i>Actualización Masiva de Producción (Excel .xlsx)
+            </h2>
+          </div>
+
+          <div id="excelAlert" class="alert d-none py-2 px-3 small mb-3" role="alert"></div>
+
+          <p class="text-muted small mb-3">
+            Sube el archivo Excel mensual del Reporte 40 (por ejemplo <code>REPORTE 40 2026.xlsx</code>). El sistema extraerá automáticamente las pestañas <strong>ipress personal x mes</strong> (ATD/ATC) y <strong>v_reporte40_APP</strong> (APP), consolidará al personal con múltiples establecimientos y actualizará la base de datos de consulta.
+          </p>
+
+          <!-- Zona Drag & Drop -->
+          <div id="excelDropZone" class="excel-drop-zone">
+            <div class="excel-drop-icon">
+              <i class="bi bi-file-earmark-excel"></i>
+            </div>
+            <h3 class="h6 fw-bold text-main mb-1">Arrastra y suelta tu archivo Excel aquí</h3>
+            <p class="text-muted small mb-3">o haz clic para buscarlo en tu equipo (.xlsx, .xls)</p>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="d-none">
+            <button type="button" class="btn btn-sm btn-primary-custom" onclick="document.getElementById('excelFileInput').click()">
+              <i class="bi bi-folder2-open me-1"></i> Seleccionar Archivo
+            </button>
+          </div>
+
+          <!-- Tarjeta de Previsualización y Confirmación -->
+          <div id="excelPreviewCard" class="d-none mt-4 p-3 rounded" style="background-color: var(--bg-card-subtle); border: 1px solid var(--border-color);">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-2 mb-3 border-bottom">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-check-fill text-success fs-4"></i>
+                <div>
+                  <strong id="previewFileName" class="text-main d-block">archivo.xlsx</strong>
+                  <span id="previewFileSize" class="text-muted small">0 KB</span>
+                </div>
+              </div>
+              <span id="previewSheetsBadge" class="badge-custom badge-success">Pestañas validadas</span>
+            </div>
+
+            <!-- Resumen de Datos Extraídos -->
+            <div class="row g-3 mb-3 text-center">
+              <div class="col-sm-3 col-6">
+                <div class="p-2 rounded bg-body border">
+                  <div id="previewAtdCount" class="fw-bold fs-5 text-primary">0</div>
+                  <div class="text-muted small" style="font-size: 0.78rem;">Registros ATD/ATC</div>
+                </div>
+              </div>
+              <div class="col-sm-3 col-6">
+                <div class="p-2 rounded bg-body border">
+                  <div id="previewAppCount" class="fw-bold fs-5 text-indigo">0</div>
+                  <div class="text-muted small" style="font-size: 0.78rem;">Registros APP</div>
+                </div>
+              </div>
+              <div class="col-sm-3 col-6">
+                <div class="p-2 rounded bg-body border">
+                  <div id="previewUsersCount" class="fw-bold fs-5 text-success">0</div>
+                  <div class="text-muted small" style="font-size: 0.78rem;">Personal Único</div>
+                </div>
+              </div>
+              <div class="col-sm-3 col-6">
+                <div class="p-2 rounded bg-body border">
+                  <div id="previewMonthsCount" class="fw-bold fs-5 text-warning">0</div>
+                  <div class="text-muted small" style="font-size: 0.78rem;">Meses Detectados</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 justify-content-end">
+              <button id="btnCancelExcel" type="button" class="btn btn-sm btn-secondary-custom">
+                Cancelar
+              </button>
+              <button id="btnApplyExcel" type="button" class="btn btn-sm btn-primary-custom">
+                <i class="bi bi-check-circle-fill me-1"></i> Aplicar y Guardar a la Base de Datos
+              </button>
+            </div>
+          </div>
+
+          <!-- Opciones avanzadas de mantenimiento -->
+          <div class="mt-4 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span class="text-muted small">
+              <i class="bi bi-shield-check me-1"></i> La sincronización se guarda en el almacenamiento local y actualiza los reportes inmediatamente.
+            </span>
+            <div class="d-flex gap-2">
+              <button id="btnDownloadDemoDataJs" class="btn btn-sm btn-outline-primary" title="Exporta el archivo demo_data.js para colocarlo en tu carpeta data/">
+                <i class="bi bi-download me-1"></i> Descargar demo_data.js
+              </button>
+              <button id="btnResetOriginalData" class="btn btn-sm btn-outline-danger" title="Borrar datos sobreescritos y volver al Excel inicial">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar Original
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA 4: COMUNICADO INSTITUCIONAL -->
+      <div class="tab-pane fade" id="tab-notice" role="tabpanel">
+        <div class="app-card fade-in mb-4">
+          <div class="app-card-header">
+            <h2 class="h6 fw-bold mb-0 text-main">
+              <i class="bi bi-megaphone text-primary me-2"></i>Gestión de Comunicados y Avisos Oficiales
+            </h2>
+          </div>
+
+          <div id="noticeAlert" class="alert d-none py-2 px-3 small mb-3" role="alert"></div>
+
+          <p class="text-muted small mb-3">
+            Publica avisos o recordatorios importantes (como fechas de corte o regularizaciones en el HIS) que aparecerán destacados en la parte superior del Dashboard de cada trabajador de salud.
+          </p>
+
+          <form id="noticeForm">
+            <!-- Switch Activar / Desactivar -->
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="noticeActiveSwitch" checked>
+              <label class="form-check-label fw-bold text-main" for="noticeActiveSwitch">
+                Mostrar este comunicado en la pantalla principal del personal
+              </label>
+            </div>
+
+            <!-- Título -->
+            <div class="mb-3">
+              <label for="noticeTitleInput" class="form-label text-main fw-semibold small">Título del Comunicado</label>
+              <input type="text" class="form-control" id="noticeTitleInput" placeholder="Ej: Cierre de Registro Mensual de Información" required>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="mb-3">
+              <label for="noticeMessageInput" class="form-label text-main fw-semibold small">Mensaje / Indicaciones</label>
+              <textarea class="form-control" id="noticeMessageInput" rows="3" placeholder="Ej: Se recuerda al personal de salud que el plazo para la regularización de atenciones en el HIS culmina el 15 de cada mes." required></textarea>
+            </div>
+
+            <!-- Vista Previa en Vivo -->
+            <div class="mb-3">
+              <label class="form-label text-muted small fw-bold">VISTA PREVIA EN TIEMPO REAL</label>
+              <div id="noticePreviewBanner" class="alert-elegant alert-info-elegant" role="alert" style="background-color: var(--primary-light); border: 1.5px solid var(--border-color);">
+                <i class="bi bi-megaphone-fill fs-5 text-primary"></i>
+                <div class="flex-grow-1">
+                  <strong id="previewNoticeTitle" class="d-block text-main mb-1">Cierre de Registro Mensual de Información</strong>
+                  <span id="previewNoticeMessage" class="text-muted small">Se recuerda al personal de salud que el plazo para la regularización de atenciones en el HIS culmina el 15 de cada mes.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" id="saveNoticeBtn" class="btn-primary-custom shadow-sm">
+                <i class="bi bi-check-circle-fill me-1"></i> Guardar y Publicar Comunicado
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal para Resetear Contraseña -->
+  <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title h6 fw-bold text-main">
+            <i class="bi bi-key-fill text-warning me-2"></i>Restablecer Contraseña de Personal
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="resetPasswordForm">
+          <div class="modal-body">
+            <div id="resetAlert" class="alert d-none py-2 px-3 small" role="alert"></div>
+
+            <p class="small text-muted mb-3">
+              Estás modificando la clave de acceso para:
+            </p>
+            <div class="p-2 mb-3 rounded bg-body-secondary small">
+              <div><strong class="text-main">Personal:</strong> <span id="resetModalUserName">-</span></div>
+              <div><strong class="text-main">DNI:</strong> <span id="resetModalUserDni">-</span></div>
+            </div>
+
+            <div class="mb-3">
+              <label for="resetNewPassInput" class="form-label">Nueva Contraseña</label>
+              <input type="text" class="form-control" id="resetNewPassInput" placeholder="Dejar en blanco para restaurar a su DNI">
+              <div class="form-text small text-muted">
+                Tip: Si dejas el campo vacío, la contraseña se restaurará automáticamente a su propio número de DNI.
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn-primary-custom" id="confirmResetBtn">Confirmar Cambio</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie de Página -->
+  <footer class="footer-custom">
+    <div class="container-fluid">
+      <span>Sistema de Reporte 40 • Red de Servicios de Salud Cusco Sur</span> • 
+      <span class="footer-author">hecho por xzerox99</span>
+    </div>
+  </footer>
+
+  <!-- Librerías Externas -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SheetJS para exportar Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Scripts del Sistema -->
+  <script src="data/demo_data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/pwa.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+</html>
+

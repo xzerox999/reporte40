@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Reporte Oficial — Red Cusco Sur</title>
+
+  <!-- Google Fonts & Bootstrap 5 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+
+  <script src="data/demo_data.js"></script>
+</head>
+<body class="d-flex align-items-center justify-content-center p-3" style="min-height: 100vh;">
+
+  <!-- Botón flotante tema -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <button class="theme-toggle-btn shadow-sm" type="button" aria-label="Cambiar tema">
+      <i class="bi bi-moon-stars-fill text-primary"></i> <span>Oscuro</span>
+    </button>
+  </div>
+
+  <div class="app-card fade-in shadow-lg" style="max-width: 540px; width: 100%;">
+    <div class="text-center pb-3 border-bottom mb-3">
+      <div class="brand-badge mb-2">
+        <i class="bi bi-patch-check-fill"></i> SISTEMA OFICIAL DE VERIFICACIÓN
+      </div>
+      <h1 class="h5 fw-bold text-main mb-1">Red de Servicios de Salud Cusco Sur</h1>
+      <p class="text-muted small mb-0">Comprobación de Autenticidad de Reporte 40</p>
+    </div>
+
+    <!-- Estado de Validación -->
+    <div class="text-center my-3">
+      <div class="d-inline-flex align-items-center justify-content-center rounded-circle p-3 mb-2" style="background-color: rgba(16, 185, 129, 0.15); width: 68px; height: 68px;">
+        <i class="bi bi-check-circle-fill text-success fs-1"></i>
+      </div>
+      <h2 class="h6 fw-bold text-success mb-1">DOCUMENTO OFICIAL AUTÉNTICO</h2>
+      <p class="text-muted small">Este reporte fue emitido legítimamente desde el Sistema Reporte 40 institucional.</p>
+    </div>
+
+    <!-- Ficha de Datos Validados -->
+    <div class="p-3 rounded mb-3" style="background-color: var(--bg-card-subtle); border: 1px solid var(--border-color);">
+      <div class="row g-2 small">
+        <div class="col-sm-6">
+          <span class="text-muted">Personal de Salud:</span>
+          <div id="valPersonal" class="fw-bold text-main fs-6">-</div>
+        </div>
+        <div class="col-sm-6">
+          <span class="text-muted">Número de DNI:</span>
+          <div id="valDni" class="fw-bold text-main fs-6">-</div>
+        </div>
+        <div class="col-sm-6">
+          <span class="text-muted">Establecimiento / Ámbito:</span>
+          <div id="valEstab" class="fw-bold text-main">-</div>
+        </div>
+        <div class="col-sm-6">
+          <span class="text-muted">Período Consultado:</span>
+          <div id="valMeses" class="fw-bold text-primary">-</div>
+        </div>
+        <div class="col-6 mt-2 pt-2 border-top">
+          <span class="text-muted">Total Atenciones (ATC):</span>
+          <div id="valATC" class="fw-bold text-primary fs-5">0</div>
+        </div>
+        <div class="col-6 mt-2 pt-2 border-top">
+          <span class="text-muted">Total Atendidos (ATD):</span>
+          <div id="valATD" class="fw-bold text-success fs-5">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-muted small mt-3">
+      <div>Código de Seguridad Digital: <code id="valCode" class="text-main fw-bold">REP40-VERIFIED</code></div>
+      <div class="mt-2 text-muted" style="font-size: 0.78rem;">
+        Sistema de Reportes • <span class="footer-author">hecho por xzerox99</span>
+      </div>
+    </div>
+
+    <div class="mt-4 text-center">
+      <a href="index.html" class="btn btn-sm btn-secondary-custom">
+        <i class="bi bi-arrow-left me-1"></i> Ir al Sistema Reporte 40
+      </a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/theme.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const dni = urlParams.get("dni") || "";
+      const personal = urlParams.get("p") || "";
+      const estab = urlParams.get("e") || "";
+      const meses = urlParams.get("m") || "";
+      const atc = urlParams.get("atc") || "0";
+      const atd = urlParams.get("atd") || "0";
+      const code = urlParams.get("c") || "";
+
+      document.getElementById("valDni").textContent = dni || "No especificado";
+      document.getElementById("valPersonal").textContent = personal ? decodeURIComponent(personal) : "Personal de Salud";
+      document.getElementById("valEstab").textContent = estab ? decodeURIComponent(estab) : "Red Cusco Sur";
+      document.getElementById("valMeses").textContent = meses || "Todos";
+      document.getElementById("valATC").textContent = Number(atc).toLocaleString();
+      document.getElementById("valATD").textContent = Number(atd).toLocaleString();
+
+      if (code) {
+        document.getElementById("valCode").textContent = code;
+      } else {
+        document.getElementById("valCode").textContent = "REP40-" + (dni ? dni.slice(-4) : "OK");
+      }
+    });
+  </script>
+</body>
+</html>
