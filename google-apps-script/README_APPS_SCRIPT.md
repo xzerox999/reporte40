@@ -74,7 +74,7 @@ En la carpeta `e:\Otros\reporte40\data\` ya se crearon los archivos listos:
    Ejemplo: `https://script.google.com/macros/s/AKfycbx.../exec`
 7. **¡Copia esa URL!**
 
----https://script.google.com/macros/s/AKfycbyt8ijYhPLtgBQxiAUNNaUxGvj09un1CjzzrbtL7EkzbMMHy1eNrojbi8Rz27ba3fFI/exec
+---
 
 ## Paso 5: Conectar con el Frontend
 
@@ -82,9 +82,25 @@ En la carpeta `e:\Otros\reporte40\data\` ya se crearon los archivos listos:
 2. Pega tu URL en la variable `API_URL`:
    ```javascript
    const CONFIG = {
-     API_URL: "https://script.google.com/macros/s/AKfycbx.../exec",
-     DEMO_MODE: false // Cambiar a false para usar Google Sheets real
+     API_URL: "https://script.google.com/macros/s/AKfycbyt8ijYhPLtgBQxiAUNNaUxGvj09un1CjzzrbtL7EkzbMMHy1eNrojbi8Rz27ba3fFI/exec",
+     USE_DEMO_FALLBACK: true
    };
    ```
 3. Guarda el archivo. ¡Y listo! Todo tu sistema ya estará conectado en tiempo real.
+
+---
+
+## Paso 6: ¿Cómo actualizar el código en Google Apps Script si hay cambios?
+
+Cada vez que se modifica el archivo `google-apps-script/Code.gs` (por ejemplo mejoras en login, normalización de DNIs o reportes):
+
+1. Abre tu hoja en Google Sheets y ve a **Extensiones > Apps Script**.
+2. Reemplaza el código viejo con el contenido nuevo de `Code.gs`.
+3. Guarda los cambios con `Ctrl + S`.
+4. Haz clic arriba a la derecha en **Implementar > Administrar implementaciones**.
+5. Haz clic en el ícono del **Lápiz (Editar)** de tu implementación activa.
+6. En el desplegable **Versión**, cámbialo a **"Nueva versión"**.
+7. Haz clic en el botón azul **Implementar**.
+
+*(Si no seleccionas "Nueva versión", Google seguirá ejecutando la versión vieja anterior sin los cambios).*
 

@@ -21,6 +21,25 @@
 </head>
 <body>
 
+  <!-- Overlay Bloqueante de Vinculación y Sincronización con BD -->
+  <div id="syncDatabaseOverlay" class="sync-overlay">
+    <div class="sync-card fade-in">
+      <div class="sync-icon-pulse" id="syncIconContainer">
+        <i class="bi bi-database-fill-gear"></i>
+      </div>
+      <h3 class="h5 fw-bold text-main mb-1" id="syncTitle">Vinculando con Base de Datos</h3>
+      <p class="text-muted small mb-0" id="syncSubtitle">Conectando con el repositorio oficial de la Red Cusco Sur...</p>
+      
+      <div class="sync-progress">
+        <div id="syncProgressBar" class="sync-progress-bar"></div>
+      </div>
+      <div class="d-flex justify-content-between text-muted small" style="font-size: 0.78rem;">
+        <span id="syncStepText">Inicializando verificación...</span>
+        <span id="syncPercentText" class="fw-bold text-primary">0%</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Barra de Navegación -->
   <nav class="navbar-custom">
     <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -40,6 +59,11 @@
         <!-- Switch Tema Claro/Oscuro -->
         <button class="theme-toggle-btn shadow-sm" type="button" aria-label="Cambiar tema">
           <i class="bi bi-moon-stars-fill text-primary"></i> <span>Oscuro</span>
+        </button>
+
+        <!-- Botón Manual de Usuario -->
+        <button class="btn btn-sm btn-outline-info d-flex align-items-center gap-1 shadow-sm" type="button" data-bs-toggle="modal" data-bs-target="#userManualModal" title="Ver guía de uso del sistema">
+          <i class="bi bi-book-half"></i> <span class="d-none d-sm-inline">Manual de Usuario</span>
         </button>
 
         <!-- Dropdown Usuario -->
@@ -83,6 +107,34 @@
         <span id="comunicadoTexto" class="text-muted small">Texto del aviso...</span>
       </div>
       <button type="button" class="btn-close ms-2" onclick="document.getElementById('bannerComunicado').classList.add('d-none')" aria-label="Cerrar"></button>
+    </div>
+
+    <!-- Banner de Alerta Urgente: Contraseña por defecto no cambiada -->
+    <div id="urgentPasswordAlert" class="alert-urgent-danger mb-4 d-none fade-in" role="alert">
+      <div class="alert-urgent-icon">
+        <i class="bi bi-shield-exclamation"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+          <span class="badge bg-danger text-white fw-bold">ACCIÓN URGENTE REQUERIDA</span>
+          <strong class="text-main">Seguridad de tu Cuenta: Clave Inicial Detectada</strong>
+        </div>
+        <p class="mb-0 text-muted small">
+          Por favor, cambia tu contraseña urgente. Actualmente tu clave sigue siendo tu número de DNI, lo que permite que cualquier persona que conozca tu documento pueda ingresar y descargar tus reportes.
+        </p>
+      </div>
+      <button type="button" class="btn btn-sm btn-danger shadow-sm text-nowrap align-self-start align-self-md-center" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+        <i class="bi bi-key-fill me-1"></i> Cambiar Contraseña Ahora
+      </button>
+    </div>
+
+    <!-- Banner Informativo de IPRESS Desactivada (Aparece si la IPRESS está en auditoría) -->
+    <div id="disabledIpressAlert" class="alert-elegant alert-warning-elegant mb-4 d-none fade-in" role="alert">
+      <i class="bi bi-exclamation-triangle-fill fs-5 text-warning"></i>
+      <div class="flex-grow-1">
+        <strong class="d-block text-main mb-1">Establecimiento en Auditoría o Cierre Administrativo</strong>
+        <span class="text-muted small">La producción del establecimiento seleccionado no está disponible temporalmente por revisión institucional. Los reportes oficiales solo incluirán IPRESS activas.</span>
+      </div>
     </div>
 
     <!-- Tarjeta de Información del Profesional -->
@@ -319,6 +371,105 @@
             <button type="submit" class="btn-primary-custom" id="savePasswordBtn">Guardar Nueva Contraseña</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Manual de Usuario -->
+  <div class="modal fade" id="userManualModal" tabindex="-1" aria-labelledby="userManualModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center gap-2">
+            <div class="p-2 rounded bg-primary-subtle text-primary">
+              <i class="bi bi-book-half fs-5"></i>
+            </div>
+            <div>
+              <h5 class="modal-title h6 fw-bold text-main mb-0" id="userManualModalLabel">Manual de Usuario — Sistema Reporte 40</h5>
+              <small class="text-muted">Guía explicativa para la consulta, selección y emisión de reportes</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-4">
+
+          <div class="manual-step-item">
+            <div class="manual-step-num">1</div>
+            <div>
+              <h6 class="fw-bold text-main mb-1">
+                <i class="bi bi-calendar-check text-primary me-1"></i> Selección de Meses para el Reporte
+              </h6>
+              <p class="text-muted small mb-1">
+                Al iniciar tu sesión, <strong>todos los botones de meses aparecen desactivados por defecto</strong>. Esta medida de seguridad evita imprimir por error todos los meses juntos cuando únicamente requieres presentar el informe de un mes específico.
+              </p>
+              <div class="manual-tip-box mt-2 small">
+                <i class="bi bi-cursor-fill text-primary me-1"></i> <strong>¿Cómo usarlo?</strong> Haz clic sobre el mes que deseas (por ejemplo, <code>JUL</code> o <code>NOV</code>). Si necesitas presentar un período acumulado o el año completo, puedes usar el botón superior <strong>"Todos"</strong>.
+              </div>
+            </div>
+          </div>
+
+          <div class="manual-step-item">
+            <div class="manual-step-num">2</div>
+            <div>
+              <h6 class="fw-bold text-main mb-1">
+                <i class="bi bi-geo-alt-fill text-primary me-1"></i> Filtro por Establecimiento (IPRESS)
+              </h6>
+              <p class="text-muted small mb-1">
+                Si durante el año laboraste en más de un establecimiento (rotaciones, coberturas o destaques), el sistema activará automáticamente el selector de IPRESS.
+              </p>
+              <div class="manual-tip-box mt-2 small">
+                <i class="bi bi-check-circle text-success me-1"></i> Puedes consultar el <strong>Consolidado Total Red Cusco Sur</strong> o elegir un establecimiento individual para ver únicamente lo producido en dicha sede.
+              </div>
+            </div>
+          </div>
+
+          <div class="manual-step-item">
+            <div class="manual-step-num">3</div>
+            <div>
+              <h6 class="fw-bold text-main mb-1">
+                <i class="bi bi-bar-chart-fill text-primary me-1"></i> Interpretación de Indicadores de Producción
+              </h6>
+              <ul class="text-muted small mb-0 ps-3">
+                <li class="mb-1"><strong class="text-main">ATC (Atenciones):</strong> Número total de atenciones médicas o asistenciales registradas en el HIS.</li>
+                <li class="mb-1"><strong class="text-main">ATD (Atendidos):</strong> Cantidad de personas o pacientes únicos evaluados en el período.</li>
+                <li><strong class="text-main">APP (Promoción):</strong> Total de actividades de promoción, talleres y sesiones preventivas registradas.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="manual-step-item">
+            <div class="manual-step-num">4</div>
+            <div>
+              <h6 class="fw-bold text-main mb-1">
+                <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Descarga de PDF y Validación con Código QR
+              </h6>
+              <p class="text-muted small mb-1">
+                El botón <strong>"Descargar Reporte en PDF"</strong> genera tu documento oficial con formato formal, desglose institucional y firma digital.
+              </p>
+              <div class="manual-tip-box mt-2 small">
+                <i class="bi bi-qr-code text-primary me-1"></i> <strong>Seguridad Digital:</strong> Cada PDF contiene un código QR oficial en el pie de página. Cualquier auditor o jefatura puede escanearlo con la cámara de su teléfono para verificar en tiempo real que el documento es auténtico e inalterado.
+              </div>
+            </div>
+          </div>
+
+          <div class="manual-step-item">
+            <div class="manual-step-num">5</div>
+            <div>
+              <h6 class="fw-bold text-main mb-1">
+                <i class="bi bi-shield-lock-fill text-warning me-1"></i> Seguridad y Cambio Obligatorio de Contraseña
+              </h6>
+              <p class="text-muted small mb-0">
+                Tu clave inicial es tu DNI. Para evitar que terceros descarguen o revisen tu información personal, cambia tu contraseña haciendo clic en el botón de alerta roja o en tu menú de usuario superior (<strong>"Cambiar Contraseña"</strong>).
+              </p>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">
+            <i class="bi bi-check-lg me-1"></i> Entendido, Ir al Sistema
+          </button>
+        </div>
       </div>
     </div>
   </div>

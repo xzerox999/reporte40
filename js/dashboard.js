@@ -7,14 +7,86 @@
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // 0. Funciones de barra de progreso de vinculación inicial
+  const syncOverlay = document.getElementById("syncDatabaseOverlay");
+  const syncProgressBar = document.getElementById("syncProgressBar");
+  const syncPercentText = document.getElementById("syncPercentText");
+  const syncStepText = document.getElementById("syncStepText");
+  const syncTitle = document.getElementById("syncTitle");
+  const syncIconContainer = document.getElementById("syncIconContainer");
+
+  function setSyncProgress(percent, stepMessage, title = null) {
+    if (syncProgressBar) syncProgressBar.style.width = percent + "%";
+    if (syncPercentText) syncPercentText.textContent = percent + "%";
+    if (syncStepText && stepMessage) syncStepText.textContent = stepMessage;
+    if (syncTitle && title) syncTitle.textContent = title;
+  }
+
+  function finishSyncOverlay() {
+    setSyncProgress(100, "¡Sincronización completa con la Red Cusco Sur!", "¡Datos Vinculados Exitosamente!");
+    if (syncIconContainer) {
+      syncIconContainer.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+      syncIconContainer.style.background = "rgba(16, 185, 129, 0.15)";
+      syncIconContainer.style.color = "#10b981";
+    }
+    setTimeout(() => {
+      if (syncOverlay) {
+        syncOverlay.classList.add("fade-out");
+        setTimeout(() => syncOverlay.remove(), 400);
+      }
+    }, 450);
+  }
+
+  setSyncProgress(15, "Verificando credenciales institucionales...");
+
   // 1. Validar autenticación
   if (!Auth.requireAuth()) return;
 
-  const currentUser = Auth.getCurrentUser();
+  // Soporte para Modo Simulación de Auditor (Admin viendo como un personal específico)
+  let currentUser = Auth.getCurrentUser();
+  const impersonateDni = sessionStorage.getItem("impersonate_user_dni");
+  if (impersonateDni && Auth.isAdmin()) {
+    const demo = window.DEMO_DATA || {};
+    const targetUser = demo.usuarios && demo.usuarios[impersonateDni];
+    if (targetUser) {
+      currentUser = { ...targetUser };
+      // Insertar banner superior de auditor
+      const auditBanner = document.createElement("div");
+      auditBanner.className = "alert alert-info py-2 px-3 mb-0 text-center fw-bold d-flex justify-content-between align-items-center shadow-sm";
+      auditBanner.style.borderRadius = "0";
+      auditBanner.style.borderBottom = "2px solid #0284c7";
+      auditBanner.innerHTML = `
+        <span><i class="bi bi-eye-fill me-2 text-primary fs-5"></i> MODO SIMULACIÓN AUDITOR: Visualizando producción de <u>${targetUser.nombre}</u> (DNI: ${impersonateDni})</span>
+        <button class="btn btn-sm btn-dark" onclick="sessionStorage.removeItem('impersonate_user_dni'); window.close(); window.location.reload();">
+          <i class="bi bi-x-circle me-1"></i> Finalizar Simulación
+        </button>
+      `;
+      document.body.prepend(auditBanner);
+    }
+  }
+
   let userAtdData = null;
   let userAppData = null;
   let selectedEstab = "ALL"; // Por defecto "ALL" (Consolidado)
-  let selectedMonths = CONFIG.MESES.map(m => m.key); // Por defecto todos seleccionados
+  let selectedMonths = []; // Todos desactivados por defecto al cargar según indicación
+
+  // Control de IPRESS activas/bloqueadas
+  function getIpressControl() {
+    try {
+      const saved = localStorage.getItem("reporte40_ipress_control");
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    if (window.DEMO_DATA && window.DEMO_DATA.ipress_control) {
+      return window.DEMO_DATA.ipress_control;
+    }
+    return {};
+  }
+
+  function isIpressActive(estabName) {
+    if (!estabName) return true;
+    const ctrl = getIpressControl();
+    return ctrl[estabName.trim()] !== false;
+  }
 
   // Elementos DOM
   const navUserName = document.getElementById("navUserName");
@@ -26,6 +98,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userColegioContainer = document.getElementById("userColegioContainer");
   const adminMenuOption = document.getElementById("adminMenuOption");
   const logoutBtn = document.getElementById("logoutBtn");
+  const urgentPasswordAlert = document.getElementById("urgentPasswordAlert");
+  const disabledIpressAlert = document.getElementById("disabledIpressAlert");
 
   const estabSelectorCard = document.getElementById("estabSelectorCard");
   const estabSelect = document.getElementById("estabSelect");
@@ -76,16 +150,83 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Helpers para obtener el conjunto de datos activo (Consolidado o IPRESS específica)
   function getActiveAtdDataset() {
     if (!userAtdData) return null;
+
     if (selectedEstab === "ALL" || !userAtdData.por_establecimiento) {
+      const porEst = userAtdData.por_establecimiento || {};
+      const estabNames = Object.keys(porEst);
+
+      if (estabNames.length > 0) {
+        const activeEstabs = estabNames.filter(e => isIpressActive(e));
+
+        if (activeEstabs.length === 0) {
+          if (disabledIpressAlert) disabledIpressAlert.classList.remove("d-none");
+          return { meses: {}, total_atc: 0, total_atd: 0, disabled: true };
+        } else {
+          if (disabledIpressAlert) disabledIpressAlert.classList.add("d-none");
+        }
+
+        const consMeses = {};
+        CONFIG.MESES.forEach(m => {
+          consMeses[m.key] = {
+            atc: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.meses?.[m.key]?.atc || 0), 0),
+            atd: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.meses?.[m.key]?.atd || 0), 0)
+          };
+        });
+
+        return {
+          meses: consMeses,
+          total_atc: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.total_atc || 0), 0),
+          total_atd: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.total_atd || 0), 0)
+        };
+      }
+
+      if (!isIpressActive(currentUser.establecimiento)) {
+        if (disabledIpressAlert) disabledIpressAlert.classList.remove("d-none");
+        return { meses: {}, total_atc: 0, total_atd: 0, disabled: true };
+      }
+      if (disabledIpressAlert) disabledIpressAlert.classList.add("d-none");
       return userAtdData.consolidado || userAtdData;
     }
+
+    // IPRESS individual seleccionada
+    if (!isIpressActive(selectedEstab)) {
+      if (disabledIpressAlert) disabledIpressAlert.classList.remove("d-none");
+      return { meses: {}, total_atc: 0, total_atd: 0, disabled: true };
+    }
+    if (disabledIpressAlert) disabledIpressAlert.classList.add("d-none");
     return userAtdData.por_establecimiento[selectedEstab] || null;
   }
 
   function getActiveAppDataset() {
     if (!userAppData) return null;
+
     if (selectedEstab === "ALL" || !userAppData.por_establecimiento) {
+      const porEst = userAppData.por_establecimiento || {};
+      const estabNames = Object.keys(porEst);
+
+      if (estabNames.length > 0) {
+        const activeEstabs = estabNames.filter(e => isIpressActive(e));
+        if (activeEstabs.length === 0) {
+          return { meses: {}, total: 0, disabled: true };
+        }
+        const consMeses = {};
+        CONFIG.MESES.forEach(m => {
+          consMeses[m.key] = activeEstabs.reduce((acc, e) => acc + (porEst[e]?.meses?.[m.key] || 0), 0);
+        });
+        return {
+          meses: consMeses,
+          total: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.total || 0), 0)
+        };
+      }
+
+      if (!isIpressActive(currentUser.establecimiento)) {
+        return { meses: {}, total: 0, disabled: true };
+      }
       return userAppData.consolidado || userAppData;
+    }
+
+    if (!isIpressActive(selectedEstab)) {
+      return { meses: {}, total: 0, disabled: true };
     }
     return userAppData.por_establecimiento[selectedEstab] || null;
   }
@@ -143,25 +284,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       estabSelect.innerHTML = "";
       
-      // Opción 1: Consolidado General (Suma de todo)
-      const totalGeneral = userAtdData.consolidado ? userAtdData.consolidado.total_atc : 0;
+      // Opción 1: Consolidado General (Suma de las IPRESS activas)
+      const porEst = userAtdData.por_establecimiento || {};
+      const activeTotal = Object.keys(porEst)
+        .filter(e => isIpressActive(e))
+        .reduce((acc, e) => acc + (porEst[e]?.total_atc || 0), 0);
+
       const optAll = document.createElement("option");
       optAll.value = "ALL";
-      optAll.textContent = `🌟 Todos los Establecimientos (Consolidado: ${totalGeneral.toLocaleString()} Atenciones)`;
+      optAll.textContent = `🌟 Todos los Establecimientos (Consolidado Activo: ${activeTotal.toLocaleString()} Atenciones)`;
       estabSelect.appendChild(optAll);
 
       // Opciones por cada establecimiento ordenadas de mayor a menor producción
       const sortedEstabs = [...estabs].sort((a, b) => {
-        const prodA = (userAtdData.por_establecimiento[a] && userAtdData.por_establecimiento[a].total_atc) || 0;
-        const prodB = (userAtdData.por_establecimiento[b] && userAtdData.por_establecimiento[b].total_atc) || 0;
+        const prodA = (porEst[a] && porEst[a].total_atc) || 0;
+        const prodB = (porEst[b] && porEst[b].total_atc) || 0;
         return prodB - prodA;
       });
 
       sortedEstabs.forEach((est) => {
-        const prod = (userAtdData.por_establecimiento[est] && userAtdData.por_establecimiento[est].total_atc) || 0;
+        const prod = (porEst[est] && porEst[est].total_atc) || 0;
         const opt = document.createElement("option");
         opt.value = est;
-        opt.textContent = `${est} (${prod.toLocaleString()} Atenciones)`;
+        const active = isIpressActive(est);
+        opt.textContent = active 
+          ? `${est} (${prod.toLocaleString()} Atenciones)`
+          : `🔒 ${est} [EN AUDITORÍA / BLOQUEADO]`;
+        if (!active) {
+          opt.style.color = "#ef4444";
+        }
         estabSelect.appendChild(opt);
       });
 
@@ -377,9 +528,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-  // 2. Cargar datos del usuario desde la API
+  // 2. Cargar datos del usuario desde la API con barra de progreso
   try {
+    setSyncProgress(35, "Consultando base de datos oficial (Google Sheets / HIS)...");
     const res = await Api.callAppsScript("getData", { dni: currentUser.dni });
+
+    setSyncProgress(70, "Sincronizando atenciones (ATC / ATD) y actividades (APP)...");
+
     if (res.success) {
       userAtdData = res.atd_atc;
       userAppData = res.app;
@@ -398,9 +553,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (err) {
     console.error("Error al cargar datos:", err);
+  } finally {
+    finishSyncOverlay();
+  }
+
+  // Verificación de Contraseña por defecto (DNI)
+  function checkDefaultPasswordAlert() {
+    if (!urgentPasswordAlert) return;
+    const hasCustomPass = localStorage.getItem("custom_pass_" + currentUser.dni);
+    if (!hasCustomPass && currentUser.rol !== "admin") {
+      urgentPasswordAlert.classList.remove("d-none");
+    } else {
+      urgentPasswordAlert.classList.add("d-none");
+    }
   }
 
   // Inicializar componentes
+  checkDefaultPasswordAlert();
   renderComunicadoBanner();
   setupEstablishmentSelector();
   renderMonthSelector();
@@ -482,6 +651,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (res.success) {
         changePassAlert.className = "alert alert-success py-2 px-3 small";
         changePassAlert.textContent = res.message || "¡Contraseña actualizada exitosamente!";
+        
+        // Ocultar de inmediato el banner de advertencia urgente
+        if (urgentPasswordAlert) urgentPasswordAlert.classList.add("d-none");
+
         setTimeout(() => {
           const modalEl = document.getElementById("changePasswordModal");
           const modal = bootstrap.Modal.getInstance(modalEl);

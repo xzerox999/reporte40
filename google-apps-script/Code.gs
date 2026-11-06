@@ -201,6 +201,26 @@ function computeSHA256(text) {
 }
 
 /**
+ * Comparador flexible de DNI / Carnet de Extranjería
+ * Maneja ceros a la izquierda (ej. 02442082 vs 2442082, 004704812 vs 4704812)
+ */
+function matchesDni(a, b) {
+  if (!a || !b) return false;
+  const sA = String(a).trim();
+  const sB = String(b).trim();
+  if (sA === sB) return true;
+
+  const stripA = sA.replace(/^0+/, "");
+  const stripB = sB.replace(/^0+/, "");
+  if (stripA === stripB && stripA !== "") return true;
+
+  if (sA.length <= 8 && sB.length <= 8) {
+    if (sA.padStart(8, "0") === sB.padStart(8, "0")) return true;
+  }
+  return false;
+}
+
+/**
  * 1. Login de Usuario o Admin
  */
 function apiLogin(dni, password) {
@@ -215,13 +235,23 @@ function apiLogin(dni, password) {
 
   const cleanDni = String(dni).trim();
   const inputHash = computeSHA256(password);
+  const rawPass = String(password).trim();
   const data = sheet.getDataRange().getValues();
 
   for (let i = 1; i < data.length; i++) {
     const rowDni = String(data[i][0]).trim();
-    if (rowDni === cleanDni) {
+    if (matchesDni(rowDni, cleanDni)) {
       const storedHash = String(data[i][2]).trim();
-      if (storedHash === inputHash) {
+
+      // Verificar si coincide con el hash guardado, o con la clave por defecto (su DNI con o sin ceros)
+      const isDefaultPass = matchesDni(rawPass, rowDni) || matchesDni(rawPass, cleanDni);
+      const isHashMatch = (storedHash === inputHash) ||
+                          (storedHash === computeSHA256(cleanDni)) ||
+                          (storedHash === computeSHA256(rowDni)) ||
+                          (storedHash === computeSHA256(cleanDni.replace(/^0+/, ""))) ||
+                          (storedHash === computeSHA256(cleanDni.padStart(8, "0")));
+
+      if (isHashMatch || isDefaultPass) {
         // Actualizar último acceso
         sheet.getRange(i + 1, 9).setValue(new Date().toISOString());
 
@@ -262,11 +292,15 @@ function apiChangePassword(dni, oldPassword, newPassword) {
   const cleanDni = String(dni).trim();
   const oldHash = computeSHA256(oldPassword);
   const newHash = computeSHA256(newPassword);
+  const rawOld = String(oldPassword).trim();
 
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim() === cleanDni) {
-      if (String(data[i][2]).trim() === oldHash) {
+    const rowDni = String(data[i][0]).trim();
+    if (matchesDni(rowDni, cleanDni)) {
+      const storedHash = String(data[i][2]).trim();
+      const isDefaultOld = matchesDni(rawOld, rowDni) || matchesDni(rawOld, cleanDni);
+      if (storedHash === oldHash || isDefaultOld) {
         sheet.getRange(i + 1, 3).setValue(newHash);
         return { success: true, message: "Contraseña cambiada exitosamente" };
       } else {
@@ -305,7 +339,7 @@ function apiGetData(dni) {
     let personalNombre = "";
 
     for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][1]).trim() === cleanDni) {
+      if (matchesDni(rows[i][1], cleanDni)) {
         const r = rows[i];
         const estab = String(r[0]).trim();
         personalNombre = String(r[2]).trim();
@@ -370,7 +404,7 @@ function apiGetData(dni) {
     let personalNombreApp = "";
 
     for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][2]).trim() === cleanDni) {
+      if (matchesDni(rows[i][2], cleanDni)) {
         const r = rows[i];
         const microred = String(r[0]).trim();
         const estab = String(r[1]).trim();

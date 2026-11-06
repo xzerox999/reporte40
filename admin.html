@@ -12,6 +12,9 @@
   <!-- Estilos del Sistema -->
   <link rel="stylesheet" href="css/styles.css">
 
+  <!-- DataTables Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
+
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
@@ -133,6 +136,11 @@
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="tab-notice-btn" data-bs-toggle="pill" data-bs-target="#tab-notice" type="button" role="tab">
           <i class="bi bi-megaphone-fill me-1"></i> Comunicado Institucional
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-estabs-btn" data-bs-toggle="pill" data-bs-target="#tab-estabs" type="button" role="tab">
+          <i class="bi bi-buildings-fill me-1"></i> Control de IPRESS
         </button>
       </li>
     </ul>
@@ -371,6 +379,74 @@
         </div>
       </div>
 
+      <!-- PESTAÑA 5: CONTROL DE ESTABLECIMIENTOS (IPRESS) -->
+      <div class="tab-pane fade" id="tab-estabs" role="tabpanel">
+        <div class="app-card fade-in mb-4">
+          <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+              <h2 class="h6 fw-bold mb-1 text-main">
+                <i class="bi bi-buildings text-primary me-2"></i>Control de Disponibilidad de Producción por IPRESS
+              </h2>
+              <p class="text-muted small mb-0">
+                Activa o desactiva la visibilidad de los establecimientos. Las IPRESS desactivadas quedan temporalmente bloqueadas para los usuarios y no suman en los reportes PDF.
+              </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span id="estabsActiveBadge" class="badge-custom badge-success">Cargando IPRESS...</span>
+            </div>
+          </div>
+
+          <!-- Acciones en lote y filtros rápidos -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 p-3 rounded" style="background-color: var(--bg-card-subtle); border: 1px solid var(--border-color);">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="small fw-bold text-main"><i class="bi bi-filter"></i> MicroRed:</span>
+              <select id="microredFilterSelect" class="form-select form-select-sm" style="max-width: 200px;">
+                <option value="">Todas las MicroRedes</option>
+              </select>
+              <button id="btnActivateMicrored" type="button" class="btn btn-sm btn-outline-success" title="Activar todos los establecimientos de la MicroRed seleccionada">
+                <i class="bi bi-check-circle me-1"></i> Activar MicroRed
+              </button>
+              <button id="btnDeactivateMicrored" type="button" class="btn btn-sm btn-outline-danger" title="Desactivar todos los establecimientos de la MicroRed seleccionada">
+                <i class="bi bi-slash-circle me-1"></i> Desactivar MicroRed
+              </button>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <button id="btnActivateAllEstabs" type="button" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-check-all me-1"></i> Activar Todas
+              </button>
+              <button id="btnDeactivateAllEstabs" type="button" class="btn btn-sm btn-danger">
+                <i class="bi bi-dash-circle me-1"></i> Desactivar Todas
+              </button>
+              <button id="btnSaveEstabsStatus" type="button" class="btn btn-sm btn-primary-custom shadow-sm">
+                <i class="bi bi-floppy-fill me-1"></i> Guardar Cambios
+              </button>
+            </div>
+          </div>
+
+          <div id="estabsControlAlert" class="alert d-none py-2 px-3 small mb-3" role="alert"></div>
+
+          <div class="table-responsive">
+            <table id="estabsTable" class="table table-hover align-middle w-100">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>MicroRed</th>
+                  <th>Establecimiento (IPRESS)</th>
+                  <th class="text-center">Personal</th>
+                  <th class="text-center">Atenciones (ATC)</th>
+                  <th class="text-center" style="width: 130px;">Estado</th>
+                  <th class="text-center" style="width: 120px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="estabsTableBody">
+                <!-- DataTables dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -424,6 +500,10 @@
 
   <!-- Librerías Externas -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery & DataTables -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
   <!-- SheetJS para exportar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 

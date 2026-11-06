@@ -156,9 +156,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${u.microred || "-"}</td>
         <td class="small text-muted">${u.colegio || "-"}</td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-warning btn-reset-pass" data-dni="${u.dni}" data-name="${u.nombre}" title="Restablecer Contraseña">
-            <i class="bi bi-key-fill"></i> Restablecer Clave
-          </button>
+          <div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-sm btn-outline-warning btn-reset-pass" data-dni="${u.dni}" data-name="${u.nombre}" title="Restablecer Contraseña">
+              <i class="bi bi-key-fill"></i> Clave
+            </button>
+            <button class="btn btn-sm btn-outline-info btn-simulate-user" data-dni="${u.dni}" title="Ver Dashboard como este profesional">
+              <i class="bi bi-eye"></i> Simular
+            </button>
+          </div>
         </td>
       `;
       usersTableBody.appendChild(tr);
@@ -172,6 +177,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const targetDni = btn.getAttribute("data-dni");
         const targetName = btn.getAttribute("data-name");
         openResetModal(targetDni, targetName);
+      });
+    });
+
+    // Vincular botones de simulación
+    usersTableBody.querySelectorAll(".btn-simulate-user").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetDni = btn.getAttribute("data-dni");
+        sessionStorage.setItem("impersonate_user_dni", targetDni);
+        window.open("dashboard.html", "_blank");
       });
     });
   }
@@ -1045,7 +1059,301 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // =====================================================================
+  // 11. CONTROL DE ESTABLECIMIENTOS (IPRESS) CON DATATABLES (PESTAÑA 5)
+  // =====================================================================
+  let estabsDataTable = null;
+  let estabsStatusMap = {};
+  let allEstabsData = [];
+
+  function loadEstabsStatus() {
+    const saved = localStorage.getItem("reporte40_ipress_control");
+    if (saved) {
+      try {
+        estabsStatusMap = JSON.parse(saved);
+      } catch (e) {
+        estabsStatusMap = {};
+      }
+    } else if (window.DEMO_DATA && window.DEMO_DATA.ipress_control) {
+      estabsStatusMap = { ...window.DEMO_DATA.ipress_control };
+    }
+  }
+
+  function getEstabsSummary() {
+    const data = window.DEMO_DATA || {};
+    const usuarios = data.usuarios || {};
+    const atdAtc = data.atd_atc || {};
+
+    const estabMap = {};
+
+    // 1. Recorrer usuarios para saber personal por IPRESS y MicroRed
+    Object.values(usuarios).forEach(u => {
+      const estabs = u.establecimientos || (u.establecimiento ? [u.establecimiento] : []);
+      estabs.forEach(est => {
+        if (!est) return;
+        const key = est.trim().toUpperCase();
+        if (!estabMap[key]) {
+          estabMap[key] = {
+            nombre: est.trim(),
+            microred: u.microred || "RED CUSCO SUR",
+            personalSet: new Set(),
+            totalATC: 0
+          };
+        }
+        estabMap[key].personalSet.add(u.dni);
+        if (u.microred && (!estabMap[key].microred || estabMap[key].microred === "RED CUSCO SUR")) {
+          estabMap[key].microred = u.microred;
+        }
+      });
+    });
+
+    // 2. Sumar ATC de cada IPRESS desde atd_atc
+    Object.values(atdAtc).forEach(item => {
+      const porEst = item.por_establecimiento || {};
+      Object.keys(porEst).forEach(estName => {
+        const key = estName.trim().toUpperCase();
+        const tot = Number(porEst[estName].total_atc) || 0;
+        if (!estabMap[key]) {
+          estabMap[key] = {
+            nombre: estName.trim(),
+            microred: "RED CUSCO SUR",
+            personalSet: new Set([item.dni]),
+            totalATC: 0
+          };
+        }
+        estabMap[key].totalATC += tot;
+      });
+    });
+
+    const list = Object.values(estabMap).map(e => ({
+      nombre: e.nombre,
+      microred: e.microred || "RED CUSCO SUR",
+      personalCount: e.personalSet.size,
+      totalATC: e.totalATC,
+      activo: estabsStatusMap[e.nombre] !== false
+    }));
+
+    list.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    return list;
+  }
+
+  function initEstabsControl() {
+    loadEstabsStatus();
+    allEstabsData = getEstabsSummary();
+
+    const estabsTableBody = document.getElementById("estabsTableBody");
+    const estabsActiveBadge = document.getElementById("estabsActiveBadge");
+    const microredFilterSelect = document.getElementById("microredFilterSelect");
+    const estabsControlAlert = document.getElementById("estabsControlAlert");
+
+    if (!estabsTableBody) return;
+
+    function updateActiveBadge() {
+      const total = allEstabsData.length;
+      const activeCount = allEstabsData.filter(e => estabsStatusMap[e.nombre] !== false).length;
+      if (estabsActiveBadge) {
+        estabsActiveBadge.textContent = `${activeCount} de ${total} IPRESS Activas`;
+        estabsActiveBadge.className = activeCount === total ? "badge-custom badge-success" : "badge-custom badge-warning";
+      }
+    }
+
+    // Poblar MicroRedes únicas en el select
+    const uniqueMicroredes = Array.from(new Set(allEstabsData.map(e => e.microred).filter(Boolean))).sort();
+    if (microredFilterSelect && microredFilterSelect.options.length <= 1) {
+      microredFilterSelect.innerHTML = '<option value="">Todas las MicroRedes</option>';
+      uniqueMicroredes.forEach(mr => {
+        const opt = document.createElement("option");
+        opt.value = mr;
+        opt.textContent = mr;
+        microredFilterSelect.appendChild(opt);
+      });
+    }
+
+    function renderTableAndDataTable() {
+      const currentFilter = microredFilterSelect ? $(microredFilterSelect).val() : "";
+
+      if (window.jQuery && $.fn.DataTable && $.fn.DataTable.isDataTable("#estabsTable")) {
+        $("#estabsTable").DataTable().destroy();
+      }
+
+      estabsTableBody.innerHTML = "";
+      allEstabsData.forEach((est, idx) => {
+        const isActive = estabsStatusMap[est.nombre] !== false;
+        const tr = document.createElement("tr");
+        tr.setAttribute("data-estab", est.nombre);
+        tr.setAttribute("data-microred", est.microred);
+
+        tr.innerHTML = `
+          <td class="text-muted small">${idx + 1}</td>
+          <td><span class="badge-custom badge-info">${est.microred}</span></td>
+          <td><strong class="estab-name text-main">${est.nombre}</strong></td>
+          <td class="text-center fw-semibold text-main">${est.personalCount}</td>
+          <td class="text-center fw-semibold text-primary">${est.totalATC.toLocaleString()}</td>
+          <td class="text-center status-col">
+            <span class="badge-custom ${isActive ? 'badge-success' : 'badge-danger'} status-badge">
+              <i class="bi ${isActive ? 'bi-check-circle-fill' : 'bi-slash-circle-fill'} me-1"></i>
+              ${isActive ? 'Activo' : 'Bloqueado'}
+            </span>
+          </td>
+          <td class="text-center">
+            <div class="form-check form-switch d-inline-block">
+              <input class="form-check-input ipress-switch" type="checkbox" role="switch" data-estab="${est.nombre}" ${isActive ? 'checked' : ''} title="Activar/Desactivar IPRESS">
+            </div>
+          </td>
+        `;
+        estabsTableBody.appendChild(tr);
+      });
+
+      updateActiveBadge();
+
+      if (window.jQuery && $.fn.DataTable) {
+        estabsDataTable = $("#estabsTable").DataTable({
+          responsive: true,
+          pageLength: 15,
+          lengthMenu: [10, 15, 25, 50, 100],
+          order: [[2, "asc"]],
+          language: {
+            search: "Buscar IPRESS:",
+            searchPlaceholder: "Nombre o MicroRed...",
+            lengthMenu: "Mostrar _MENU_ por página",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ IPRESS",
+            infoEmpty: "Mostrando 0 IPRESS",
+            infoFiltered: "(filtrado de _MAX_ en total)",
+            paginate: {
+              first: '<i class="bi bi-chevron-double-left"></i>',
+              previous: '<i class="bi bi-chevron-left"></i>',
+              next: '<i class="bi bi-chevron-right"></i>',
+              last: '<i class="bi bi-chevron-double-right"></i>'
+            },
+            emptyTable: "No hay establecimientos disponibles"
+          }
+        });
+
+        if (currentFilter) {
+          estabsDataTable.column(1).search(`^${currentFilter}$`, true, false).draw();
+        }
+      }
+    }
+
+    renderTableAndDataTable();
+
+    // Filtro de MicroRed sincronizado con DataTable
+    if (microredFilterSelect) {
+      $(microredFilterSelect).off("change").on("change", function () {
+        const val = $(this).val();
+        if (estabsDataTable) {
+          estabsDataTable.column(1).search(val ? `^${val}$` : '', true, false).draw();
+        }
+      });
+    }
+
+    // Delegación de eventos para switches individuales
+    $(document).off("change", ".ipress-switch").on("change", ".ipress-switch", function () {
+      const estabName = $(this).attr("data-estab");
+      const isChecked = $(this).is(":checked");
+      estabsStatusMap[estabName] = isChecked;
+
+      const tr = $(this).closest("tr");
+      const statusBadge = tr.find(".status-badge");
+      if (isChecked) {
+        statusBadge.removeClass("badge-danger").addClass("badge-success").html('<i class="bi bi-check-circle-fill me-1"></i> Activo');
+      } else {
+        statusBadge.removeClass("badge-success").addClass("badge-danger").html('<i class="bi bi-slash-circle-fill me-1"></i> Bloqueado');
+      }
+
+      saveEstabsStatus(false);
+      updateActiveBadge();
+    });
+
+    // Activar MicroRed seleccionada
+    $("#btnActivateMicrored").off("click").on("click", function () {
+      const selectedMr = $(microredFilterSelect).val();
+      if (!selectedMr) {
+        alert("Por favor selecciona primero una MicroRed en el desplegable.");
+        return;
+      }
+      allEstabsData.forEach(e => {
+        if (e.microred === selectedMr) {
+          estabsStatusMap[e.nombre] = true;
+        }
+      });
+      saveEstabsStatus(false);
+      renderTableAndDataTable();
+      showControlAlert(`¡Se activaron todas las IPRESS de la MicroRed ${selectedMr}!`, "success");
+    });
+
+    // Desactivar MicroRed seleccionada
+    $("#btnDeactivateMicrored").off("click").on("click", function () {
+      const selectedMr = $(microredFilterSelect).val();
+      if (!selectedMr) {
+        alert("Por favor selecciona primero una MicroRed en el desplegable.");
+        return;
+      }
+      if (!confirm(`¿Bloquear la producción de todos los establecimientos de la MicroRed ${selectedMr}?`)) return;
+      allEstabsData.forEach(e => {
+        if (e.microred === selectedMr) {
+          estabsStatusMap[e.nombre] = false;
+        }
+      });
+      saveEstabsStatus(false);
+      renderTableAndDataTable();
+      showControlAlert(`¡Se bloquearon todas las IPRESS de la MicroRed ${selectedMr}!`, "warning");
+    });
+
+    // Botón Activar Todas
+    $("#btnActivateAllEstabs").off("click").on("click", function () {
+      allEstabsData.forEach(e => {
+        estabsStatusMap[e.nombre] = true;
+      });
+      saveEstabsStatus(true);
+      renderTableAndDataTable();
+    });
+
+    // Botón Desactivar Todas
+    $("#btnDeactivateAllEstabs").off("click").on("click", function () {
+      if (!confirm("¿Deseas bloquear la producción de TODOS los 71 establecimientos? Los usuarios verán un aviso de conciliación.")) return;
+      allEstabsData.forEach(e => {
+        estabsStatusMap[e.nombre] = false;
+      });
+      saveEstabsStatus(true);
+      renderTableAndDataTable();
+    });
+
+    // Botón Guardar Cambios
+    $("#btnSaveEstabsStatus").off("click").on("click", function () {
+      saveEstabsStatus(true);
+    });
+
+    function showControlAlert(msg, type = "success") {
+      if (!estabsControlAlert) return;
+      estabsControlAlert.className = `alert alert-${type} py-2 px-3 small fade-in`;
+      estabsControlAlert.innerHTML = `<i class="bi bi-info-circle-fill me-1"></i> ${msg}`;
+      setTimeout(() => {
+        estabsControlAlert.className = "alert d-none";
+      }, 4000);
+    }
+
+    async function saveEstabsStatus(showAlert = false) {
+      localStorage.setItem("reporte40_ipress_control", JSON.stringify(estabsStatusMap));
+      if (window.DEMO_DATA) {
+        window.DEMO_DATA.ipress_control = estabsStatusMap;
+      }
+
+      try {
+        await Api.callAppsScript("adminSaveIpressControl", {
+          adminDni: currentAdmin.dni,
+          ipressStatus: estabsStatusMap
+        });
+      } catch (e) {}
+
+      if (showAlert) {
+        showControlAlert("¡Control de IPRESS guardado con éxito! Las restricciones aplican inmediatamente a todos los usuarios.", "success");
+      }
+    }
+  }
+
   // Ejecución inicial
   loadInitialData();
+  initEstabsControl();
 });
 
