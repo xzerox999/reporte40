@@ -604,9 +604,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const previewFileSize = document.getElementById("previewFileSize");
   const previewSheetsBadge = document.getElementById("previewSheetsBadge");
   const previewAtdCount = document.getElementById("previewAtdCount");
+  const previewAtdLabel = document.getElementById("previewAtdLabel");
   const previewAppCount = document.getElementById("previewAppCount");
+  const previewAppLabel = document.getElementById("previewAppLabel");
   const previewUsersCount = document.getElementById("previewUsersCount");
+  const previewUsersLabel = document.getElementById("previewUsersLabel");
   const previewMonthsCount = document.getElementById("previewMonthsCount");
+  const previewMonthsLabel = document.getElementById("previewMonthsLabel");
+  const previewDetailList = document.getElementById("previewDetailList");
   const btnCancelExcel = document.getElementById("btnCancelExcel");
   const btnApplyExcel = document.getElementById("btnApplyExcel");
   const btnDownloadDemoDataJs = document.getElementById("btnDownloadDemoDataJs");
@@ -667,7 +672,274 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function parseWorkbook(wb, file) {
     const sheetNames = wb.SheetNames;
-    
+    const fileName = (file.name || "").toLowerCase();
+
+    const monthMap = {
+      "01": "ENE", "02": "FEB", "03": "MAR", "04": "ABR",
+      "05": "MAY", "06": "JUN", "07": "JUL", "08": "AGO",
+      "09": "SET", "10": "OCT", "11": "NOV", "12": "DIC"
+    };
+
+    // -------------------------------------------------------------
+    // CASO 1: DETECCIÓN DE SIHCE CITAS RESERVADAS (ADMISIÓN)
+    // -------------------------------------------------------------
+    let isCitas = fileName.includes("citas");
+    let wsCitas = null;
+    for (const sName of sheetNames) {
+      const rowsSample = XLSX.utils.sheet_to_json(wb.Sheets[sName], { header: 1, range: 0, defval: "" }).slice(0, 5);
+      const rowText = rowsSample.map(r => r.join(" ")).join(" ").toUpperCase();
+      if (rowText.includes("PERSONAL QUE CITA") || (fileName.includes("citas") && rowText.includes("FECHA DE CITA"))) {
+        isCitas = true;
+        wsCitas = wb.Sheets[sName];
+        break;
+      }
+    }
+
+    if (isCitas && wsCitas) {
+      const rows = XLSX.utils.sheet_to_json(wsCitas, { header: 1, defval: "" });
+      if (rows.length < 2) {
+        showExcelAlert("El archivo de citas no contiene filas de datos suficientes.", "danger");
+        return;
+      }
+
+      let colStaff = 35;
+      let colFechaCita = 10;
+      let colFechaCrea = 16;
+      let colEstab = 1;
+
+      const headerRow = (rows[0] || []).map(c => String(c).trim().toUpperCase());
+      headerRow.forEach((h, idx) => {
+        if (h.includes("PERSONAL QUE CITA")) colStaff = idx;
+        if (h.includes("FECHA DE CITA")) colFechaCita = idx;
+        if (h.includes("FECHA DE CREACI")) colFechaCrea = idx;
+        if (h.includes("NOMBRE EESS")) colEstab = idx;
+      });
+
+      const staffStats = {};
+      let totalCitas = 0;
+      const detectedMonthsSet = new Set();
+      const detectedDaysSet = new Set();
+
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[colStaff]) continue;
+        const rawDni = String(r[colStaff]).trim().replace(/\.0$/, "");
+        if (!rawDni || !/^\d+$/.test(rawDni)) continue;
+
+        let fStr = String(r[colFechaCita] || "").trim();
+        if (!fStr || fStr.length < 10) fStr = String(r[colFechaCrea] || "").trim();
+        if (fStr.length < 10) continue;
+
+        let mNum = "", dNum = "";
+        if (fStr[4] === "-" && fStr[7] === "-") {
+          mNum = fStr.substring(5, 7);
+          dNum = fStr.substring(8, 10);
+        } else if (fStr.includes("/")) {
+          const parts = fStr.split("/");
+          dNum = parts[0].padStart(2, "0");
+          mNum = parts[1].padStart(2, "0");
+        } else {
+          continue;
+        }
+
+        const mKey = monthMap[mNum];
+        if (!mKey) continue;
+
+        detectedMonthsSet.add(mKey);
+        detectedDaysSet.add(dNum);
+        totalCitas++;
+
+        if (!staffStats[rawDni]) {
+          staffStats[rawDni] = { total: 0, months: {}, estab: String(r[colEstab] || "SAN SEBASTIAN").trim() };
+        }
+        staffStats[rawDni].total++;
+        if (!staffStats[rawDni].months[mKey]) staffStats[rawDni].months[mKey] = {};
+        staffStats[rawDni].months[mKey][dNum] = (staffStats[rawDni].months[mKey][dNum] || 0) + 1;
+      }
+
+      const detectedMonths = Array.from(detectedMonthsSet);
+      const totalStaff = Object.keys(staffStats).length;
+
+      parsedExcelData = {
+        isSihce: true,
+        sihceType: "CITAS",
+        sihceLabel: "Citas Reservadas (Admisión)",
+        sihceData: staffStats,
+        months: detectedMonths,
+        totalItems: totalCitas,
+        file: file
+      };
+
+      previewFileName.textContent = file.name;
+      previewFileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      previewSheetsBadge.textContent = "SIHCE: Citas de Admisión";
+      previewSheetsBadge.className = "badge-custom badge-info";
+
+      previewAtdCount.textContent = totalCitas.toLocaleString();
+      if (previewAtdLabel) previewAtdLabel.textContent = "Total Citas";
+      previewAppCount.textContent = totalStaff.toLocaleString();
+      if (previewAppLabel) previewAppLabel.textContent = "Personal Admisión";
+      previewUsersCount.textContent = detectedDaysSet.size.toString();
+      if (previewUsersLabel) previewUsersLabel.textContent = "Días con Citas";
+      previewMonthsCount.textContent = detectedMonths.join(", ");
+      if (previewMonthsLabel) previewMonthsLabel.textContent = "Mes(es) Afectado(s)";
+
+      if (previewDetailList) {
+        previewDetailList.classList.remove("d-none");
+        const topStaff = Object.keys(staffStats).sort((a, b) => staffStats[b].total - staffStats[a].total).slice(0, 10);
+        let listHtml = `<div class="fw-bold mb-1 text-primary"><i class="bi bi-people me-1"></i> Resumen de Producción por Personal de Admisión (${totalStaff} trabajadores):</div><div class="row g-2">`;
+        topStaff.forEach(dni => {
+          const uName = (window.DEMO_DATA?.usuarios?.[dni]?.nombre) || `Personal DNI ${dni}`;
+          listHtml += `<div class="col-sm-6"><span class="badge bg-body text-main border me-1">${dni}</span> ${uName}: <strong class="text-primary">${staffStats[dni].total.toLocaleString()} citas</strong></div>`;
+        });
+        listHtml += `</div>`;
+        previewDetailList.innerHTML = listHtml;
+      }
+
+      excelPreviewCard.classList.remove("d-none");
+      showExcelAlert("¡Archivo de Citas SIHCE analizado! Revisa el resumen y presiona 'Aplicar y Guardar' para incorporar la producción.", "success");
+      return;
+    }
+
+    // -------------------------------------------------------------
+    // CASO 2: DETECCIÓN DE SIHCE TRIAJE DE ENFERMERÍA
+    // -------------------------------------------------------------
+    let isTriaje = fileName.includes("triaje");
+    let wsTriaje = null;
+    for (const sName of sheetNames) {
+      if (/triaje/i.test(sName)) {
+        isTriaje = true;
+        wsTriaje = wb.Sheets[sName];
+        break;
+      }
+      const rowsSample = XLSX.utils.sheet_to_json(wb.Sheets[sName], { header: 1, range: 0, defval: "" }).slice(0, 15);
+      const rowText = rowsSample.map(r => r.join(" ")).join(" ").toUpperCase();
+      if (rowText.includes("PERSONAL QUE REGISTR") || rowText.includes("PACIENTES TRIADOS")) {
+        isTriaje = true;
+        wsTriaje = wb.Sheets[sName];
+        break;
+      }
+    }
+
+    if (isTriaje && wsTriaje) {
+      const rows = XLSX.utils.sheet_to_json(wsTriaje, { header: 1, defval: "" });
+      if (rows.length < 14) {
+        showExcelAlert("El archivo de triajes no contiene filas de datos suficientes.", "danger");
+        return;
+      }
+
+      let colStaff = 22;
+      let colFechaAten = 21;
+      let estabHeader = "SAN SEBASTIAN";
+
+      for (let r = 0; r < Math.min(rows.length, 12); r++) {
+        const rowStr = (rows[r] || []).join(" ").toUpperCase();
+        if (rowStr.includes("ESTABLECIMIENTO") && rows[r][1]) {
+          estabHeader = String(rows[r][1]).trim();
+        }
+        if (rowStr.includes("PERSONAL QUE REGISTR")) {
+          (rows[r] || []).forEach((c, idx) => {
+            if (String(c).toUpperCase().includes("PERSONAL QUE REGISTR")) colStaff = idx;
+            if (String(c).toUpperCase().includes("FECHA DE ATENCION")) colFechaAten = idx;
+          });
+        }
+      }
+
+      const staffStats = {};
+      let totalTriajes = 0;
+      const detectedMonthsSet = new Set();
+      const detectedDaysSet = new Set();
+
+      for (let i = 13; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[colStaff]) continue;
+        const staffRaw = String(r[colStaff]).trim();
+        const rawDni = staffRaw.replace(/\D/g, "");
+        if (!rawDni || rawDni.length < 6) continue;
+
+        const fStr = String(r[colFechaAten] || "").trim();
+        if (fStr.length < 10) continue;
+
+        let mNum = "", dNum = "";
+        if (fStr.includes("/")) {
+          const parts = fStr.substring(0, 10).split("/");
+          dNum = parts[0].padStart(2, "0");
+          mNum = parts[1].padStart(2, "0");
+        } else if (fStr[4] === "-" && fStr[7] === "-") {
+          mNum = fStr.substring(5, 7);
+          dNum = fStr.substring(8, 10);
+        } else {
+          continue;
+        }
+
+        const mKey = monthMap[mNum];
+        if (!mKey) continue;
+
+        detectedMonthsSet.add(mKey);
+        detectedDaysSet.add(dNum);
+        totalTriajes++;
+
+        if (!staffStats[rawDni]) {
+          staffStats[rawDni] = { total: 0, months: {}, estab: estabHeader };
+        }
+        staffStats[rawDni].total++;
+        if (!staffStats[rawDni].months[mKey]) staffStats[rawDni].months[mKey] = {};
+        staffStats[rawDni].months[mKey][dNum] = (staffStats[rawDni].months[mKey][dNum] || 0) + 1;
+      }
+
+      const detectedMonths = Array.from(detectedMonthsSet);
+      const totalStaff = Object.keys(staffStats).length;
+
+      parsedExcelData = {
+        isSihce: true,
+        sihceType: "TRIAJES",
+        sihceLabel: "Triajes de Enfermería",
+        sihceData: staffStats,
+        months: detectedMonths,
+        totalItems: totalTriajes,
+        file: file
+      };
+
+      previewFileName.textContent = file.name;
+      previewFileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+      previewSheetsBadge.textContent = "SIHCE: Triajes de Enfermería";
+      previewSheetsBadge.className = "badge-custom badge-success";
+
+      previewAtdCount.textContent = totalTriajes.toLocaleString();
+      if (previewAtdLabel) previewAtdLabel.textContent = "Total Triajes";
+      previewAppCount.textContent = totalStaff.toLocaleString();
+      if (previewAppLabel) previewAppLabel.textContent = "Personal de Triaje";
+      previewUsersCount.textContent = detectedDaysSet.size.toString();
+      if (previewUsersLabel) previewUsersLabel.textContent = "Días con Triajes";
+      previewMonthsCount.textContent = detectedMonths.join(", ");
+      if (previewMonthsLabel) previewMonthsLabel.textContent = "Mes(es) Afectado(s)";
+
+      if (previewDetailList) {
+        previewDetailList.classList.remove("d-none");
+        const topStaff = Object.keys(staffStats).sort((a, b) => staffStats[b].total - staffStats[a].total);
+        let listHtml = `<div class="fw-bold mb-1 text-success"><i class="bi bi-heart-pulse me-1"></i> Resumen de Producción por Personal de Triaje (${totalStaff} trabajadores):</div><div class="row g-2">`;
+        topStaff.forEach(dni => {
+          const uName = (window.DEMO_DATA?.usuarios?.[dni]?.nombre) || `Personal DNI ${dni}`;
+          listHtml += `<div class="col-sm-6"><span class="badge bg-body text-main border me-1">${dni}</span> ${uName}: <strong class="text-success">${staffStats[dni].total.toLocaleString()} triajes</strong></div>`;
+        });
+        listHtml += `</div>`;
+        previewDetailList.innerHTML = listHtml;
+      }
+
+      excelPreviewCard.classList.remove("d-none");
+      showExcelAlert("¡Archivo de Triajes SIHCE analizado! Revisa el resumen y presiona 'Aplicar y Guardar' para incorporar la producción.", "success");
+      return;
+    }
+
+    // -------------------------------------------------------------
+    // CASO 3: REPORTE 40 GENERAL (HIS)
+    // -------------------------------------------------------------
+    if (previewAtdLabel) previewAtdLabel.textContent = "Registros ATD/ATC";
+    if (previewAppLabel) previewAppLabel.textContent = "Registros APP";
+    if (previewUsersLabel) previewUsersLabel.textContent = "Personal Único";
+    if (previewMonthsLabel) previewMonthsLabel.textContent = "Meses Detectados";
+    if (previewDetailList) previewDetailList.classList.add("d-none");
+
     // Buscar hojas ATD y APP
     const atdSheetName = sheetNames.find(n => /ipress|atd|atc|personal x mes/i.test(n)) || sheetNames[0];
     const appSheetName = sheetNames.find(n => /app/i.test(n));
@@ -996,12 +1268,145 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnApplyExcel.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sincronizando...';
 
       try {
-        // 1. Guardar en localStorage
+        // CASO A: Archivo SIHCE (Citas o Triajes)
+        if (parsedExcelData.isSihce) {
+          const baseData = window.DEMO_DATA || (await Api.loadDemoData()) || {};
+          if (!baseData.diario) baseData.diario = {};
+          if (!baseData.atd_atc) baseData.atd_atc = {};
+          if (!baseData.usuarios) baseData.usuarios = {};
+          if (!baseData.sihce) baseData.sihce = { citas: {}, triajes: {} };
+
+          const sData = parsedExcelData.sihceData;
+          const sType = parsedExcelData.sihceType; // "CITAS" o "TRIAJES"
+
+          Object.keys(sData).forEach(dni => {
+            const staffObj = sData[dni];
+            const estab = staffObj.estab || "SAN SEBASTIAN";
+
+            // Asegurar que exista en usuarios
+            if (!baseData.usuarios[dni]) {
+              baseData.usuarios[dni] = {
+                dni,
+                nombre: `PERSONAL ${dni}`,
+                rol: "usuario",
+                establecimiento: estab,
+                establecimientos: [estab],
+                microred: "CUSCO",
+                colegio: sType === "CITAS" ? "ADMISIÓN SIHCE" : "ENFERMERÍA / TRIAJE"
+              };
+            }
+
+            // Asegurar que exista en diario
+            if (!baseData.diario[dni]) baseData.diario[dni] = {};
+
+            // Asegurar que exista en atd_atc
+            if (!baseData.atd_atc[dni]) {
+              baseData.atd_atc[dni] = {
+                dni,
+                personal: baseData.usuarios[dni]?.nombre || `PERSONAL ${dni}`,
+                establecimiento_principal: estab,
+                establecimientos: [estab],
+                consolidado: {
+                  meses: {},
+                  total_atc: 0,
+                  total_atd: 0
+                },
+                por_establecimiento: {
+                  [estab]: {
+                    meses: {},
+                    total_atc: 0,
+                    total_atd: 0
+                  }
+                }
+              };
+              CONFIG.MESES.forEach(m => {
+                baseData.atd_atc[dni].consolidado.meses[m.key] = { atc: 0, atd: 0 };
+                baseData.atd_atc[dni].por_establecimiento[estab].meses[m.key] = { atc: 0, atd: 0 };
+              });
+            }
+
+            Object.keys(staffObj.months).forEach(mKey => {
+              if (!baseData.diario[dni][mKey]) {
+                baseData.diario[dni][mKey] = {
+                  mes: mKey,
+                  dias: {},
+                  total_atc: 0,
+                  total_atd: 0
+                };
+                for (let d = 1; d <= 31; d++) {
+                  const dTag = (d < 10 ? "0" : "") + d;
+                  baseData.diario[dni][mKey].dias[dTag] = { atc: 0, atd: 0, citas: 0, triajes: 0 };
+                }
+              }
+
+              const mEntry = baseData.diario[dni][mKey];
+              const daysObj = staffObj.months[mKey];
+              let addedMonthSum = 0;
+
+              for (let d = 1; d <= 31; d++) {
+                const dTag = (d < 10 ? "0" : "") + d;
+                const prevCitas = mEntry.dias[dTag]?.citas || 0;
+                const prevTriajes = mEntry.dias[dTag]?.triajes || 0;
+                const hisAtc = Math.max(0, (mEntry.dias[dTag]?.atc || 0) - prevCitas - prevTriajes);
+
+                const newCitas = sType === "CITAS" ? (daysObj[dTag] || 0) : prevCitas;
+                const newTriajes = sType === "TRIAJES" ? (daysObj[dTag] || 0) : prevTriajes;
+
+                mEntry.dias[dTag] = {
+                  atc: hisAtc + newCitas + newTriajes,
+                  atd: mEntry.dias[dTag]?.atd || 0,
+                  citas: newCitas,
+                  triajes: newTriajes
+                };
+                addedMonthSum += (hisAtc + newCitas + newTriajes);
+              }
+
+              mEntry.total_atc = addedMonthSum;
+              mEntry.total_triajes = Object.values(mEntry.dias).reduce((acc, d) => acc + (d.triajes || 0), 0);
+              mEntry.total_citas = Object.values(mEntry.dias).reduce((acc, d) => acc + (d.citas || 0), 0);
+
+              // Actualizar en atd_atc mensual
+              if (baseData.atd_atc[dni]?.consolidado?.meses?.[mKey]) {
+                baseData.atd_atc[dni].consolidado.meses[mKey].atc = addedMonthSum;
+              }
+              const estKey = baseData.atd_atc[dni].establecimiento_principal || estab;
+              if (baseData.atd_atc[dni]?.por_establecimiento?.[estKey]?.meses?.[mKey]) {
+                baseData.atd_atc[dni].por_establecimiento[estKey].meses[mKey].atc = addedMonthSum;
+              }
+            });
+
+            // Recalcular total anual
+            let annualSum = 0;
+            CONFIG.MESES.forEach(m => {
+              annualSum += Number(baseData.atd_atc[dni]?.consolidado?.meses?.[m.key]?.atc || 0);
+            });
+            baseData.atd_atc[dni].consolidado.total_atc = annualSum;
+            const estKey = baseData.atd_atc[dni].establecimiento_principal || estab;
+            if (baseData.atd_atc[dni]?.por_establecimiento?.[estKey]) {
+              baseData.atd_atc[dni].por_establecimiento[estKey].total_atc = annualSum;
+            }
+          });
+
+          localStorage.setItem("DEMO_DATA_OVERRIDE", JSON.stringify(baseData));
+          window.DEMO_DATA = baseData;
+          Api._demoData = baseData;
+
+          allUsers = Object.values(baseData.usuarios);
+          updateKPIs();
+          renderUsersTable(allUsers);
+
+          showExcelAlert(`¡Producción de ${parsedExcelData.sihceLabel} incorporada y reemplazada con éxito! Se sincronizaron ${parsedExcelData.totalItems.toLocaleString()} registros para ${Object.keys(sData).length} trabajadores en el mes de ${parsedExcelData.months.join(", ")}.`, "success");
+          excelPreviewCard.classList.add("d-none");
+          if (excelFileInput) excelFileInput.value = "";
+          return;
+        }
+
+        // CASO B: Archivo Reporte 40 HIS General
         localStorage.setItem("DEMO_DATA_OVERRIDE", JSON.stringify(parsedExcelData));
         window.DEMO_DATA = parsedExcelData;
         Api._demoData = parsedExcelData;
 
-        // 2. Intentar actualizar en backend si Apps Script está configurado
+        // Intentar actualizar en backend si Apps Script está configurado
         try {
           await Api.callAppsScript("adminImportExcel", {
             adminDni: currentAdmin.dni,
@@ -1009,7 +1414,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
         } catch (e) {}
 
-        // 3. Recargar estado local
         allUsers = Object.values(parsedExcelData.usuarios);
         updateKPIs();
         renderUsersTable(allUsers);

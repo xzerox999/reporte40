@@ -34,18 +34,25 @@ En la carpeta `e:\Otros\reporte40\data\` ya se crearon los archivos listos:
    - Selecciona el archivo `data/DATA_APP.csv`.
    - Tipo de importación: **Reemplazar la hoja actual**.
 
-4. **Hoja 4: `LOG_DESCARGAS`**
+4. **Hoja 4: `DATA_DIARIO` (Para el reporte y desglose por días)**
+   - Crea otra hoja llamada **`DATA_DIARIO`**.
+   - Menú: **Archivo > Importar > Subir**.
+   - Selecciona el archivo `data/DATA_DIARIO.csv`.
+   - Tipo de importación: **Reemplazar la hoja actual**.
+
+5. **Hoja 5: `LOG_DESCARGAS`**
    - Crea una hoja llamada **`LOG_DESCARGAS`**.
    - En la fila 1 escribe los encabezados:
      `id` | `timestamp` | `dni` | `personal` | `establecimiento` | `meses` | `tipo_reporte` | `ip`
 
-5. **Hoja 5: `CONFIG`**
+6. **Hoja 6: `CONFIG`**
    - Crea una hoja llamada **`CONFIG`**.
    - En la fila 1: `clave` | `valor` | `descripcion`
    - En la fila 2: `hoja_atd_atc` | `DATA_ATD_ATC` | `Nombre de hoja de atenciones`
    - En la fila 3: `hoja_app` | `DATA_APP` | `Nombre de hoja de APP`
-   - En la fila 4: `hoja_usuarios` | `USUARIOS` | `Nombre de hoja de usuarios`
-   - En la fila 5: `hoja_logs` | `LOG_DESCARGAS` | `Nombre de hoja de logs`
+   - En la fila 4: `hoja_diario` | `DATA_DIARIO` | `Nombre de hoja de reporte diario`
+   - En la fila 5: `hoja_usuarios` | `USUARIOS` | `Nombre de hoja de usuarios`
+   - En la fila 6: `hoja_logs` | `LOG_DESCARGAS` | `Nombre de hoja de logs`
 
 *(Si algún día cambias los nombres de las hojas, solo actualizas la columna "valor" en esta hoja CONFIG)*
 

@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let userAtdData = null;
   let userAppData = null;
+  let userDailyData = null;
+  let isDailyModeActive = false;
   let selectedEstab = "ALL"; // Por defecto "ALL" (Consolidado)
   let selectedMonths = []; // Todos desactivados por defecto al cargar según indicación
 
@@ -116,6 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const kpiAPP = document.getElementById("kpiAPP");
 
   const atdTableBody = document.getElementById("atdTableBody");
+  const atdTableHead = document.getElementById("atdTableHead");
+  const atdTableFoot = document.getElementById("atdTableFoot");
   const atdTableTotalATC = document.getElementById("atdTableTotalATC");
   const atdTableTotalATD = document.getElementById("atdTableTotalATD");
 
@@ -123,6 +127,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const appTableTotal = document.getElementById("appTableTotal");
 
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+
+  // Elementos de Control de Modo Diario
+  const toggleDailyReport = document.getElementById("toggleDailyReport");
+  const dailyAvailabilityBadge = document.getElementById("dailyAvailabilityBadge");
+  const dailyReportHelpText = document.getElementById("dailyReportHelpText");
+  const dailyDetailSection = document.getElementById("dailyDetailSection");
+  const dailySectionTitle = document.getElementById("dailySectionTitle");
+  const dailyTableBody = document.getElementById("dailyTableBody");
+  const dailyTotalATC = document.getElementById("dailyTotalATC");
+  const dailyTotalATD = document.getElementById("dailyTotalATD");
+  const dailyDaysActiveText = document.getElementById("dailyDaysActiveText");
+  const dailyTotalBadge = document.getElementById("dailyTotalBadge");
 
   // Mostrar datos del usuario en la interfaz
   navUserName.textContent = currentUser.nombre ? currentUser.nombre.split(" ")[0] : "Personal";
@@ -256,9 +272,205 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  function updateDailyControlState() {
+    if (!toggleDailyReport) return;
+    if (selectedMonths.length === 1) {
+      const mKey = selectedMonths[0];
+      const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
+      const hasDailyData = userDailyData && userDailyData[mKey] && userDailyData[mKey].dias;
+
+      toggleDailyReport.disabled = false;
+      // Activación automática cuando se selecciona un único mes
+      toggleDailyReport.checked = true;
+      isDailyModeActive = true;
+
+      if (hasDailyData) {
+        if (dailyAvailabilityBadge) {
+          dailyAvailabilityBadge.className = "badge bg-success-subtle text-success small";
+          dailyAvailabilityBadge.textContent = `Disponible para ${mKey}`;
+        }
+        if (dailyReportHelpText) {
+          dailyReportHelpText.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i> Desglose día por día activado automáticamente para <strong>${monthObj.label}</strong>.`;
+        }
+      } else {
+        if (dailyAvailabilityBadge) {
+          dailyAvailabilityBadge.className = "badge bg-secondary-subtle text-secondary small";
+          dailyAvailabilityBadge.textContent = `Consolidado ${mKey}`;
+        }
+        if (dailyReportHelpText) {
+          dailyReportHelpText.innerHTML = `<i class="bi bi-info-circle me-1"></i> Para ${monthObj.label} los registros están en formato consolidado mensual.`;
+        }
+      }
+    } else {
+      toggleDailyReport.checked = false;
+      toggleDailyReport.disabled = true;
+      isDailyModeActive = false;
+      if (dailyAvailabilityBadge) {
+        dailyAvailabilityBadge.className = "badge bg-secondary-subtle text-secondary small";
+        dailyAvailabilityBadge.textContent = "Selecciona 1 mes";
+      }
+      if (dailyReportHelpText) {
+        dailyReportHelpText.innerHTML = `<i class="bi bi-info-circle me-1"></i> Disponible al seleccionar un único mes para ver su producción detallada día por día.`;
+      }
+      if (dailyDetailSection) dailyDetailSection.classList.add("d-none");
+    }
+  }
+
+  function updateDailyView() {
+    if (!dailyDetailSection) return;
+    if (!isDailyModeActive || selectedMonths.length !== 1) {
+      dailyDetailSection.classList.add("d-none");
+      return;
+    }
+
+    const mKey = selectedMonths[0];
+    const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
+    if (dailySectionTitle) {
+      dailySectionTitle.textContent = `Desglose Diario de Producción — Mes: ${monthObj.label.toUpperCase()} ${CONFIG.ANIO}`;
+    }
+
+    const monthData = userDailyData && userDailyData[mKey];
+    if (dailyTableBody) dailyTableBody.innerHTML = "";
+
+    if (!monthData || !monthData.dias) {
+      if (dailyTableBody) {
+        dailyTableBody.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+              <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+              No se encontraron registros de producción día a día para <strong>${monthObj.label}</strong> en la base de datos.<br>
+              <span class="small">Este mes se encuentra consolidado a nivel mensual en las tablas inferiores.</span>
+            </td>
+          </tr>
+        `;
+      }
+      if (dailyTotalATC) dailyTotalATC.textContent = "0";
+      if (dailyTotalATD) dailyTotalATD.textContent = "0";
+      if (dailyDaysActiveText) dailyDaysActiveText.textContent = "0 días laborados";
+      if (dailyTotalBadge) dailyTotalBadge.textContent = "0 días con actividad";
+      dailyDetailSection.classList.remove("d-none");
+      return;
+    }
+
+    const dias = monthData.dias;
+    let daysWithActivity = 0;
+    let sumATC = 0;
+    let sumATD = 0;
+
+    const maxATC = Math.max(...Object.values(dias).map(d => Number(d.atc) || 0), 1);
+
+    for (let d = 1; d <= 31; d++) {
+      const dTag = (d < 10 ? "0" : "") + d;
+      const dInfo = dias[dTag] || { atc: 0, atd: 0 };
+      const atc = Number(dInfo.atc) || 0;
+      const atd = Number(dInfo.atd) || 0;
+      const hasActivity = atc > 0 || atd > 0;
+
+      if (hasActivity) {
+        daysWithActivity++;
+        sumATC += atc;
+        sumATD += atd;
+      }
+
+      const citas = Number(dInfo.citas) || 0;
+      const triajes = Number(dInfo.triajes) || 0;
+      const hisAtc = Math.max(0, atc - citas - triajes);
+
+      let detailBadges = [];
+      if (hisAtc > 0) {
+        detailBadges.push(`<span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1" title="Atenciones médicas / asistenciales del sistema HIS">${hisAtc} HIS</span>`);
+      }
+      if (triajes > 0) {
+        detailBadges.push(`<span class="badge bg-success-subtle text-success border border-success-subtle me-1" title="Triajes de enfermería registrados en SIHCE">${triajes} triajes</span>`);
+      }
+      if (citas > 0) {
+        detailBadges.push(`<span class="badge bg-info-subtle text-info border border-info-subtle me-1" title="Citas reservadas registradas en SIHCE Admisión">${citas} citas</span>`);
+      }
+
+      let detailLabel = "";
+      if (detailBadges.length > 0) {
+        detailLabel = detailBadges.join("");
+      } else if (hasActivity) {
+        detailLabel = `<span class="text-muted small">${atc} pac.</span>`;
+      } else {
+        detailLabel = `<span class="text-muted opacity-50 small">Sin activ.</span>`;
+      }
+
+      const percent = Math.min(100, Math.round((atc / maxATC) * 100));
+
+      const tr = document.createElement("tr");
+      if (hasActivity) {
+        tr.style.backgroundColor = "rgba(59, 130, 246, 0.04)";
+      }
+
+      tr.innerHTML = `
+        <td class="text-center">
+          <span class="daily-day-badge ${hasActivity ? 'daily-day-active' : ''}">${dTag}</span>
+        </td>
+        <td class="text-center fw-bold ${atc > 0 ? 'text-primary' : 'text-muted'}">${atc > 0 ? atc.toLocaleString() : '-'}</td>
+        <td class="text-center fw-bold ${atd > 0 ? 'text-success' : 'text-muted'}">${atd > 0 ? atd.toLocaleString() : '-'}</td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div class="daily-bar-container flex-grow-1">
+              <div class="daily-bar-fill" style="width: ${percent}%;"></div>
+            </div>
+            <span class="small d-flex flex-wrap align-items-center" style="min-width: 140px;">
+              ${detailLabel}
+            </span>
+          </div>
+        </td>
+      `;
+      if (dailyTableBody) dailyTableBody.appendChild(tr);
+    }
+
+    let sumTriajesMonth = 0;
+    let sumCitasMonth = 0;
+    Object.values(dias).forEach(d => {
+      sumTriajesMonth += Number(d.triajes) || 0;
+      sumCitasMonth += Number(d.citas) || 0;
+    });
+    const finalMonthAtc = monthData.total_atc || sumATC;
+    const sumHisMonth = Math.max(0, finalMonthAtc - sumTriajesMonth - sumCitasMonth);
+
+    let pillsSummary = [];
+    if (sumHisMonth > 0) {
+      pillsSummary.push(`<span class="badge bg-primary-subtle text-primary border border-primary-subtle">${sumHisMonth.toLocaleString()} HIS</span>`);
+    }
+    if (sumTriajesMonth > 0) {
+      pillsSummary.push(`<span class="badge bg-success-subtle text-success border border-success-subtle">${sumTriajesMonth.toLocaleString()} Triajes Enf.</span>`);
+    }
+    if (sumCitasMonth > 0) {
+      pillsSummary.push(`<span class="badge bg-info-subtle text-info border border-info-subtle">${sumCitasMonth.toLocaleString()} Citas Admisión</span>`);
+    }
+
+    if (dailyTotalATC) dailyTotalATC.textContent = finalMonthAtc.toLocaleString();
+    if (dailyTotalATD) dailyTotalATD.textContent = (monthData.total_atd || sumATD).toLocaleString();
+    if (dailyDaysActiveText) {
+      if (pillsSummary.length > 1) {
+        dailyDaysActiveText.innerHTML = `<span class="me-2">${daysWithActivity} de 31 días con actividad</span> <span class="d-inline-flex flex-wrap gap-1 align-items-center">(${pillsSummary.join(" + ")})</span>`;
+      } else {
+        dailyDaysActiveText.textContent = `${daysWithActivity} de 31 días con actividad asistencial`;
+      }
+    }
+    if (dailyTotalBadge) dailyTotalBadge.textContent = `${daysWithActivity} días con actividad`;
+
+    dailyDetailSection.classList.remove("d-none");
+  }
+
+  if (toggleDailyReport) {
+    toggleDailyReport.addEventListener("change", (e) => {
+      isDailyModeActive = e.target.checked;
+      updateDailyView();
+      const activeAtd = getActiveAtdDataset();
+      renderOrUpdateChart(activeAtd);
+    });
+  }
+
   function onSelectionChange() {
     selectedCountBadge.textContent = `${selectedMonths.length} seleccionados`;
+    updateDailyControlState();
     updateTablesAndKPIs();
+    updateDailyView();
   }
 
   selectAllMonthsBtn.addEventListener("click", () => {
@@ -341,12 +553,69 @@ document.addEventListener("DOMContentLoaded", async () => {
     let totalATD = 0;
     let totalAPP = 0;
 
+    let sumPeriodTriajes = 0;
+    let sumPeriodCitas = 0;
+    let sumPeriodHis = 0;
+
+    selectedMonths.forEach(mKey => {
+      const mDaily = userDailyData && userDailyData[mKey];
+      if (mDaily) {
+        sumPeriodTriajes += Number(mDaily.total_triajes) || 0;
+        sumPeriodCitas += Number(mDaily.total_citas) || 0;
+      }
+    });
+    const hasAnySihce = (sumPeriodTriajes > 0 || sumPeriodCitas > 0);
+
     // 1. Tabla ATD / ATC
     atdTableBody.innerHTML = "";
+    if (atdTableHead) {
+      if (hasAnySihce) {
+        atdTableHead.innerHTML = `
+          <tr>
+            <th>Mes</th>
+            <th class="text-center"><span class="badge bg-primary-subtle text-primary border border-primary-subtle">Atenciones HIS</span></th>
+            <th class="text-center"><span class="badge bg-success-subtle text-success border border-success-subtle">Triajes (SIHCE)</span></th>
+            <th class="text-center"><span class="badge bg-info-subtle text-info border border-info-subtle">Citas Adm. (SIHCE)</span></th>
+            <th class="text-center">Total ATC</th>
+            <th class="text-center">Atendidos (ATD)</th>
+          </tr>
+        `;
+      } else {
+        atdTableHead.innerHTML = `
+          <tr>
+            <th>Mes</th>
+            <th class="text-center">Atenciones (ATC)</th>
+            <th class="text-center">Atendidos (ATD)</th>
+          </tr>
+        `;
+      }
+    }
+
     if (selectedMonths.length === 0) {
-      atdTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">Selecciona al menos un mes</td></tr>`;
-      atdTableTotalATC.textContent = "0";
-      atdTableTotalATD.textContent = "0";
+      const colSpan = hasAnySihce ? 6 : 3;
+      atdTableBody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center text-muted py-3">Selecciona al menos un mes</td></tr>`;
+      if (atdTableFoot) {
+        if (hasAnySihce) {
+          atdTableFoot.innerHTML = `
+            <tr>
+              <td>Total Seleccionado</td>
+              <td class="text-center">0</td>
+              <td class="text-center">0</td>
+              <td class="text-center">0</td>
+              <td class="text-center">0</td>
+              <td class="text-center">0</td>
+            </tr>
+          `;
+        } else {
+          atdTableFoot.innerHTML = `
+            <tr>
+              <td>Total Seleccionado</td>
+              <td id="atdTableTotalATC" class="text-center">0</td>
+              <td id="atdTableTotalATD" class="text-center">0</td>
+            </tr>
+          `;
+        }
+      }
     } else {
       selectedMonths.forEach((mKey) => {
         const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
@@ -357,16 +626,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         totalATD += atd;
 
         const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${monthObj.label}</strong></td>
-          <td class="text-center fw-semibold text-main">${atc.toLocaleString()}</td>
-          <td class="text-center fw-semibold text-main">${atd.toLocaleString()}</td>
-        `;
+        if (hasAnySihce) {
+          const mDaily = userDailyData && userDailyData[mKey];
+          const mTriajes = mDaily ? (Number(mDaily.total_triajes) || 0) : 0;
+          const mCitas = mDaily ? (Number(mDaily.total_citas) || 0) : 0;
+          const mHis = Math.max(0, atc - mTriajes - mCitas);
+          sumPeriodHis += mHis;
+
+          tr.innerHTML = `
+            <td><strong>${monthObj.label}</strong></td>
+            <td class="text-center fw-semibold text-primary">${mHis > 0 ? mHis.toLocaleString() : '-'}</td>
+            <td class="text-center fw-semibold text-success">${mTriajes > 0 ? mTriajes.toLocaleString() : '-'}</td>
+            <td class="text-center fw-semibold text-info">${mCitas > 0 ? mCitas.toLocaleString() : '-'}</td>
+            <td class="text-center fw-bold text-main">${atc.toLocaleString()}</td>
+            <td class="text-center fw-semibold text-main">${atd.toLocaleString()}</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td><strong>${monthObj.label}</strong></td>
+            <td class="text-center fw-semibold text-main">${atc.toLocaleString()}</td>
+            <td class="text-center fw-semibold text-main">${atd.toLocaleString()}</td>
+          `;
+        }
         atdTableBody.appendChild(tr);
       });
 
-      atdTableTotalATC.textContent = totalATC.toLocaleString();
-      atdTableTotalATD.textContent = totalATD.toLocaleString();
+      if (atdTableFoot) {
+        if (hasAnySihce) {
+          atdTableFoot.innerHTML = `
+            <tr>
+              <td><strong>Total Seleccionado</strong></td>
+              <td class="text-center fw-bold text-primary">${sumPeriodHis.toLocaleString()}</td>
+              <td class="text-center fw-bold text-success">${sumPeriodTriajes.toLocaleString()}</td>
+              <td class="text-center fw-bold text-info">${sumPeriodCitas.toLocaleString()}</td>
+              <td class="text-center fw-bold text-main">${totalATC.toLocaleString()}</td>
+              <td class="text-center fw-bold text-main">${totalATD.toLocaleString()}</td>
+            </tr>
+          `;
+        } else {
+          atdTableFoot.innerHTML = `
+            <tr>
+              <td>Total Seleccionado</td>
+              <td id="atdTableTotalATC" class="text-center">${totalATC.toLocaleString()}</td>
+              <td id="atdTableTotalATD" class="text-center">${totalATD.toLocaleString()}</td>
+            </tr>
+          `;
+        }
+      }
     }
 
     // 2. Tabla APP
@@ -410,22 +716,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     const gridColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
     const textColor = isDark ? "#94a3b8" : "#64748b";
 
-    const labels = [];
-    const atcData = [];
-    const atdData = [];
+    let labels = [];
+    let atcData = [];
+    let atdData = [];
 
-    selectedMonths.forEach((mKey) => {
-      const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
-      labels.push(monthObj.label);
-      const mData = (activeAtd && activeAtd.meses && activeAtd.meses[mKey]) || { atc: 0, atd: 0 };
-      atcData.push(Number(mData.atc) || 0);
-      atdData.push(Number(mData.atd) || 0);
-    });
+    // Modo Diario si está activo para 1 mes
+    if (isDailyModeActive && selectedMonths.length === 1) {
+      const mKey = selectedMonths[0];
+      const mDaily = userDailyData && userDailyData[mKey];
+      if (mDaily && mDaily.dias) {
+        for (let d = 1; d <= 31; d++) {
+          const dTag = (d < 10 ? "0" : "") + d;
+          labels.push(`D${dTag}`);
+          atcData.push(mDaily.dias[dTag]?.atc || 0);
+          atdData.push(mDaily.dias[dTag]?.atd || 0);
+        }
+      }
+    }
+
+    // Modo Mensual Estándar
+    if (labels.length === 0) {
+      selectedMonths.forEach((mKey) => {
+        const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
+        labels.push(monthObj.label);
+        const mData = (activeAtd && activeAtd.meses && activeAtd.meses[mKey]) || { atc: 0, atd: 0 };
+        atcData.push(Number(mData.atc) || 0);
+        atdData.push(Number(mData.atd) || 0);
+      });
+    }
 
     if (productionChart) {
       productionChart.data.labels = labels;
       productionChart.data.datasets[0].data = atcData;
       productionChart.data.datasets[1].data = atdData;
+      productionChart.data.datasets[0].label = isDailyModeActive ? "Atenciones Diarias (ATC)" : "Atenciones (ATC)";
+      productionChart.data.datasets[1].label = isDailyModeActive ? "Atendidos Diarios (ATD)" : "Atendidos (ATD)";
       if (productionChart.options.scales.x) {
         productionChart.options.scales.x.grid.color = gridColor;
         productionChart.options.scales.x.ticks.color = textColor;
@@ -528,16 +853,128 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
+  // Funciones de fusión para producción SIHCE (Admisión y Triaje)
+  function mergeDiarioWithSihce(baseDiario, localDaily) {
+    if (!localDaily) return baseDiario;
+    if (!baseDiario) return localDaily;
+
+    const merged = JSON.parse(JSON.stringify(baseDiario));
+    Object.keys(localDaily).forEach(mKey => {
+      const lMonth = localDaily[mKey];
+      if (!merged[mKey]) {
+        merged[mKey] = JSON.parse(JSON.stringify(lMonth));
+        return;
+      }
+
+      const mMonth = merged[mKey];
+      mMonth.total_triajes = lMonth.total_triajes || 0;
+      mMonth.total_citas = lMonth.total_citas || 0;
+
+      if (lMonth.dias) {
+        if (!mMonth.dias) mMonth.dias = {};
+        let calcAtc = 0;
+        let calcAtd = 0;
+
+        for (let d = 1; d <= 31; d++) {
+          const dStr = (d < 10 ? "0" : "") + d;
+          const lDay = lMonth.dias[dStr] || { atc: 0, atd: 0, citas: 0, triajes: 0 };
+          const mDay = mMonth.dias[dStr] || { atc: 0, atd: 0 };
+
+          const cVal = Number(lDay.citas) || 0;
+          const tVal = Number(lDay.triajes) || 0;
+          const lAtc = Number(lDay.atc) || 0;
+          const mAtc = Number(mDay.atc) || 0;
+          const mAtd = Number(mDay.atd) || 0;
+          const lAtd = Number(lDay.atd) || 0;
+
+          let finalAtc = Math.max(mAtc, lAtc);
+          if (cVal + tVal > 0 && finalAtc < (cVal + tVal)) {
+            finalAtc = mAtc + cVal + tVal;
+          }
+
+          mMonth.dias[dStr] = {
+            atc: finalAtc,
+            atd: Math.max(mAtd, lAtd),
+            citas: cVal,
+            triajes: tVal
+          };
+          calcAtc += finalAtc;
+          calcAtd += Math.max(mAtd, lAtd);
+        }
+
+        mMonth.total_atc = Math.max(calcAtc, Number(lMonth.total_atc) || 0);
+        mMonth.total_atd = Math.max(calcAtd, Number(lMonth.total_atd) || 0);
+      }
+    });
+
+    return merged;
+  }
+
+  function mergeAtdWithSihce(baseAtd, localAtd, dailyData) {
+    if (!localAtd && !dailyData) return baseAtd;
+    if (!baseAtd) return localAtd;
+
+    const merged = JSON.parse(JSON.stringify(baseAtd));
+    CONFIG.MESES.forEach(m => {
+      const mKey = m.key;
+      const dMonthAtc = dailyData?.[mKey]?.total_atc || 0;
+      const lMonthAtc = localAtd?.consolidado?.meses?.[mKey]?.atc || 0;
+      const targetAtc = Math.max(dMonthAtc, lMonthAtc);
+
+      if (merged.consolidado?.meses?.[mKey]) {
+        const curAtc = Number(merged.consolidado.meses[mKey].atc) || 0;
+        if (targetAtc > curAtc) {
+          merged.consolidado.meses[mKey].atc = targetAtc;
+          const pEst = merged.establecimiento_principal;
+          if (pEst && merged.por_establecimiento?.[pEst]?.meses?.[mKey]) {
+            merged.por_establecimiento[pEst].meses[mKey].atc = targetAtc;
+          }
+        }
+      }
+    });
+
+    if (merged.consolidado?.meses) {
+      let sumTot = 0;
+      CONFIG.MESES.forEach(m => {
+        sumTot += Number(merged.consolidado.meses[m.key]?.atc) || 0;
+      });
+      merged.consolidado.total_atc = sumTot;
+
+      const pEst = merged.establecimiento_principal;
+      if (pEst && merged.por_establecimiento?.[pEst]) {
+        merged.por_establecimiento[pEst].total_atc = sumTot;
+      }
+    }
+
+    return merged;
+  }
+
   // 2. Cargar datos del usuario desde la API con barra de progreso
   try {
-    setSyncProgress(35, "Consultando base de datos oficial (Google Sheets / HIS)...");
-    const res = await Api.callAppsScript("getData", { dni: currentUser.dni });
+    setSyncProgress(25, "Consultando base de datos oficial (Google Sheets / HIS)...");
+    
+    // Cargar datos locales de demo / respaldo / override primero
+    const localDemo = await Api.loadDemoData();
+    const localDailyMatch = Api.findInMapByDni(currentUser.dni, localDemo?.diario);
+    const localAtdMatch = Api.findInMapByDni(currentUser.dni, localDemo?.atd_atc);
+    const localAppMatch = Api.findInMapByDni(currentUser.dni, localDemo?.app);
 
-    setSyncProgress(70, "Sincronizando atenciones (ATC / ATD) y actividades (APP)...");
+    const localDaily = localDailyMatch?.data || null;
+    const localAtd = localAtdMatch?.data || null;
+    const localApp = localAppMatch?.data || null;
 
-    if (res.success) {
-      userAtdData = res.atd_atc;
-      userAppData = res.app;
+    setSyncProgress(55, "Sincronizando atenciones (ATC / ATD) y actividades (APP)...");
+    let res = null;
+    try {
+      res = await Api.callAppsScript("getData", { dni: currentUser.dni });
+    } catch (e) {
+      console.warn("Apps Script no disponible o en modo local:", e);
+    }
+
+    if (res && res.success) {
+      userDailyData = mergeDiarioWithSihce(res.diario, localDaily);
+      userAtdData = mergeAtdWithSihce(res.atd_atc, localAtd, userDailyData);
+      userAppData = res.app || localApp;
 
       // Si tiene establecimiento principal detectado
       if (userAtdData && userAtdData.establecimiento_principal) {
@@ -550,6 +987,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         userMicroRedDisplay.textContent = currentUser.microred;
       }
       Auth.setSession(currentUser);
+    } else {
+      userDailyData = localDaily;
+      userAtdData = localAtd;
+      userAppData = localApp;
+
+      if (userAtdData && userAtdData.establecimiento_principal) {
+        currentUser.establecimiento = userAtdData.establecimiento_principal;
+        userEstabDisplay.textContent = currentUser.establecimiento;
+      }
+      if (userAppData && userAppData.microred && !currentUser.microred) {
+        currentUser.microred = userAppData.microred;
+        userMicroRedDisplay.textContent = currentUser.microred;
+      }
     }
   } catch (err) {
     console.error("Error al cargar datos:", err);
@@ -591,22 +1041,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       // Registrar log de auditoría
       const estabLabel = selectedEstab === "ALL" ? "Consolidado Red Cusco Sur" : selectedEstab;
+      const isDailySingleMonth = isDailyModeActive && selectedMonths.length === 1;
+      const logTipo = isDailySingleMonth 
+        ? (selectedEstab === "ALL" ? "PDF_DIARIO_CONSOLIDADO" : "PDF_DIARIO_IPRESS")
+        : (selectedEstab === "ALL" ? "PDF_CONSOLIDADO" : "PDF_IPRESS");
+
       Api.callAppsScript("logDownload", {
         dni: currentUser.dni,
         personal: currentUser.nombre,
         establecimiento: estabLabel,
-        meses: selectedMonths.join(","),
-        tipo: selectedEstab === "ALL" ? "PDF_CONSOLIDADO" : "PDF_IPRESS"
+        meses: selectedMonths.join(",") + (isDailySingleMonth ? " (Desglose Diario)" : ""),
+        tipo: logTipo
       });
 
-      // Generar PDF Profesional con desglose multi-establecimiento
+      // Generar PDF Profesional con opción de desglose diario
       await PdfGenerator.generate(
         currentUser,
         selectedMonths,
         activeAtd,
         activeApp,
         userAtdData,
-        selectedEstab
+        selectedEstab,
+        userDailyData,
+        isDailySingleMonth
       );
     } catch (err) {
       alert("Hubo un inconveniente al generar el PDF: " + err.message);

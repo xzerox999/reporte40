@@ -187,10 +187,12 @@ const Api = {
       case "getData": {
         const atdMatch = this.findInMapByDni(dni, data.atd_atc);
         const appMatch = this.findInMapByDni(dni, data.app);
+        const diarioMatch = data.diario ? this.findInMapByDni(dni, data.diario) : null;
         return {
           success: true,
           atd_atc: atdMatch ? atdMatch.data : null,
-          app: appMatch ? appMatch.data : null
+          app: appMatch ? appMatch.data : null,
+          diario: diarioMatch ? diarioMatch.data : null
         };
       }
 

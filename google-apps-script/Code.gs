@@ -23,6 +23,7 @@ const DEFAULT_CONFIG = {
   SHEET_USERS: "USUARIOS",
   SHEET_ATD_ATC: "DATA_ATD_ATC",
   SHEET_APP: "DATA_APP",
+  SHEET_DIARIO: "DATA_DIARIO",
   SHEET_LOGS: "LOG_DESCARGAS",
   SHEET_CONFIG: "CONFIG",
   ADMIN_DEFAULT_DNI: "46638223"
@@ -442,10 +443,43 @@ function apiGetData(dni) {
     }
   }
 
+  // 3. Obtener Datos Diarios (si la hoja DATA_DIARIO existe)
+  let diarioData = {};
+  const diarioSheetName = getSheetName("hoja_diario", DEFAULT_CONFIG.SHEET_DIARIO);
+  const diarioSheet = ss.getSheetByName(diarioSheetName);
+
+  if (diarioSheet) {
+    const dRows = diarioSheet.getDataRange().getValues();
+    // dRows: [mes, dni, personal, d01_atc, d01_atd, ..., d31_atc, d31_atd, total_atc, total_atd]
+    for (let i = 1; i < dRows.length; i++) {
+      if (matchesDni(dRows[i][1], cleanDni)) {
+        const r = dRows[i];
+        const mKey = String(r[0]).trim().toUpperCase();
+        const diasObj = {};
+        for (let d = 1; d <= 31; d++) {
+          const dStr = (d < 10 ? "0" : "") + d;
+          const atcIdx = 3 + (d - 1) * 2;
+          const atdIdx = atcIdx + 1;
+          diasObj[dStr] = {
+            atc: Number(r[atcIdx]) || 0,
+            atd: Number(r[atdIdx]) || 0
+          };
+        }
+        diarioData[mKey] = {
+          mes: mKey,
+          dias: diasObj,
+          total_atc: Number(r[65]) || 0,
+          total_atd: Number(r[66]) || 0
+        };
+      }
+    }
+  }
+
   return {
     success: true,
     atd_atc: atdData,
-    app: appData
+    app: appData,
+    diario: Object.keys(diarioData).length > 0 ? diarioData : null
   };
 }
 
@@ -609,7 +643,7 @@ function checkAdminRole(dni) {
 
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim() === cleanDni && String(data[i][3]).toLowerCase() === "admin") {
+    if (matchesDni(data[i][0], cleanDni) && String(data[i][3]).toLowerCase() === "admin") {
       return true;
     }
   }

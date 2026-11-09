@@ -238,7 +238,11 @@
           <div id="excelAlert" class="alert d-none py-2 px-3 small mb-3" role="alert"></div>
 
           <p class="text-muted small mb-3">
-            Sube el archivo Excel mensual del Reporte 40 (por ejemplo <code>REPORTE 40 2026.xlsx</code>). El sistema extraerá automáticamente las pestañas <strong>ipress personal x mes</strong> (ATD/ATC) y <strong>v_reporte40_APP</strong> (APP), consolidará al personal con múltiples establecimientos y actualizará la base de datos de consulta.
+            Sube el archivo Excel que deseas actualizar o incorporar a la base de datos:
+            <br>• <strong>Reporte 40 HIS General</strong> (<code>REPORTE 40 2026.xlsx</code>) — Atenciones médicas y actividades de promoción APP.
+            <br>• <strong>SIHCE Admisión</strong> (<code>citas_reservadas_*.xlsx</code>) — Citas agendadas por el personal de ventanilla / admisión.
+            <br>• <strong>SIHCE Triaje</strong> (<code>Reporte_Triajes_*.xlsx</code>) — Evaluaciones de triaje realizadas por el personal de enfermería.
+            <br>El sistema <strong>detectará automáticamente el tipo de archivo</strong> y te mostrará un resumen previo antes de aplicar los cambios.
           </p>
 
           <!-- Zona Drag & Drop -->
@@ -247,7 +251,7 @@
               <i class="bi bi-file-earmark-excel"></i>
             </div>
             <h3 class="h6 fw-bold text-main mb-1">Arrastra y suelta tu archivo Excel aquí</h3>
-            <p class="text-muted small mb-3">o haz clic para buscarlo en tu equipo (.xlsx, .xls)</p>
+            <p class="text-muted small mb-3">Reporte 40, Citas Reservadas o Triajes (.xlsx, .xls)</p>
             <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="d-none">
             <button type="button" class="btn btn-sm btn-primary-custom" onclick="document.getElementById('excelFileInput').click()">
               <i class="bi bi-folder2-open me-1"></i> Seleccionar Archivo
@@ -264,7 +268,7 @@
                   <span id="previewFileSize" class="text-muted small">0 KB</span>
                 </div>
               </div>
-              <span id="previewSheetsBadge" class="badge-custom badge-success">Pestañas validadas</span>
+              <span id="previewSheetsBadge" class="badge-custom badge-success">Archivo Validado</span>
             </div>
 
             <!-- Resumen de Datos Extraídos -->
@@ -272,27 +276,31 @@
               <div class="col-sm-3 col-6">
                 <div class="p-2 rounded bg-body border">
                   <div id="previewAtdCount" class="fw-bold fs-5 text-primary">0</div>
-                  <div class="text-muted small" style="font-size: 0.78rem;">Registros ATD/ATC</div>
+                  <div id="previewAtdLabel" class="text-muted small" style="font-size: 0.78rem;">Registros ATD/ATC</div>
                 </div>
               </div>
               <div class="col-sm-3 col-6">
                 <div class="p-2 rounded bg-body border">
                   <div id="previewAppCount" class="fw-bold fs-5 text-indigo">0</div>
-                  <div class="text-muted small" style="font-size: 0.78rem;">Registros APP</div>
+                  <div id="previewAppLabel" class="text-muted small" style="font-size: 0.78rem;">Registros APP</div>
                 </div>
               </div>
               <div class="col-sm-3 col-6">
                 <div class="p-2 rounded bg-body border">
                   <div id="previewUsersCount" class="fw-bold fs-5 text-success">0</div>
-                  <div class="text-muted small" style="font-size: 0.78rem;">Personal Único</div>
+                  <div id="previewUsersLabel" class="text-muted small" style="font-size: 0.78rem;">Personal Único</div>
                 </div>
               </div>
               <div class="col-sm-3 col-6">
                 <div class="p-2 rounded bg-body border">
                   <div id="previewMonthsCount" class="fw-bold fs-5 text-warning">0</div>
-                  <div class="text-muted small" style="font-size: 0.78rem;">Meses Detectados</div>
+                  <div id="previewMonthsLabel" class="text-muted small" style="font-size: 0.78rem;">Meses Detectados</div>
                 </div>
               </div>
+            </div>
+
+            <!-- Lista de Vista Previa del Personal Detectado -->
+            <div id="previewDetailList" class="p-2 rounded mb-3 small d-none" style="background-color: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); max-height: 180px; overflow-y: auto;">
             </div>
 
             <div class="d-flex flex-wrap gap-2 justify-content-end">

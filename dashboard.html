@@ -205,7 +205,25 @@
       </div>
       <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
         <span><i class="bi bi-info-circle me-1"></i> Selecciona uno o varios meses para ver tus estadísticas y generar tu PDF.</span>
-        <span id="selectedCountBadge" class="badge bg-primary">11 seleccionados</span>
+        <span id="selectedCountBadge" class="badge bg-primary">0 seleccionados</span>
+      </div>
+
+      <!-- Control de Modo Reporte / Desglose por Días -->
+      <div id="dailyReportControlCard" class="mt-3 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-3" style="border-color: var(--border-color) !important;">
+        <div class="d-flex align-items-center gap-2">
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="toggleDailyReport" disabled>
+            <label class="form-check-label fw-bold text-main small" for="toggleDailyReport">
+              <i class="bi bi-calendar-check text-primary me-1"></i> Reporte por Días (Desglose Diario 01 al 31)
+            </label>
+          </div>
+          <span id="dailyAvailabilityBadge" class="badge bg-secondary-subtle text-secondary small">
+            Selecciona 1 mes
+          </span>
+        </div>
+        <div class="small text-muted" id="dailyReportHelpText">
+          <i class="bi bi-info-circle me-1"></i> Disponible al seleccionar un único mes para ver su producción detallada día por día.
+        </div>
       </div>
     </div>
 
@@ -269,6 +287,47 @@
       </div>
     </div>
 
+    <!-- Sección de Desglose Diario (Visible cuando toggleDailyReport está activo) -->
+    <div id="dailyDetailSection" class="app-card mb-4 fade-in d-none">
+      <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-calendar2-range text-primary fs-5"></i>
+          <div>
+            <h4 class="h6 fw-bold mb-0 text-main" id="dailySectionTitle">Desglose Diario de Producción</h4>
+            <small class="text-muted">Registro detallado día a día del 01 al 31 (Atenciones ATC y Atendidos ATD)</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary-subtle text-primary fw-semibold" id="dailyTotalBadge">0 días con actividad</span>
+        </div>
+      </div>
+      
+      <!-- Tabla diaria con scroll suave -->
+      <div class="table-responsive-wrapper" style="max-height: 480px; overflow-y: auto;">
+        <table class="custom-table table-sm daily-matrix-table" id="dailyTable">
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 90px;">Día</th>
+              <th class="text-center">Atenciones (ATC)</th>
+              <th class="text-center">Atendidos (ATD)</th>
+              <th>Actividad Diaria</th>
+            </tr>
+          </thead>
+          <tbody id="dailyTableBody">
+            <!-- Filas dinámicas de los 31 días -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="text-center fw-bold">TOTAL MES</td>
+              <td id="dailyTotalATC" class="text-center fw-bold text-primary">0</td>
+              <td id="dailyTotalATD" class="text-center fw-bold text-success">0</td>
+              <td id="dailyDaysActiveText" class="small text-muted">-</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
     <!-- Tablas de Detalle por Mes -->
     <div class="row g-4 mb-4">
       <!-- Tabla 1: ATD / ATC -->
@@ -280,8 +339,8 @@
             </h4>
           </div>
           <div class="table-responsive-wrapper">
-            <table class="custom-table">
-              <thead>
+            <table class="custom-table" id="atdTable">
+              <thead id="atdTableHead">
                 <tr>
                   <th>Mes</th>
                   <th class="text-center">Atenciones (ATC)</th>
@@ -291,7 +350,7 @@
               <tbody id="atdTableBody">
                 <!-- Filas dinámicas -->
               </tbody>
-              <tfoot>
+              <tfoot id="atdTableFoot">
                 <tr>
                   <td>Total Seleccionado</td>
                   <td id="atdTableTotalATC" class="text-center">-</td>
@@ -403,7 +462,10 @@
                 Al iniciar tu sesión, <strong>todos los botones de meses aparecen desactivados por defecto</strong>. Esta medida de seguridad evita imprimir por error todos los meses juntos cuando únicamente requieres presentar el informe de un mes específico.
               </p>
               <div class="manual-tip-box mt-2 small">
-                <i class="bi bi-cursor-fill text-primary me-1"></i> <strong>¿Cómo usarlo?</strong> Haz clic sobre el mes que deseas (por ejemplo, <code>JUL</code> o <code>NOV</code>). Si necesitas presentar un período acumulado o el año completo, puedes usar el botón superior <strong>"Todos"</strong>.
+                <i class="bi bi-cursor-fill text-primary me-1"></i> <strong>¿Cómo usarlo?</strong> Haz clic sobre el mes que deseas (por ejemplo, <code>JUL</code> o <code>OCT</code>). Si necesitas presentar un período acumulado o el año completo, puedes usar el botón superior <strong>"Todos"</strong>.
+              </div>
+              <div class="manual-tip-box mt-2 small">
+                <i class="bi bi-calendar2-range text-primary me-1"></i> <strong>Reporte por Días (Día a Día):</strong> Al seleccionar un único mes, se habilita el interruptor para consultar el desglose detallado del día 01 al 31 tanto en el panel interactivo como en el PDF oficial descargable.
               </div>
             </div>
           </div>
