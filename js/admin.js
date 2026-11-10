@@ -1402,23 +1402,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         // CASO B: Archivo Reporte 40 HIS General
+        // Conservar contraseñas previas existentes en DEMO_DATA / local
+        const prevUsers = (window.DEMO_DATA && window.DEMO_DATA.usuarios) || {};
+        Object.keys(parsedExcelData.usuarios).forEach(dni => {
+          if (prevUsers[dni] && prevUsers[dni].password_hash) {
+            parsedExcelData.usuarios[dni].password_hash = prevUsers[dni].password_hash;
+          }
+        });
+
         localStorage.setItem("DEMO_DATA_OVERRIDE", JSON.stringify(parsedExcelData));
         window.DEMO_DATA = parsedExcelData;
         Api._demoData = parsedExcelData;
 
-        // Intentar actualizar en backend si Apps Script está configurado
+        // Sincronizar catálogo de usuarios en Google Sheets (Hoja USUARIOS) sin sobreescribir contraseñas
+        let syncMsg = "";
         try {
-          await Api.callAppsScript("adminImportExcel", {
+          const syncRes = await Api.callAppsScript("adminSyncUsers", {
             adminDni: currentAdmin.dni,
-            usuariosCount: Object.keys(parsedExcelData.usuarios).length
+            users: Object.values(parsedExcelData.usuarios)
           });
-        } catch (e) {}
+          if (syncRes && syncRes.success && syncRes.message) {
+            syncMsg = " " + syncRes.message;
+          }
+        } catch (e) {
+          console.warn("No se pudo sincronizar usuarios con Google Sheets:", e);
+        }
 
         allUsers = Object.values(parsedExcelData.usuarios);
         updateKPIs();
         renderUsersTable(allUsers);
 
-        showExcelAlert("¡Base de datos actualizada con éxito! La nueva información ya está activa en todo el sistema para todos los trabajadores.", "success");
+        showExcelAlert("¡Base de datos actualizada con éxito!" + (syncMsg || " La nueva información ya está activa en todo el sistema para todos los trabajadores."), "success");
         excelPreviewCard.classList.add("d-none");
         if (excelFileInput) excelFileInput.value = "";
       } catch (err) {
@@ -1470,16 +1484,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   let estabsStatusMap = {};
   let allEstabsData = [];
 
+  function normalizeEstabsMap(raw) {
+    const res = {};
+    if (!raw || typeof raw !== "object") return res;
+    for (const [k, v] of Object.entries(raw)) {
+      if (k) {
+        res[k.trim().toUpperCase()] = !(v === false || v === "false" || v === 0 || v === "0");
+      }
+    }
+    return res;
+  }
+
+  function isEstabActiveInAdmin(name) {
+    if (!name) return true;
+    const clean = name.trim().toUpperCase();
+    return estabsStatusMap[clean] !== false;
+  }
+
   function loadEstabsStatus() {
     const saved = localStorage.getItem("reporte40_ipress_control");
     if (saved) {
       try {
-        estabsStatusMap = JSON.parse(saved);
+        estabsStatusMap = normalizeEstabsMap(JSON.parse(saved));
       } catch (e) {
         estabsStatusMap = {};
       }
     } else if (window.DEMO_DATA && window.DEMO_DATA.ipress_control) {
-      estabsStatusMap = { ...window.DEMO_DATA.ipress_control };
+      estabsStatusMap = normalizeEstabsMap(window.DEMO_DATA.ipress_control);
     }
   }
 
@@ -1534,7 +1565,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       microred: e.microred || "RED CUSCO SUR",
       personalCount: e.personalSet.size,
       totalATC: e.totalATC,
-      activo: estabsStatusMap[e.nombre] !== false
+      activo: isEstabActiveInAdmin(e.nombre)
     }));
 
     list.sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -1554,7 +1585,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function updateActiveBadge() {
       const total = allEstabsData.length;
-      const activeCount = allEstabsData.filter(e => estabsStatusMap[e.nombre] !== false).length;
+      const activeCount = allEstabsData.filter(e => isEstabActiveInAdmin(e.nombre)).length;
       if (estabsActiveBadge) {
         estabsActiveBadge.textContent = `${activeCount} de ${total} IPRESS Activas`;
         estabsActiveBadge.className = activeCount === total ? "badge-custom badge-success" : "badge-custom badge-warning";
@@ -1582,7 +1613,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       estabsTableBody.innerHTML = "";
       allEstabsData.forEach((est, idx) => {
-        const isActive = estabsStatusMap[est.nombre] !== false;
+        const isActive = isEstabActiveInAdmin(est.nombre);
         const tr = document.createElement("tr");
         tr.setAttribute("data-estab", est.nombre);
         tr.setAttribute("data-microred", est.microred);
@@ -1646,7 +1677,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         const res = await Api.callAppsScript("getIpressControl");
         if (res && res.success && res.ipress_control && Object.keys(res.ipress_control).length > 0) {
-          estabsStatusMap = res.ipress_control;
+          estabsStatusMap = normalizeEstabsMap(res.ipress_control);
           localStorage.setItem("reporte40_ipress_control", JSON.stringify(estabsStatusMap));
           if (window.DEMO_DATA) {
             window.DEMO_DATA.ipress_control = estabsStatusMap;
@@ -1674,7 +1705,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $(document).off("change", ".ipress-switch").on("change", ".ipress-switch", function () {
       const estabName = $(this).attr("data-estab");
       const isChecked = $(this).is(":checked");
-      estabsStatusMap[estabName] = isChecked;
+      estabsStatusMap[estabName.trim().toUpperCase()] = isChecked;
 
       const tr = $(this).closest("tr");
       const statusBadge = tr.find(".status-badge");
@@ -1697,7 +1728,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       allEstabsData.forEach(e => {
         if (e.microred === selectedMr) {
-          estabsStatusMap[e.nombre] = true;
+          estabsStatusMap[e.nombre.trim().toUpperCase()] = true;
         }
       });
       saveEstabsStatus(false);
@@ -1715,7 +1746,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!confirm(`¿Bloquear la producción de todos los establecimientos de la MicroRed ${selectedMr}?`)) return;
       allEstabsData.forEach(e => {
         if (e.microred === selectedMr) {
-          estabsStatusMap[e.nombre] = false;
+          estabsStatusMap[e.nombre.trim().toUpperCase()] = false;
         }
       });
       saveEstabsStatus(false);
@@ -1726,7 +1757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Botón Activar Todas
     $("#btnActivateAllEstabs").off("click").on("click", function () {
       allEstabsData.forEach(e => {
-        estabsStatusMap[e.nombre] = true;
+        estabsStatusMap[e.nombre.trim().toUpperCase()] = true;
       });
       saveEstabsStatus(true);
       renderTableAndDataTable();
@@ -1736,7 +1767,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#btnDeactivateAllEstabs").off("click").on("click", function () {
       if (!confirm("¿Deseas bloquear la producción de TODOS los 71 establecimientos? Los usuarios verán un aviso de conciliación.")) return;
       allEstabsData.forEach(e => {
-        estabsStatusMap[e.nombre] = false;
+        estabsStatusMap[e.nombre.trim().toUpperCase()] = false;
       });
       saveEstabsStatus(true);
       renderTableAndDataTable();
@@ -1757,6 +1788,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function saveEstabsStatus(showAlert = false) {
+      estabsStatusMap = normalizeEstabsMap(estabsStatusMap);
       localStorage.setItem("reporte40_ipress_control", JSON.stringify(estabsStatusMap));
       if (window.DEMO_DATA) {
         window.DEMO_DATA.ipress_control = estabsStatusMap;

@@ -6,7 +6,7 @@
  * =====================================================================
  */
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function initDashboard() {
   // 0. Funciones de barra de progreso de vinculación inicial
   const syncOverlay = document.getElementById("syncDatabaseOverlay");
   const syncProgressBar = document.getElementById("syncProgressBar");
@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const syncTitle = document.getElementById("syncTitle");
   const syncIconContainer = document.getElementById("syncIconContainer");
 
+  let isOverlayClosed = false;
   function setSyncProgress(percent, stepMessage, title = null) {
     if (syncProgressBar) syncProgressBar.style.width = percent + "%";
     if (syncPercentText) syncPercentText.textContent = percent + "%";
@@ -23,6 +24,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function finishSyncOverlay() {
+    if (isOverlayClosed) return;
+    isOverlayClosed = true;
+    clearTimeout(safetyOverlayTimer);
     setSyncProgress(100, "¡Sincronización completa con la Red Cusco Sur!", "¡Datos Vinculados Exitosamente!");
     if (syncIconContainer) {
       syncIconContainer.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
@@ -37,10 +41,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 450);
   }
 
+  // Seguro de tiempo máximo: si la red tarda, desbloquea la pantalla automáticamente en 4s
+  const safetyOverlayTimer = setTimeout(() => {
+    finishSyncOverlay();
+  }, 4000);
+
   setSyncProgress(15, "Verificando credenciales institucionales...");
 
   // 1. Validar autenticación
-  if (!Auth.requireAuth()) return;
+  if (!Auth.requireAuth()) {
+    finishSyncOverlay();
+    return;
+  }
 
   // Soporte para Modo Simulación de Auditor (Admin viendo como un personal específico)
   let currentUser = Auth.getCurrentUser();
@@ -1235,4 +1247,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       savePasswordBtn.textContent = "Guardar Nueva Contraseña";
     }
   });
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initDashboard);
+} else {
+  initDashboard();
+}

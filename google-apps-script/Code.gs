@@ -175,6 +175,10 @@ function handleRequest(e, params) {
         responseData = apiAdminSaveIpressControl(params.adminDni, params.ipressStatus);
         break;
 
+      case "adminSyncUsers":
+        responseData = apiAdminSyncUsers(params.adminDni, params.users);
+        break;
+
       default:
         responseData = { success: false, message: "Acción inválida: " + action };
     }
@@ -728,6 +732,96 @@ function apiAdminSaveIpressControl(adminDni, ipressStatus) {
   } catch (err) {
     return { success: false, message: "Error al guardar en CONFIG: " + err.toString() };
   }
+}
+
+/**
+ * 11. Sincronización inteligente de usuarios (Merge):
+ * Conserva intactas las contraseñas personalizadas que ya fueron cambiadas
+ * y solo registra al personal nuevo con su DNI como clave inicial.
+ */
+function apiAdminSyncUsers(adminDni, usersList) {
+  if (!checkAdminRole(adminDni)) {
+    return { success: false, message: "Acceso no autorizado para sincronizar usuarios." };
+  }
+  if (!usersList || !Array.isArray(usersList) || usersList.length === 0) {
+    return { success: false, message: "Lista de usuarios vacía o no válida." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetName = getSheetName("hoja_usuarios", DEFAULT_CONFIG.SHEET_USERS);
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    sheet.appendRow([
+      "dni", "nombre", "password_hash", "rol", 
+      "establecimiento", "microred", "colegio", 
+      "fecha_creacion", "ultimo_acceso"
+    ]);
+  }
+
+  const data = sheet.getDataRange().getValues();
+  // Mapa de usuarios existentes: dni normalizado -> número de fila
+  const existingMap = {};
+  for (let i = 1; i < data.length; i++) {
+    const rowDni = String(data[i][0]).trim();
+    if (rowDni) {
+      existingMap[rowDni] = i + 1;
+      const stripped = rowDni.replace(/^0+/, "");
+      if (stripped && stripped !== rowDni) {
+        existingMap[stripped] = i + 1;
+      }
+    }
+  }
+
+  let updatedCount = 0;
+  let addedCount = 0;
+  const newRows = [];
+
+  for (let uIdx = 0; uIdx < usersList.length; uIdx++) {
+    const u = usersList[uIdx];
+    const uDni = String(u.dni || "").trim();
+    if (!uDni) continue;
+
+    const rowNum = existingMap[uDni] || existingMap[uDni.replace(/^0+/, "")];
+
+    if (rowNum) {
+      // Usuario ya existe: actualizar datos institucionales si aplican
+      // ¡JAMÁS TOCAR LA COLUMNA 3 (password_hash)!
+      if (u.nombre) sheet.getRange(rowNum, 2).setValue(u.nombre);
+      if (u.establecimiento) sheet.getRange(rowNum, 5).setValue(u.establecimiento);
+      if (u.microred) sheet.getRange(rowNum, 6).setValue(u.microred);
+      if (u.colegio) sheet.getRange(rowNum, 7).setValue(u.colegio);
+      updatedCount++;
+    } else {
+      // Personal nuevo en el Reporte 40: registrar con contraseña inicial = su DNI
+      const defaultHash = computeSHA256(uDni);
+      newRows.push([
+        uDni,
+        u.nombre || ("PERSONAL " + uDni),
+        defaultHash,
+        u.rol || (uDni === DEFAULT_CONFIG.ADMIN_DEFAULT_DNI ? "admin" : "usuario"),
+        u.establecimiento || "",
+        u.microred || "",
+        u.colegio || "",
+        new Date().toISOString(),
+        ""
+      ]);
+      existingMap[uDni] = true;
+      addedCount++;
+    }
+  }
+
+  // Insertar personal nuevo en lote
+  if (newRows.length > 0) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, 9).setValues(newRows);
+  }
+
+  return {
+    success: true,
+    message: `Sincronización completada: ${updatedCount} trabajadores actualizados (conservando sus contraseñas) y ${addedCount} nuevos trabajadores registrados con clave DNI.`,
+    updated: updatedCount,
+    added: addedCount
+  };
 }
 
 
