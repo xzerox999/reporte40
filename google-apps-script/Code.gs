@@ -167,6 +167,14 @@ function handleRequest(e, params) {
         responseData = apiAdminExportAll(params.adminDni);
         break;
 
+      case "getIpressControl":
+        responseData = apiGetIpressControl();
+        break;
+
+      case "adminSaveIpressControl":
+        responseData = apiAdminSaveIpressControl(params.adminDni, params.ipressStatus);
+        break;
+
       default:
         responseData = { success: false, message: "Acción inválida: " + action };
     }
@@ -265,7 +273,8 @@ function apiLogin(dni, password) {
             establecimiento: data[i][4] || "",
             microred: data[i][5] || "",
             colegio: data[i][6] || ""
-          }
+          },
+          ipress_control: getIpressControlMap()
         };
       } else {
         return { success: false, message: "Contraseña incorrecta" };
@@ -479,7 +488,8 @@ function apiGetData(dni) {
     success: true,
     atd_atc: atdData,
     app: appData,
-    diario: Object.keys(diarioData).length > 0 ? diarioData : null
+    diario: Object.keys(diarioData).length > 0 ? diarioData : null,
+    ipress_control: getIpressControlMap()
   };
 }
 
@@ -649,4 +659,75 @@ function checkAdminRole(dni) {
   }
   return false;
 }
+
+/**
+ * 9. Obtener mapa de control de disponibilidad por IPRESS desde la hoja CONFIG
+ */
+function getIpressControlMap() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const confSheet = ss.getSheetByName(DEFAULT_CONFIG.SHEET_CONFIG);
+    if (!confSheet) return {};
+    const data = confSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim().toLowerCase() === "ipress_control" && data[i][1]) {
+        const val = data[i][1];
+        if (typeof val === "object") return val;
+        return JSON.parse(String(val));
+      }
+    }
+  } catch (e) {
+    // Si falla lectura o parseo, devolver objeto vacío
+  }
+  return {};
+}
+
+/**
+ * Endpoint para consultar el estado de las IPRESS
+ */
+function apiGetIpressControl() {
+  return {
+    success: true,
+    ipress_control: getIpressControlMap()
+  };
+}
+
+/**
+ * 10. Guardar estado de IPRESS en la hoja CONFIG (solo administradores)
+ */
+function apiAdminSaveIpressControl(adminDni, ipressStatus) {
+  if (!checkAdminRole(adminDni)) {
+    return { success: false, message: "Acceso no autorizado para administrar IPRESS" };
+  }
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let confSheet = ss.getSheetByName(DEFAULT_CONFIG.SHEET_CONFIG);
+    if (!confSheet) {
+      confSheet = ss.insertSheet(DEFAULT_CONFIG.SHEET_CONFIG);
+      confSheet.appendRow(["clave", "valor", "descripcion"]);
+    }
+    const data = confSheet.getDataRange().getValues();
+    let foundRow = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim().toLowerCase() === "ipress_control") {
+        foundRow = i + 1;
+        break;
+      }
+    }
+    const jsonStr = typeof ipressStatus === "string" ? ipressStatus : JSON.stringify(ipressStatus);
+    if (foundRow > 0) {
+      confSheet.getRange(foundRow, 2).setValue(jsonStr);
+      confSheet.getRange(foundRow, 3).setValue("Control de disponibilidad de producción por IPRESS (JSON)");
+    } else {
+      confSheet.appendRow(["ipress_control", jsonStr, "Control de disponibilidad de producción por IPRESS (JSON)"]);
+    }
+    return { 
+      success: true, 
+      message: "Control de IPRESS guardado correctamente en Google Sheets (hoja CONFIG)." 
+    };
+  } catch (err) {
+    return { success: false, message: "Error al guardar en CONFIG: " + err.toString() };
+  }
+}
+
 

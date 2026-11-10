@@ -166,6 +166,12 @@
 
           if (res.success && res.user) {
             Auth.setSession(res.user);
+            if (res.ipress_control && typeof res.ipress_control === "object") {
+              try {
+                localStorage.setItem("reporte40_ipress_control", JSON.stringify(res.ipress_control));
+                if (window.DEMO_DATA) window.DEMO_DATA.ipress_control = res.ipress_control;
+              } catch (e) {}
+            }
             loginAlert.className = "alert-elegant alert-success-elegant fade-in";
             loginAlert.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>¡Bienvenido(a), ${res.user.nombre}! Redirigiendo...</span>`;
 

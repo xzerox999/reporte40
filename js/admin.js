@@ -1641,6 +1641,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderTableAndDataTable();
 
+    // Sincronizar con el estado real guardado en Google Sheets (Hoja CONFIG)
+    async function fetchCloudEstabsStatus() {
+      try {
+        const res = await Api.callAppsScript("getIpressControl");
+        if (res && res.success && res.ipress_control && Object.keys(res.ipress_control).length > 0) {
+          estabsStatusMap = res.ipress_control;
+          localStorage.setItem("reporte40_ipress_control", JSON.stringify(estabsStatusMap));
+          if (window.DEMO_DATA) {
+            window.DEMO_DATA.ipress_control = estabsStatusMap;
+          }
+          allEstabsData = getEstabsSummary();
+          renderTableAndDataTable();
+        }
+      } catch (e) {
+        console.warn("No se pudo cargar control IPRESS desde Google Sheets:", e);
+      }
+    }
+    fetchCloudEstabsStatus();
+
     // Filtro de MicroRed sincronizado con DataTable
     if (microredFilterSelect) {
       $(microredFilterSelect).off("change").on("change", function () {
@@ -1743,15 +1762,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.DEMO_DATA.ipress_control = estabsStatusMap;
       }
 
+      if (showAlert) {
+        showControlAlert("Sincronizando control de IPRESS con Google Sheets...", "info");
+      }
+
       try {
-        await Api.callAppsScript("adminSaveIpressControl", {
+        const res = await Api.callAppsScript("adminSaveIpressControl", {
           adminDni: currentAdmin.dni,
           ipressStatus: estabsStatusMap
         });
-      } catch (e) {}
-
-      if (showAlert) {
-        showControlAlert("¡Control de IPRESS guardado con éxito! Las restricciones aplican inmediatamente a todos los usuarios.", "success");
+        if (showAlert) {
+          if (res && res.success) {
+            showControlAlert("¡Control de IPRESS guardado y sincronizado con éxito en Google Sheets! Las restricciones aplican a todos los usuarios.", "success");
+          } else {
+            showControlAlert("Guardado localmente. Advertencia nube: " + (res?.message || "No se pudo sincronizar"), "warning");
+          }
+        }
+      } catch (e) {
+        if (showAlert) {
+          showControlAlert("Guardado en este navegador. Nota: No se pudo conectar a Google Sheets.", "info");
+        }
       }
     }
   }

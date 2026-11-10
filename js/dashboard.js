@@ -87,7 +87,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   function isIpressActive(estabName) {
     if (!estabName) return true;
     const ctrl = getIpressControl();
-    return ctrl[estabName.trim()] !== false;
+    if (!ctrl || Object.keys(ctrl).length === 0) return true;
+    const clean = estabName.trim().toUpperCase();
+    for (const [k, v] of Object.entries(ctrl)) {
+      if (k.trim().toUpperCase() === clean) {
+        return v !== false;
+      }
+    }
+    return true;
   }
 
   // Elementos DOM
@@ -329,6 +336,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       dailySectionTitle.textContent = `Desglose Diario de Producción — Mes: ${monthObj.label.toUpperCase()} ${CONFIG.ANIO}`;
     }
 
+    const activeAtd = getActiveAtdDataset();
+    if (activeAtd && activeAtd.disabled) {
+      if (dailyTableBody) {
+        dailyTableBody.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center text-danger py-4">
+              <i class="bi bi-shield-lock-fill fs-3 d-block mb-2 text-warning"></i>
+              <strong class="text-danger">Producción Diaria Restringida</strong><br>
+              <span class="small text-muted">El establecimiento se encuentra temporalmente bloqueado por auditoría y conciliación. Comuníquese con la Administración.</span>
+            </td>
+          </tr>
+        `;
+      }
+      if (dailyTotalATC) dailyTotalATC.textContent = "0";
+      if (dailyTotalATD) dailyTotalATD.textContent = "0";
+      if (dailyDaysActiveText) dailyDaysActiveText.textContent = "0 días laborados";
+      if (dailyTotalBadge) dailyTotalBadge.textContent = "0 días con actividad";
+      dailyDetailSection.classList.remove("d-none");
+      return;
+    }
+
     const monthData = userDailyData && userDailyData[mKey];
     if (dailyTableBody) dailyTableBody.innerHTML = "";
 
@@ -566,6 +594,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     const hasAnySihce = (sumPeriodTriajes > 0 || sumPeriodCitas > 0);
 
+    // Si el establecimiento seleccionado (o consolidado) está bloqueado por auditoría
+    if (activeAtd && activeAtd.disabled) {
+      const colSpan = hasAnySihce ? 6 : 3;
+      atdTableBody.innerHTML = `
+        <tr>
+          <td colspan="${colSpan}" class="text-center text-danger py-4">
+            <i class="bi bi-shield-lock-fill fs-3 d-block mb-2 text-warning"></i>
+            <strong class="text-danger">Establecimiento Bloqueado por Auditoría</strong><br>
+            <span class="small text-muted">La producción de este establecimiento se encuentra temporalmente en proceso de conciliación y validación por la administración.</span>
+          </td>
+        </tr>
+      `;
+      if (atdTableFoot) {
+        atdTableFoot.innerHTML = `
+          <tr>
+            <td>Total Seleccionado</td>
+            ${hasAnySihce ? '<td class="text-center">0</td><td class="text-center">0</td><td class="text-center">0</td>' : ''}
+            <td class="text-center">0</td>
+            <td class="text-center">0</td>
+          </tr>
+        `;
+      }
+      appTableBody.innerHTML = `
+        <tr>
+          <td colspan="2" class="text-center text-danger py-3">
+            <i class="bi bi-shield-lock-fill me-1 text-warning"></i>
+            Producción de APP Bloqueada por Auditoría
+          </td>
+        </tr>
+      `;
+      if (appTableTotal) appTableTotal.textContent = "0";
+      kpiATC.textContent = "0";
+      kpiATD.textContent = "0";
+      kpiAPP.textContent = "0";
+      renderOrUpdateChart(activeAtd);
+      updateDailyView();
+      return;
+    }
+
     // 1. Tabla ATD / ATC
     atdTableBody.innerHTML = "";
     if (atdTableHead) {
@@ -711,6 +778,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderOrUpdateChart(activeAtd) {
     const canvas = document.getElementById("productionChart");
     if (!canvas || typeof Chart === "undefined") return;
+
+    if (activeAtd && activeAtd.disabled) {
+      if (productionChart) {
+        productionChart.destroy();
+        productionChart = null;
+      }
+      return;
+    }
 
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
     const gridColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
@@ -987,6 +1062,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         userMicroRedDisplay.textContent = currentUser.microred;
       }
       Auth.setSession(currentUser);
+
+      // Sincronizar control de disponibilidad de IPRESS recibido de la nube
+      if (res.ipress_control && typeof res.ipress_control === "object") {
+        try {
+          localStorage.setItem("reporte40_ipress_control", JSON.stringify(res.ipress_control));
+        } catch (e) {}
+        if (window.DEMO_DATA) {
+          window.DEMO_DATA.ipress_control = res.ipress_control;
+        }
+      }
     } else {
       userDailyData = localDaily;
       userAtdData = localAtd;
@@ -1000,6 +1085,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentUser.microred = userAppData.microred;
         userMicroRedDisplay.textContent = currentUser.microred;
       }
+
+      // Si falla getData o está en local, intentar obtener ipress_control
+      try {
+        const ctrlRes = await Api.callAppsScript("getIpressControl");
+        if (ctrlRes && ctrlRes.success && ctrlRes.ipress_control && typeof ctrlRes.ipress_control === "object") {
+          try {
+            localStorage.setItem("reporte40_ipress_control", JSON.stringify(ctrlRes.ipress_control));
+          } catch (e) {}
+          if (window.DEMO_DATA) {
+            window.DEMO_DATA.ipress_control = ctrlRes.ipress_control;
+          }
+        }
+      } catch (e) {}
     }
   } catch (err) {
     console.error("Error al cargar datos:", err);
@@ -1027,6 +1125,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 3. Descarga de PDF
   downloadPdfBtn.addEventListener("click", async () => {
+    const activeAtd = getActiveAtdDataset();
+    if (activeAtd && activeAtd.disabled) {
+      alert("No es posible generar ni descargar el reporte en PDF: el establecimiento seleccionado se encuentra temporalmente bloqueado por auditoría de la administración.");
+      return;
+    }
+
     if (selectedMonths.length === 0) {
       alert("Por favor selecciona al menos un mes para generar tu reporte.");
       return;
