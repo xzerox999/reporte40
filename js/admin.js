@@ -157,6 +157,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td class="small text-muted">${u.colegio || "-"}</td>
         <td class="text-center">
           <div class="d-flex justify-content-center gap-1">
+            <button class="btn btn-sm btn-outline-primary btn-serums-user" data-dni="${u.dni}" title="Generar Reporte Personalizado SERUMS">
+              <i class="bi bi-mortarboard-fill"></i> SERUMS
+            </button>
             <button class="btn btn-sm btn-outline-warning btn-reset-pass" data-dni="${u.dni}" data-name="${u.nombre}" title="Restablecer Contraseña">
               <i class="bi bi-key-fill"></i> Clave
             </button>
@@ -170,6 +173,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     usersCountText.textContent = `Mostrando ${displayList.length} de ${users.length} profesionales ${users.length > 100 ? "(Usa el buscador para filtrar)" : ""}`;
+
+    // Vincular botones de reporte SERUMS
+    usersTableBody.querySelectorAll(".btn-serums-user").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetDni = btn.getAttribute("data-dni");
+        openSerumsModal(targetDni);
+      });
+    });
 
     // Vincular botones de reseteo
     usersTableBody.querySelectorAll(".btn-reset-pass").forEach((btn) => {
@@ -1972,9 +1983,335 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // =====================================================================
+  // 13. GENERADOR DE REPORTE PERSONALIZADO SERUMS (MULTI-ANUAL)
+  // Exclusivo Reporte 40 (HIS General). Sin Citas ni Triajes.
+  // =====================================================================
+  let serumsModalInstance = null;
+  let currentSerumsUser = null;
+  let currentSerumsAtd = null;
+  let currentSerumsApp = null;
+  let currentSerumsMonthsList = [];
+  let currentSerumsTotals = null;
+
+  const MONTH_DEFS = [
+    { key: "ENE", label: "Enero" },
+    { key: "FEB", label: "Febrero" },
+    { key: "MAR", label: "Marzo" },
+    { key: "ABR", label: "Abril" },
+    { key: "MAY", label: "Mayo" },
+    { key: "JUN", label: "Junio" },
+    { key: "JUL", label: "Julio" },
+    { key: "AGO", label: "Agosto" },
+    { key: "SET", label: "Setiembre" },
+    { key: "OCT", label: "Octubre" },
+    { key: "NOV", label: "Noviembre" },
+    { key: "DIC", label: "Diciembre" }
+  ];
+
+  function openSerumsModal(targetDni = null) {
+    const modalEl = document.getElementById("serumsReportModal");
+    if (!modalEl) return;
+    if (!serumsModalInstance) {
+      serumsModalInstance = new bootstrap.Modal(modalEl);
+    }
+
+    const userSelect = document.getElementById("serumsUserSelect");
+    if (userSelect) {
+      userSelect.innerHTML = '<option value="">-- Seleccionar personal de salud --</option>';
+      const sortedUsers = [...allUsers].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+      sortedUsers.forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u.dni;
+        opt.textContent = `${u.nombre} (DNI: ${u.dni} — ${u.establecimiento || "Sin IPRESS"})`;
+        userSelect.appendChild(opt);
+      });
+
+      if (targetDni) {
+        userSelect.value = targetDni;
+      }
+    }
+
+    serumsModalInstance.show();
+    if (targetDni) {
+      handleSerumsUserChange(targetDni);
+    }
+  }
+
+  async function handleSerumsUserChange(dni) {
+    const infoBox = document.getElementById("serumsUserInfoBox");
+    const estabSelect = document.getElementById("serumsEstabSelect");
+    const previewSection = document.getElementById("serumsPreviewSection");
+    const btnDownload = document.getElementById("btnDownloadSerumsPdf");
+
+    if (!dni) {
+      currentSerumsUser = null;
+      currentSerumsAtd = null;
+      currentSerumsApp = null;
+      if (infoBox) infoBox.classList.add("d-none");
+      if (previewSection) previewSection.classList.add("d-none");
+      if (btnDownload) btnDownload.disabled = true;
+      if (estabSelect) estabSelect.innerHTML = '<option value="ALL">Consolidado (Todos sus establecimientos)</option>';
+      return;
+    }
+
+    currentSerumsUser = allUsers.find(u => Api.matchesDni(u.dni, dni)) ||
+      (window.DEMO_DATA?.usuarios?.[dni]) ||
+      { dni, nombre: "Personal " + dni };
+
+    // Llenar info box
+    document.getElementById("serumsInfoName").textContent = currentSerumsUser.nombre || "-";
+    document.getElementById("serumsInfoDni").textContent = currentSerumsUser.dni || dni;
+    document.getElementById("serumsInfoEstab").textContent = currentSerumsUser.establecimiento || "-";
+    document.getElementById("serumsInfoMicrored").textContent = currentSerumsUser.microred || "-";
+    document.getElementById("serumsInfoColegio").textContent = currentSerumsUser.colegio || "No registrado";
+    if (infoBox) infoBox.classList.remove("d-none");
+
+    // Cargar dataset ATD/ATC y APP exclusivo de Reporte 40 (sin SIHCE)
+    let userAtd = null;
+    let userApp = null;
+    try {
+      const res = await Api.callAppsScript("getData", { dni });
+      if (res && res.success) {
+        userAtd = res.atd_atc;
+        userApp = res.app;
+      }
+    } catch (e) {}
+
+    if (!userAtd && window.DEMO_DATA) {
+      const atdMatch = Api.findInMapByDni(dni, window.DEMO_DATA.atd_atc);
+      const appMatch = Api.findInMapByDni(dni, window.DEMO_DATA.app);
+      userAtd = atdMatch?.data || null;
+      userApp = appMatch?.data || null;
+    }
+
+    currentSerumsAtd = userAtd;
+    currentSerumsApp = userApp;
+
+    // Llenar selector de establecimientos
+    if (estabSelect) {
+      estabSelect.innerHTML = '<option value="ALL">Consolidado (Todos sus establecimientos)</option>';
+      const estabSet = new Set();
+      if (currentSerumsUser.establecimiento) estabSet.add(currentSerumsUser.establecimiento);
+      if (Array.isArray(currentSerumsUser.establecimientos)) {
+        currentSerumsUser.establecimientos.forEach(e => estabSet.add(e));
+      }
+      if (currentSerumsAtd && currentSerumsAtd.por_establecimiento) {
+        Object.keys(currentSerumsAtd.por_establecimiento).forEach(e => estabSet.add(e));
+      }
+      estabSet.forEach(est => {
+        if (est && est.trim()) {
+          const opt = document.createElement("option");
+          opt.value = est;
+          opt.textContent = est;
+          estabSelect.appendChild(opt);
+        }
+      });
+    }
+
+    calculateSerumsPreview();
+  }
+
+  function calculateSerumsPreview() {
+    if (!currentSerumsUser) return;
+
+    const startM = parseInt(document.getElementById("serumsStartMonth").value, 10);
+    const startY = parseInt(document.getElementById("serumsStartYear").value, 10);
+    const endM = parseInt(document.getElementById("serumsEndMonth").value, 10);
+    const endY = parseInt(document.getElementById("serumsEndYear").value, 10);
+
+    const periodText = document.getElementById("serumsPeriodRangeText");
+    const previewSection = document.getElementById("serumsPreviewSection");
+    const btnDownload = document.getElementById("btnDownloadSerumsPdf");
+    const tableBody = document.getElementById("serumsPreviewTableBody");
+    const estabSelect = document.getElementById("serumsEstabSelect");
+    const selectedEstab = estabSelect ? estabSelect.value : "ALL";
+
+    const startIndex = startY * 12 + startM;
+    const endIndex = endY * 12 + endM;
+
+    if (endIndex < startIndex) {
+      if (periodText) {
+        periodText.textContent = "Error: El mes y año de término deben ser posteriores o iguales al inicio.";
+        periodText.className = "mt-2 text-danger small fw-bold";
+      }
+      if (previewSection) previewSection.classList.add("d-none");
+      if (btnDownload) btnDownload.disabled = true;
+      return;
+    }
+
+    const totalMonths = endIndex - startIndex + 1;
+    if (periodText) {
+      periodText.textContent = `Periodo Seleccionado: ${MONTH_DEFS[startM].label} ${startY} a ${MONTH_DEFS[endM].label} ${endY} (${totalMonths} ${totalMonths === 1 ? 'mes' : 'meses'})`;
+      periodText.className = "mt-2 text-primary small fw-bold";
+    }
+
+    const monthsList = [];
+    let sumAtc = 0;
+    let sumAtd = 0;
+    let sumApp = 0;
+
+    for (let step = startIndex; step <= endIndex; step++) {
+      const curYear = Math.floor(step / 12);
+      const mIdx = step % 12;
+      const mDef = MONTH_DEFS[mIdx];
+
+      let atc = 0;
+      let atd = 0;
+      let app = 0;
+
+      // Lectura exclusiva de Reporte 40 (HIS General)
+      if (currentSerumsAtd) {
+        let yearAtd = currentSerumsAtd;
+        let yearApp = currentSerumsApp;
+
+        // Soporte para estructura multianual si existe
+        if (currentSerumsAtd.anios && currentSerumsAtd.anios[curYear]) {
+          yearAtd = currentSerumsAtd.anios[curYear];
+        }
+        if (currentSerumsApp && currentSerumsApp.anios && currentSerumsApp.anios[curYear]) {
+          yearApp = currentSerumsApp.anios[curYear];
+        }
+
+        if (selectedEstab === "ALL") {
+          atc = Number(yearAtd?.consolidado?.meses?.[mDef.key]?.atc) || 0;
+          atd = Number(yearAtd?.consolidado?.meses?.[mDef.key]?.atd) || 0;
+          app = Number(yearApp?.consolidado?.meses?.[mDef.key]) || 0;
+        } else {
+          atc = Number(yearAtd?.por_establecimiento?.[selectedEstab]?.meses?.[mDef.key]?.atc) || 0;
+          atd = Number(yearAtd?.por_establecimiento?.[selectedEstab]?.meses?.[mDef.key]?.atd) || 0;
+          app = Number(yearApp?.por_establecimiento?.[selectedEstab]?.meses?.[mDef.key]) || 0;
+        }
+      }
+
+      const totalMes = atc + app;
+      sumAtc += atc;
+      sumAtd += atd;
+      sumApp += app;
+
+      monthsList.push({
+        monthKey: mDef.key,
+        monthLabel: mDef.label,
+        year: String(curYear),
+        fullLabel: `${mDef.label} ${curYear}`,
+        atc,
+        atd,
+        app,
+        total: totalMes
+      });
+    }
+
+    currentSerumsMonthsList = monthsList;
+    currentSerumsTotals = {
+      total_atc: sumAtc,
+      total_atd: sumAtd,
+      total_app: sumApp,
+      total_prod: sumAtc + sumApp
+    };
+
+    // Actualizar KPIs visuales
+    document.getElementById("serumsKpiAtc").textContent = sumAtc.toLocaleString();
+    document.getElementById("serumsKpiAtd").textContent = sumAtd.toLocaleString();
+    document.getElementById("serumsKpiApp").textContent = sumApp.toLocaleString();
+    document.getElementById("serumsKpiTotal").textContent = (sumAtc + sumApp).toLocaleString();
+
+    // Renderizar tabla previa
+    if (tableBody) {
+      tableBody.innerHTML = "";
+      monthsList.forEach((m, idx) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="text-center text-muted">${idx + 1}</td>
+          <td><strong>${m.fullLabel}</strong></td>
+          <td class="text-center">${m.atc.toLocaleString()}</td>
+          <td class="text-center">${m.atd.toLocaleString()}</td>
+          <td class="text-center">${m.app.toLocaleString()}</td>
+          <td class="text-center fw-bold text-primary">${m.total.toLocaleString()}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    if (previewSection) previewSection.classList.remove("d-none");
+    if (btnDownload) btnDownload.disabled = false;
+  }
+
+  function initSerumsReportControl() {
+    const btnOpenModal = document.getElementById("btnOpenSerumsModal");
+    const userSelect = document.getElementById("serumsUserSelect");
+    const estabSelect = document.getElementById("serumsEstabSelect");
+    const startM = document.getElementById("serumsStartMonth");
+    const startY = document.getElementById("serumsStartYear");
+    const endM = document.getElementById("serumsEndMonth");
+    const endY = document.getElementById("serumsEndYear");
+    const btnDownload = document.getElementById("btnDownloadSerumsPdf");
+
+    if (btnOpenModal) {
+      btnOpenModal.addEventListener("click", () => openSerumsModal());
+    }
+
+    if (userSelect) {
+      userSelect.addEventListener("change", (e) => {
+        handleSerumsUserChange(e.target.value);
+      });
+    }
+
+    [estabSelect, startM, startY, endM, endY].forEach(el => {
+      if (el) {
+        el.addEventListener("change", () => {
+          calculateSerumsPreview();
+        });
+      }
+    });
+
+    if (btnDownload) {
+      btnDownload.addEventListener("click", async () => {
+        if (!currentSerumsUser || !currentSerumsMonthsList || currentSerumsMonthsList.length === 0) {
+          alert("Por favor selecciona un profesional y un rango válido.");
+          return;
+        }
+
+        btnDownload.disabled = true;
+        btnDownload.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Generando PDF...';
+
+        try {
+          const sM = parseInt(startM.value, 10);
+          const sY = parseInt(startY.value, 10);
+          const eM = parseInt(endM.value, 10);
+          const eY = parseInt(endY.value, 10);
+          const periodLabel = `${MONTH_DEFS[sM].label} ${sY} a ${MONTH_DEFS[eM].label} ${eY}`;
+          const selectedEstab = estabSelect ? estabSelect.value : "ALL";
+
+          // Registrar en log de auditoría
+          Api.callAppsScript("logDownload", {
+            dni: currentSerumsUser.dni,
+            personal: currentSerumsUser.nombre,
+            establecimiento: selectedEstab === "ALL" ? "Consolidado Red Cusco Sur" : selectedEstab,
+            meses: `SERUMS (${periodLabel})`,
+            tipo: "PDF_SERUMS_ADMIN"
+          });
+
+          await PdfGenerator.generateSerums({
+            user: currentSerumsUser,
+            periodLabel,
+            monthsList: currentSerumsMonthsList,
+            selectedEstab,
+            totals: currentSerumsTotals
+          });
+        } catch (err) {
+          alert("Error al generar reporte SERUMS: " + err.message);
+        } finally {
+          btnDownload.disabled = false;
+          btnDownload.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar Reporte SERUMS (PDF)';
+        }
+      });
+    }
+  }
+
   // Ejecución inicial
   loadInitialData();
   initEstabsControl();
   initYearsControl();
+  initSerumsReportControl();
 });
 

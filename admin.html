@@ -199,9 +199,14 @@
             <h2 class="h6 fw-bold mb-0 text-main">
               <i class="bi bi-person-lines-fill text-primary me-2"></i>Padrón de Personal de Salud
             </h2>
-            <div class="input-group input-group-sm" style="max-width: 280px;">
-              <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
-              <input type="text" id="userSearchInput" class="form-control" placeholder="Filtrar por DNI, nombre o IPRESS...">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <button id="btnOpenSerumsModal" class="btn btn-sm btn-outline-primary text-nowrap shadow-sm" type="button">
+                <i class="bi bi-mortarboard-fill me-1"></i> Reporte Especial SERUMS
+              </button>
+              <div class="input-group input-group-sm" style="max-width: 280px;">
+                <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="userSearchInput" class="form-control" placeholder="Filtrar por DNI, nombre o IPRESS...">
+              </div>
             </div>
           </div>
 
@@ -546,6 +551,181 @@
     </div>
   </div>
 
+  <!-- Modal Generador de Reporte SERUMS (Multi-Anual Personalizado) -->
+  <div class="modal fade" id="serumsReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title h6 fw-bold text-main">
+            <i class="bi bi-mortarboard-fill text-primary me-2"></i>Generador de Reporte Personalizado SERUMS (Multi-Anual)
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info py-2 px-3 small d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-info-circle-fill fs-5 text-primary"></i>
+            <div>
+              <strong>Producción Exclusiva de Reporte 40 (HIS General):</strong>
+              Este reporte consolida las atenciones (ATC, ATD y APP) para la carpeta y trámite de término de SERUMS. No incluye citas de admisión ni triajes.
+            </div>
+          </div>
+
+          <!-- Selección de Profesional -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-7">
+              <label for="serumsUserSelect" class="form-label small fw-bold">Seleccionar Profesional de Salud:</label>
+              <select id="serumsUserSelect" class="form-select form-select-sm">
+                <option value="">-- Seleccionar personal --</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label for="serumsEstabSelect" class="form-label small fw-bold">Ámbito / Establecimiento:</label>
+              <select id="serumsEstabSelect" class="form-select form-select-sm">
+                <option value="ALL">Consolidado (Todos sus establecimientos)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tarjeta de Datos del Personal Seleccionado -->
+          <div id="serumsUserInfoBox" class="p-3 mb-3 rounded bg-body-secondary small d-none">
+            <div class="row g-2">
+              <div class="col-sm-6"><strong>Personal:</strong> <span id="serumsInfoName">-</span></div>
+              <div class="col-sm-6"><strong>DNI:</strong> <span id="serumsInfoDni">-</span></div>
+              <div class="col-sm-6"><strong>Establecimiento Sede:</strong> <span id="serumsInfoEstab">-</span></div>
+              <div class="col-sm-6"><strong>MicroRed:</strong> <span id="serumsInfoMicrored">-</span></div>
+              <div class="col-sm-12"><strong>Colegio Profesional:</strong> <span id="serumsInfoColegio">-</span></div>
+            </div>
+          </div>
+
+          <!-- Configuración del Rango de Periodo (Inicio y Fin) -->
+          <div class="app-card p-3 mb-3 border">
+            <h6 class="fw-bold small text-main mb-2">
+              <i class="bi bi-calendar-range text-primary me-1"></i> Rango del Periodo de Servicio (SERUMS):
+            </h6>
+            <div class="row g-3">
+              <!-- Periodo Inicio -->
+              <div class="col-md-6">
+                <div class="p-2 border rounded bg-light-subtle">
+                  <span class="small fw-bold text-primary d-block mb-2">Mes y Año de INICIO:</span>
+                  <div class="d-flex gap-2">
+                    <select id="serumsStartMonth" class="form-select form-select-sm">
+                      <option value="0">Enero</option>
+                      <option value="1">Febrero</option>
+                      <option value="2">Marzo</option>
+                      <option value="3">Abril</option>
+                      <option value="4" selected>Mayo</option>
+                      <option value="5">Junio</option>
+                      <option value="6">Julio</option>
+                      <option value="7">Agosto</option>
+                      <option value="8">Setiembre</option>
+                      <option value="9">Octubre</option>
+                      <option value="10">Noviembre</option>
+                      <option value="11">Diciembre</option>
+                    </select>
+                    <select id="serumsStartYear" class="form-select form-select-sm" style="width: 100px;">
+                      <option value="2025">2025</option>
+                      <option value="2026" selected>2026</option>
+                      <option value="2027">2027</option>
+                      <option value="2028">2028</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Periodo Fin -->
+              <div class="col-md-6">
+                <div class="p-2 border rounded bg-light-subtle">
+                  <span class="small fw-bold text-success d-block mb-2">Mes y Año de TÉRMINO:</span>
+                  <div class="d-flex gap-2">
+                    <select id="serumsEndMonth" class="form-select form-select-sm">
+                      <option value="0">Enero</option>
+                      <option value="1">Febrero</option>
+                      <option value="2">Marzo</option>
+                      <option value="3">Abril</option>
+                      <option value="4" selected>Mayo</option>
+                      <option value="5">Junio</option>
+                      <option value="6">Julio</option>
+                      <option value="7">Agosto</option>
+                      <option value="8">Setiembre</option>
+                      <option value="9">Octubre</option>
+                      <option value="10">Noviembre</option>
+                      <option value="11">Diciembre</option>
+                    </select>
+                    <select id="serumsEndYear" class="form-select form-select-sm" style="width: 100px;">
+                      <option value="2026">2026</option>
+                      <option value="2027" selected>2027</option>
+                      <option value="2028">2028</option>
+                      <option value="2029">2029</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="serumsPeriodRangeText" class="mt-2 text-muted small fw-bold">
+              Periodo: Mayo 2026 a Mayo 2027 (13 meses)
+            </div>
+          </div>
+
+          <!-- Vista Previa de Resumen Acumulado -->
+          <div id="serumsPreviewSection" class="d-none">
+            <div class="row g-2 mb-3 text-center">
+              <div class="col-3">
+                <div class="p-2 border rounded bg-primary-subtle">
+                  <span class="d-block small text-muted">Total ATC</span>
+                  <strong id="serumsKpiAtc" class="fs-6 text-primary">0</strong>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="p-2 border rounded bg-success-subtle">
+                  <span class="d-block small text-muted">Total ATD</span>
+                  <strong id="serumsKpiAtd" class="fs-6 text-success">0</strong>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="p-2 border rounded bg-warning-subtle">
+                  <span class="d-block small text-muted">Total APP</span>
+                  <strong id="serumsKpiApp" class="fs-6 text-warning">0</strong>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="p-2 border rounded bg-info-subtle">
+                  <span class="d-block small text-muted">Producción Total</span>
+                  <strong id="serumsKpiTotal" class="fs-6 text-info">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla de Previsualización Cronológica -->
+            <div class="table-responsive" style="max-height: 220px; overflow-y: auto;">
+              <table class="table table-sm table-bordered table-hover align-middle small mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th style="width: 40px;" class="text-center">#</th>
+                    <th>Periodo (Mes y Año)</th>
+                    <th class="text-center">Atenciones (ATC)</th>
+                    <th class="text-center">Atendidos (ATD)</th>
+                    <th class="text-center">Actividades APP</th>
+                    <th class="text-center">Total Mes</th>
+                  </tr>
+                </thead>
+                <tbody id="serumsPreviewTableBody">
+                  <!-- Dinámico -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-sm btn-primary shadow-sm" id="btnDownloadSerumsPdf" disabled>
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar Reporte SERUMS (PDF)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Pie de Página -->
   <footer class="footer-custom">
     <div class="container-fluid">
@@ -562,6 +742,9 @@
   <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
   <!-- SheetJS para exportar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Librerías de Generación PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Scripts del Sistema -->
   <script src="data/demo_data.js"></script>
@@ -569,6 +752,7 @@
   <script src="js/theme.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/pdf-generator.js"></script>
   <script src="js/pwa.js"></script>
   <script src="js/admin.js"></script>
 

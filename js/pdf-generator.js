@@ -794,5 +794,326 @@ const PdfGenerator = {
     doc.save(filename);
 
     return true;
+  },
+
+  /**
+   * Genera y descarga el Reporte Oficial Personalizado SERUMS (Multi-Anual)
+   * Exclusivo para Reporte 40 (HIS General: ATC, ATD y APP). Sin Citas ni Triajes.
+   */
+  async generateSerums({ user, periodLabel, monthsList, selectedEstab = "ALL", totals }) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("Error: La librería jsPDF no está cargada.");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const primaryColor = [30, 64, 175];   // Azul institucional #1e40af
+    const secondaryColor = [71, 85, 105]; // Slate
+    const accentColor = [241, 245, 249];  // Gris claro #f1f5f9
+    const isConsolidated = selectedEstab === "ALL";
+
+    let currentY = 16;
+
+    // 1. ENCABEZADO INSTITUCIONAL
+    doc.setFontSize(10.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+    doc.text(CONFIG.INSTITUCION || "RED DE SERVICIOS DE SALUD CUSCO SUR", 105, currentY, { align: "center" });
+
+    currentY += 4.5;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...secondaryColor);
+    doc.text("GOBIERNO REGIONAL CUSCO — DIRECCIÓN REGIONAL DE SALUD", 105, currentY, { align: "center" });
+
+    currentY += 5;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("REPORTE OFICIAL DE PRODUCCIÓN ASISTENCIAL — SERUMS", 105, currentY, { align: "center" });
+
+    currentY += 4.5;
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+    doc.text(`Período de Servicio: ${periodLabel}`, 105, currentY, { align: "center" });
+
+    currentY += 4;
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...secondaryColor);
+    const scopeText = isConsolidated 
+      ? "Ámbito: CONSOLIDADO RED CUSCO SUR (TODOS LOS ESTABLECIMIENTOS ASIGNADOS)"
+      : `Ámbito: ESTABLECIMIENTO DE SALUD ${selectedEstab}`;
+    doc.text(scopeText, 105, currentY, { align: "center" });
+
+    // Línea divisoria decorativa
+    currentY += 3.5;
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(0.8);
+    doc.line(14, currentY, 196, currentY);
+
+    // 2. CAJA DE DATOS DEL PROFESIONAL SERUMS
+    currentY += 4.5;
+    const boxHeight = 28;
+    doc.setFillColor(...accentColor);
+    doc.roundedRect(14, currentY, 182, boxHeight, 2, 2, "F");
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(14, currentY, 182, boxHeight, 2, 2, "D");
+
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...secondaryColor);
+    doc.text("DATOS DEL PROFESIONAL SERUMS", 18, currentY + 5);
+
+    // Grid de datos
+    doc.setFontSize(8);
+    const col1X = 18;
+    const col2X = 105;
+
+    // Fila 1
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("Apellidos y Nombres:", col1X, currentY + 11);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(user.nombre || "-").toUpperCase(), col1X + 32, currentY + 11);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("DNI / Doc.:", col2X, currentY + 11);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(user.dni || "-"), col2X + 18, currentY + 11);
+
+    // Fila 2
+    doc.setFont("helvetica", "bold");
+    doc.text("Colegio Profesional:", col1X, currentY + 17);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(user.colegio || "No registrado"), col1X + 32, currentY + 17);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("MicroRed:", col2X, currentY + 17);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(user.microred || "-"), col2X + 18, currentY + 17);
+
+    // Fila 3
+    doc.setFont("helvetica", "bold");
+    doc.text("Establecimiento Sede:", col1X, currentY + 23);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(user.establecimiento || "-"), col1X + 32, currentY + 23);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Modalidad:", col2X, currentY + 23);
+    doc.setFont("helvetica", "normal");
+    doc.text("SERUMS REMUNERADO / EQUIVALENTE", col2X + 18, currentY + 23);
+
+    currentY += boxHeight + 4;
+
+    // 3. TARJETAS DE RESUMEN KPI ACUMULADO
+    const kpiWidth = 43;
+    const kpiHeight = 16;
+    const kpiY = currentY;
+
+    // KPI 1: Total ATC
+    doc.setFillColor(239, 246, 255);
+    doc.roundedRect(14, kpiY, kpiWidth, kpiHeight, 1.5, 1.5, "F");
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 64, 175);
+    doc.text("ATENCIONES TOTALES (ATC)", 14 + kpiWidth / 2, kpiY + 5, { align: "center" });
+    doc.setFontSize(11);
+    doc.text(Number(totals.total_atc || 0).toLocaleString(), 14 + kpiWidth / 2, kpiY + 12.5, { align: "center" });
+
+    // KPI 2: Total ATD
+    doc.setFillColor(240, 253, 244);
+    doc.roundedRect(60, kpiY, kpiWidth, kpiHeight, 1.5, 1.5, "F");
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(21, 128, 61);
+    doc.text("ATENDIDOS (ATD)", 60 + kpiWidth / 2, kpiY + 5, { align: "center" });
+    doc.setFontSize(11);
+    doc.text(Number(totals.total_atd || 0).toLocaleString(), 60 + kpiWidth / 2, kpiY + 12.5, { align: "center" });
+
+    // KPI 3: Total APP
+    doc.setFillColor(254, 243, 199);
+    doc.roundedRect(106, kpiY, kpiWidth, kpiHeight, 1.5, 1.5, "F");
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(180, 83, 9);
+    doc.text("ACTIVIDADES PROMOCIÓN (APP)", 106 + kpiWidth / 2, kpiY + 5, { align: "center" });
+    doc.setFontSize(11);
+    doc.text(Number(totals.total_app || 0).toLocaleString(), 106 + kpiWidth / 2, kpiY + 12.5, { align: "center" });
+
+    // KPI 4: Total Producción General
+    doc.setFillColor(245, 243, 255);
+    doc.roundedRect(152, kpiY, kpiWidth, kpiHeight, 1.5, 1.5, "F");
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(109, 40, 217);
+    doc.text("TOTAL GENERAL PRODUCCIÓN", 152 + kpiWidth / 2, kpiY + 5, { align: "center" });
+    doc.setFontSize(11);
+    doc.text(Number(totals.total_prod || 0).toLocaleString(), 152 + kpiWidth / 2, kpiY + 12.5, { align: "center" });
+
+    currentY += kpiHeight + 6;
+
+    // 4. TABLA DETALLADA CRONOLÓGICA MES A MES (Reporte 40 HIS General)
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+    doc.text("CONSOLIDADO MENSUAL DE PRODUCCIÓN — REPORTE 40 (HIS GENERAL)", 14, currentY);
+
+    currentY += 2;
+
+    const tableHeaders = [
+      ["N°", "Periodo (Mes y Año)", "Atenciones Médicas (ATC)", "Atendidos (ATD)", "Actividades APP", "Total Mes"]
+    ];
+
+    const tableData = monthsList.map((m, idx) => [
+      String(idx + 1),
+      m.fullLabel,
+      Number(m.atc || 0).toLocaleString(),
+      Number(m.atd || 0).toLocaleString(),
+      Number(m.app || 0).toLocaleString(),
+      Number((m.atc || 0) + (m.app || 0)).toLocaleString()
+    ]);
+
+    // Fila de Total Acumulado
+    const tableFooters = [
+      [
+        "",
+        "TOTAL ACUMULADO SERUMS",
+        Number(totals.total_atc || 0).toLocaleString(),
+        Number(totals.total_atd || 0).toLocaleString(),
+        Number(totals.total_app || 0).toLocaleString(),
+        Number(totals.total_prod || 0).toLocaleString()
+      ]
+    ];
+
+    doc.autoTable({
+      startY: currentY,
+      head: tableHeaders,
+      body: tableData,
+      foot: tableFooters,
+      theme: "grid",
+      styles: {
+        fontSize: 7.5,
+        cellPadding: 2,
+        textColor: [30, 41, 59],
+        lineColor: [226, 232, 240],
+        lineWidth: 0.1
+      },
+      headStyles: {
+        fillColor: primaryColor,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        halign: "center"
+      },
+      footStyles: {
+        fillColor: [241, 245, 249],
+        textColor: primaryColor,
+        fontStyle: "bold",
+        halign: "center"
+      },
+      columnStyles: {
+        0: { halign: "center", cellWidth: 12 },
+        1: { halign: "left", cellWidth: 50, fontStyle: "bold" },
+        2: { halign: "center", cellWidth: 30 },
+        3: { halign: "center", cellWidth: 30 },
+        4: { halign: "center", cellWidth: 30 },
+        5: { halign: "center", cellWidth: 30, fontStyle: "bold" }
+      },
+      margin: { left: 14, right: 14 }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 6;
+
+    // Si queda poco espacio para la certificación y firmas, agregar página
+    if (currentY > 215) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    // 5. NOTA DE CERTIFICACIÓN INSTITUCIONAL
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(14, currentY, 182, 14, 1.5, 1.5, "F");
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(14, currentY, 182, 14, 1.5, 1.5, "D");
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(...secondaryColor);
+    doc.text(
+      "CERTIFICACIÓN: Se expide el presente reporte oficial de producción asistencial a solicitud de la parte interesada para los fines correspondientes",
+      17, currentY + 5
+    );
+    doc.text(
+      "al informe final de labores y trámite de Resolución de Término de SERUMS, según registros del Sistema de Información HIS de la Red Cusco Sur.",
+      17, currentY + 10
+    );
+
+    currentY += 20;
+
+    // 6. BLOQUE DE FIRMAS INSTITUCIONALES
+    const signBoxY = currentY + 12;
+    // Línea Firma 1 (Estadística)
+    doc.setDrawColor(100, 116, 139);
+    doc.setLineWidth(0.4);
+    doc.line(25, signBoxY, 85, signBoxY);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("RESPONSABLE DE ESTADÍSTICA E INFORMÁTICA", 55, signBoxY + 4, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...secondaryColor);
+    doc.text("Red de Servicios de Salud Cusco Sur", 55, signBoxY + 8, { align: "center" });
+
+    // Línea Firma 2 (Dirección Ejecutiva)
+    doc.line(125, signBoxY, 185, signBoxY);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("DIRECCIÓN EJECUTIVA", 155, signBoxY + 4, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...secondaryColor);
+    doc.text("Red de Servicios de Salud Cusco Sur", 155, signBoxY + 8, { align: "center" });
+
+    // 7. PIE DE PÁGINA EN TODAS LAS PÁGINAS
+    const totalPages = doc.internal.getNumberOfPages();
+    const nowDateTime = new Date().toLocaleString();
+
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.4);
+      doc.line(14, 282, 196, 282);
+
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(148, 163, 184);
+
+      // Firma institucional
+      doc.text(CONFIG.AUTOR, 14, 287);
+
+      // Fecha y hora
+      doc.text(`Generado: ${nowDateTime} — Vía Panel Administrador`, 105, 287, { align: "center" });
+
+      // Numeración
+      doc.text(`Página ${i} de ${totalPages}`, 196, 287, { align: "right" });
+    }
+
+    // Descargar PDF
+    const cleanDni = String(user.dni || "serums");
+    const filename = `Reporte_SERUMS_${cleanDni}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+
+    return true;
   }
 };
