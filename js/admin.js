@@ -2016,31 +2016,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       serumsModalInstance = new bootstrap.Modal(modalEl);
     }
 
-    const userSelect = document.getElementById("serumsUserSelect");
-    if (userSelect) {
-      userSelect.innerHTML = '<option value="">-- Seleccionar personal de salud --</option>';
-      const sortedUsers = [...allUsers].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
-      sortedUsers.forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u.dni;
-        opt.textContent = `${u.nombre} (DNI: ${u.dni} — ${u.establecimiento || "Sin IPRESS"})`;
-        userSelect.appendChild(opt);
+    const $userSelect = $("#serumsUserSelect");
+    const $estabSelect = $("#serumsEstabSelect");
+
+    $userSelect.empty();
+    $userSelect.append(new Option("-- Seleccionar personal de salud --", "", false, false));
+
+    const sortedUsers = [...allUsers].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+    sortedUsers.forEach(u => {
+      const label = `${u.nombre} (DNI: ${u.dni} — ${u.establecimiento || "Sin IPRESS"})`;
+      $userSelect.append(new Option(label, u.dni, false, false));
+    });
+
+    if ($.fn.select2) {
+      $userSelect.select2({
+        dropdownParent: $("#serumsReportModal"),
+        placeholder: "-- Buscar personal por DNI o Nombres --",
+        allowClear: true,
+        width: "100%"
       });
 
-      if (targetDni) {
-        userSelect.value = targetDni;
-      }
+      $estabSelect.select2({
+        dropdownParent: $("#serumsReportModal"),
+        width: "100%"
+      });
     }
 
     serumsModalInstance.show();
+
     if (targetDni) {
-      handleSerumsUserChange(targetDni);
+      $userSelect.val(targetDni).trigger("change");
+    } else {
+      $userSelect.val("").trigger("change");
     }
   }
 
   async function handleSerumsUserChange(dni) {
     const infoBox = document.getElementById("serumsUserInfoBox");
-    const estabSelect = document.getElementById("serumsEstabSelect");
+    const $estabSelect = $("#serumsEstabSelect");
     const previewSection = document.getElementById("serumsPreviewSection");
     const btnDownload = document.getElementById("btnDownloadSerumsPdf");
 
@@ -2051,7 +2064,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (infoBox) infoBox.classList.add("d-none");
       if (previewSection) previewSection.classList.add("d-none");
       if (btnDownload) btnDownload.disabled = true;
-      if (estabSelect) estabSelect.innerHTML = '<option value="ALL">Consolidado (Todos sus establecimientos)</option>';
+      if ($estabSelect.length) {
+        $estabSelect.empty().append(new Option("Consolidado (Todos sus establecimientos)", "ALL", true, true));
+        if ($.fn.select2) $estabSelect.trigger("change.select2");
+      }
       return;
     }
 
@@ -2088,9 +2104,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentSerumsAtd = userAtd;
     currentSerumsApp = userApp;
 
-    // Llenar selector de establecimientos
-    if (estabSelect) {
-      estabSelect.innerHTML = '<option value="ALL">Consolidado (Todos sus establecimientos)</option>';
+    // Llenar selector de establecimientos con Select2
+    if ($estabSelect.length) {
+      $estabSelect.empty();
+      $estabSelect.append(new Option("Consolidado (Todos sus establecimientos)", "ALL", true, true));
       const estabSet = new Set();
       if (currentSerumsUser.establecimiento) estabSet.add(currentSerumsUser.establecimiento);
       if (Array.isArray(currentSerumsUser.establecimientos)) {
@@ -2101,12 +2118,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       estabSet.forEach(est => {
         if (est && est.trim()) {
-          const opt = document.createElement("option");
-          opt.value = est;
-          opt.textContent = est;
-          estabSelect.appendChild(opt);
+          $estabSelect.append(new Option(est, est, false, false));
         }
       });
+      if ($.fn.select2) {
+        $estabSelect.val("ALL").trigger("change.select2");
+      } else {
+        $estabSelect.val("ALL");
+      }
     }
 
     calculateSerumsPreview();
@@ -2238,8 +2257,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function initSerumsReportControl() {
     const btnOpenModal = document.getElementById("btnOpenSerumsModal");
-    const userSelect = document.getElementById("serumsUserSelect");
-    const estabSelect = document.getElementById("serumsEstabSelect");
+    const modalEl = document.getElementById("serumsReportModal");
     const startM = document.getElementById("serumsStartMonth");
     const startY = document.getElementById("serumsStartYear");
     const endM = document.getElementById("serumsEndMonth");
@@ -2250,13 +2268,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnOpenModal.addEventListener("click", () => openSerumsModal());
     }
 
-    if (userSelect) {
-      userSelect.addEventListener("change", (e) => {
-        handleSerumsUserChange(e.target.value);
+    // Eventos Select2 para Selección de Personal y Establecimiento
+    $("#serumsUserSelect").on("change", function () {
+      handleSerumsUserChange($(this).val());
+    });
+
+    $("#serumsEstabSelect").on("change", function () {
+      calculateSerumsPreview();
+    });
+
+    // Reajustar tamaño de Select2 al abrir modal
+    if (modalEl) {
+      modalEl.addEventListener("shown.bs.modal", () => {
+        if ($.fn.select2) {
+          $("#serumsUserSelect").select2({
+            dropdownParent: $("#serumsReportModal"),
+            placeholder: "-- Buscar personal por DNI o Nombres --",
+            allowClear: true,
+            width: "100%"
+          });
+          $("#serumsEstabSelect").select2({
+            dropdownParent: $("#serumsReportModal"),
+            width: "100%"
+          });
+        }
       });
     }
 
-    [estabSelect, startM, startY, endM, endY].forEach(el => {
+    [startM, startY, endM, endY].forEach(el => {
       if (el) {
         el.addEventListener("change", () => {
           calculateSerumsPreview();
