@@ -1151,7 +1151,6 @@ async function initDashboard() {
     downloadPdfBtn.disabled = true;
     downloadPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Generando PDF...';
 
-    const activeAtd = getActiveAtdDataset();
     const activeApp = getActiveAppDataset();
 
     try {
