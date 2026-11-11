@@ -1818,8 +1818,163 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // =====================================================================
+  // 12. CONTROL DE AÑOS Y PERIODOS DISPONIBLES (PESTAÑA 6)
+  // =====================================================================
+  let allConfiguredYears = ["2026", "2027"];
+  let activeYearsSet = new Set(["2026"]);
+
+  function loadYearsStatus() {
+    try {
+      const saved = localStorage.getItem("reporte40_anios_habilitados");
+      if (saved) {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr) && arr.length > 0) {
+          activeYearsSet = new Set(arr.map(String));
+          arr.forEach(y => {
+            if (!allConfiguredYears.includes(String(y))) allConfiguredYears.push(String(y));
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
+  function initYearsControl() {
+    loadYearsStatus();
+    const yearsTableBody = document.getElementById("yearsTableBody");
+    const yearsControlAlert = document.getElementById("yearsControlAlert");
+    const btnAddNewYear = document.getElementById("btnAddNewYear");
+    const btnSaveYearsStatus = document.getElementById("btnSaveYearsStatus");
+
+    if (!yearsTableBody) return;
+
+    function renderYearsTable() {
+      yearsTableBody.innerHTML = "";
+      allConfiguredYears.sort().forEach((yr, idx) => {
+        const isEnabled = activeYearsSet.has(yr);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="text-muted small">${idx + 1}</td>
+          <td><strong class="text-main fs-6">${yr}</strong></td>
+          <td class="text-muted small">Periodo Asistencial Anual ${yr} — Sistema Reporte 40</td>
+          <td class="text-center status-col">
+            <span class="badge-custom ${isEnabled ? 'badge-success' : 'badge-danger'} status-badge">
+              <i class="bi ${isEnabled ? 'bi-check-circle-fill' : 'bi-lock-fill'} me-1"></i>
+              ${isEnabled ? 'Habilitado' : 'Bloqueado (Auditoría)'}
+            </span>
+          </td>
+          <td class="text-center">
+            <div class="form-check form-switch d-inline-block">
+              <input class="form-check-input year-switch" type="checkbox" role="switch" data-year="${yr}" ${isEnabled ? 'checked' : ''} title="Habilitar/Deshabilitar Año">
+            </div>
+          </td>
+        `;
+        yearsTableBody.appendChild(tr);
+      });
+    }
+
+    renderYearsTable();
+
+    // Sincronizar con la nube
+    async function fetchCloudYears() {
+      try {
+        const res = await Api.callAppsScript("getEnabledYears");
+        if (res && res.success && Array.isArray(res.anios_habilitados) && res.anios_habilitados.length > 0) {
+          activeYearsSet = new Set(res.anios_habilitados.map(String));
+          res.anios_habilitados.forEach(y => {
+            if (!allConfiguredYears.includes(String(y))) allConfiguredYears.push(String(y));
+          });
+          localStorage.setItem("reporte40_anios_habilitados", JSON.stringify(Array.from(activeYearsSet)));
+          renderYearsTable();
+        }
+      } catch (e) {}
+    }
+    fetchCloudYears();
+
+    // Toggle switch
+    $(document).off("change", ".year-switch").on("change", ".year-switch", function () {
+      const yr = String($(this).attr("data-year"));
+      const isChecked = $(this).is(":checked");
+      if (isChecked) {
+        activeYearsSet.add(yr);
+      } else {
+        if (activeYearsSet.size === 1 && activeYearsSet.has(yr)) {
+          alert("Debe haber al menos un año habilitado para que los usuarios puedan consultar el sistema.");
+          $(this).prop("checked", true);
+          return;
+        }
+        activeYearsSet.delete(yr);
+      }
+      renderYearsTable();
+      saveYearsStatus(false);
+    });
+
+    // Agregar nuevo año
+    if (btnAddNewYear) {
+      btnAddNewYear.addEventListener("click", () => {
+        const nextYear = prompt("Ingresa el nuevo año a configurar (ejemplo: 2027 o 2028):");
+        if (!nextYear) return;
+        const cleanYr = nextYear.trim();
+        if (!/^\d{4}$/.test(cleanYr)) {
+          alert("Por favor ingresa un año válido de 4 dígitos (ejemplo: 2027).");
+          return;
+        }
+        if (!allConfiguredYears.includes(cleanYr)) {
+          allConfiguredYears.push(cleanYr);
+        }
+        activeYearsSet.add(cleanYr);
+        renderYearsTable();
+        saveYearsStatus(true);
+      });
+    }
+
+    // Botón Guardar
+    if (btnSaveYearsStatus) {
+      btnSaveYearsStatus.addEventListener("click", () => {
+        saveYearsStatus(true);
+      });
+    }
+
+    function showYearsAlert(msg, type = "success") {
+      if (!yearsControlAlert) return;
+      yearsControlAlert.className = `alert alert-${type} py-2 px-3 small fade-in`;
+      yearsControlAlert.innerHTML = `<i class="bi bi-info-circle-fill me-1"></i> ${msg}`;
+      setTimeout(() => {
+        yearsControlAlert.className = "alert d-none";
+      }, 4000);
+    }
+
+    async function saveYearsStatus(showAlert = false) {
+      const yearsArr = Array.from(activeYearsSet);
+      localStorage.setItem("reporte40_anios_habilitados", JSON.stringify(yearsArr));
+
+      if (showAlert) {
+        showYearsAlert("Sincronizando configuración de años con Google Sheets...", "info");
+      }
+
+      try {
+        const res = await Api.callAppsScript("adminSaveEnabledYears", {
+          adminDni: currentAdmin.dni,
+          years: yearsArr
+        });
+        if (showAlert) {
+          if (res && res.success) {
+            showYearsAlert("¡Configuración de años guardada con éxito en Google Sheets! Aplica a todos los usuarios.", "success");
+          } else {
+            showYearsAlert("Guardado en este navegador. Advertencia nube: " + (res?.message || "Error al conectar"), "warning");
+          }
+        }
+      } catch (e) {
+        if (showAlert) {
+          showYearsAlert("Guardado en este navegador. Nota: No se pudo conectar a Google Sheets.", "info");
+        }
+      }
+    }
+  }
+
   // Ejecución inicial
   loadInitialData();
   initEstabsControl();
+  initYearsControl();
 });
 

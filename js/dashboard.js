@@ -83,6 +83,59 @@ async function initDashboard() {
   let isDailyModeActive = false;
   let selectedEstab = "ALL"; // Por defecto "ALL" (Consolidado)
   let selectedMonths = []; // Todos desactivados por defecto al cargar según indicación
+  let selectedYear = CONFIG.ANIO || "2026";
+
+  // Control de Años Habilitados (Multi-Anual)
+  function getEnabledYears() {
+    try {
+      const saved = localStorage.getItem("reporte40_anios_habilitados");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    if (window.DEMO_DATA && Array.isArray(window.DEMO_DATA.anios_habilitados) && window.DEMO_DATA.anios_habilitados.length > 0) {
+      return window.DEMO_DATA.anios_habilitados;
+    }
+    return [CONFIG.ANIO || "2026"];
+  }
+
+  function setupYearSelector() {
+    const yearCard = document.getElementById("yearSelectorCard");
+    const yearGroup = document.getElementById("yearButtonsGroup");
+    if (!yearCard || !yearGroup) return;
+
+    const enabledYears = getEnabledYears();
+    if (!enabledYears.includes(selectedYear)) {
+      selectedYear = enabledYears[0] || CONFIG.ANIO || "2026";
+    }
+
+    if (enabledYears.length <= 1) {
+      yearCard.classList.add("d-none");
+      return;
+    }
+
+    yearCard.classList.remove("d-none");
+    yearGroup.innerHTML = "";
+
+    enabledYears.forEach((yr) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const isActive = String(yr) === String(selectedYear);
+      btn.className = `btn btn-sm ${isActive ? "btn-primary fw-bold shadow-sm" : "btn-outline-secondary"}`;
+      btn.innerHTML = `<i class="bi bi-calendar-check me-1"></i> ${yr}`;
+      btn.onclick = () => {
+        if (selectedYear === String(yr)) return;
+        selectedYear = String(yr);
+        setupYearSelector();
+        updateTablesAndKPIs();
+        if (isDailyModeActive) {
+          updateDailyView();
+        }
+      };
+      yearGroup.appendChild(btn);
+    });
+  }
 
   // Control de IPRESS activas/bloqueadas
   function getIpressControl() {
@@ -345,7 +398,7 @@ async function initDashboard() {
     const mKey = selectedMonths[0];
     const monthObj = CONFIG.MESES.find(m => m.key === mKey) || { label: mKey };
     if (dailySectionTitle) {
-      dailySectionTitle.textContent = `Desglose Diario de Producción — Mes: ${monthObj.label.toUpperCase()} ${CONFIG.ANIO}`;
+      dailySectionTitle.textContent = `Desglose Diario de Producción — Mes: ${monthObj.label.toUpperCase()} ${selectedYear || CONFIG.ANIO}`;
     }
 
     const activeAtd = getActiveAtdDataset();
@@ -1084,6 +1137,16 @@ async function initDashboard() {
           window.DEMO_DATA.ipress_control = res.ipress_control;
         }
       }
+
+      // Sincronizar años habilitados recibidos de la nube
+      if (res.anios_habilitados && Array.isArray(res.anios_habilitados)) {
+        try {
+          localStorage.setItem("reporte40_anios_habilitados", JSON.stringify(res.anios_habilitados));
+        } catch (e) {}
+        if (window.DEMO_DATA) {
+          window.DEMO_DATA.anios_habilitados = res.anios_habilitados;
+        }
+      }
     } else {
       userDailyData = localDaily;
       userAtdData = localAtd;
@@ -1098,7 +1161,7 @@ async function initDashboard() {
         userMicroRedDisplay.textContent = currentUser.microred;
       }
 
-      // Si falla getData o está en local, intentar obtener ipress_control
+      // Si falla getData o está en local, intentar obtener ipress_control y anios_habilitados
       try {
         const ctrlRes = await Api.callAppsScript("getIpressControl");
         if (ctrlRes && ctrlRes.success && ctrlRes.ipress_control && typeof ctrlRes.ipress_control === "object") {
@@ -1107,6 +1170,18 @@ async function initDashboard() {
           } catch (e) {}
           if (window.DEMO_DATA) {
             window.DEMO_DATA.ipress_control = ctrlRes.ipress_control;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const yrRes = await Api.callAppsScript("getEnabledYears");
+        if (yrRes && yrRes.success && Array.isArray(yrRes.anios_habilitados)) {
+          try {
+            localStorage.setItem("reporte40_anios_habilitados", JSON.stringify(yrRes.anios_habilitados));
+          } catch (e) {}
+          if (window.DEMO_DATA) {
+            window.DEMO_DATA.anios_habilitados = yrRes.anios_habilitados;
           }
         }
       } catch (e) {}
@@ -1131,6 +1206,7 @@ async function initDashboard() {
   // Inicializar componentes
   checkDefaultPasswordAlert();
   renderComunicadoBanner();
+  setupYearSelector();
   setupEstablishmentSelector();
   renderMonthSelector();
   updateTablesAndKPIs();
@@ -1169,7 +1245,7 @@ async function initDashboard() {
         tipo: logTipo
       });
 
-      // Generar PDF Profesional con opción de desglose diario
+      // Generar PDF Profesional con opción de desglose diario y año seleccionado
       await PdfGenerator.generate(
         currentUser,
         selectedMonths,
@@ -1178,7 +1254,8 @@ async function initDashboard() {
         userAtdData,
         selectedEstab,
         userDailyData,
-        isDailySingleMonth
+        isDailySingleMonth,
+        selectedYear
       );
     } catch (err) {
       alert("Hubo un inconveniente al generar el PDF: " + err.message);

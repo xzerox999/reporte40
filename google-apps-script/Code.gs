@@ -179,6 +179,14 @@ function handleRequest(e, params) {
         responseData = apiAdminSyncUsers(params.adminDni, params.users);
         break;
 
+      case "getEnabledYears":
+        responseData = apiGetEnabledYears();
+        break;
+
+      case "adminSaveEnabledYears":
+        responseData = apiAdminSaveEnabledYears(params.adminDni, params.years);
+        break;
+
       default:
         responseData = { success: false, message: "Acción inválida: " + action };
     }
@@ -278,7 +286,8 @@ function apiLogin(dni, password) {
             microred: data[i][5] || "",
             colegio: data[i][6] || ""
           },
-          ipress_control: getIpressControlMap()
+          ipress_control: getIpressControlMap(),
+          anios_habilitados: getEnabledYears()
         };
       } else {
         return { success: false, message: "Contraseña incorrecta" };
@@ -493,7 +502,8 @@ function apiGetData(dni) {
     atd_atc: atdData,
     app: appData,
     diario: Object.keys(diarioData).length > 0 ? diarioData : null,
-    ipress_control: getIpressControlMap()
+    ipress_control: getIpressControlMap(),
+    anios_habilitados: getEnabledYears()
   };
 }
 
@@ -823,5 +833,80 @@ function apiAdminSyncUsers(adminDni, usersList) {
     added: addedCount
   };
 }
+
+/**
+ * 12. Obtener lista de años habilitados para consulta desde la hoja CONFIG
+ */
+function getEnabledYears() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const confSheet = ss.getSheetByName(DEFAULT_CONFIG.SHEET_CONFIG);
+    if (!confSheet) return ["2026"];
+    const data = confSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim().toLowerCase() === "anios_habilitados" && data[i][1]) {
+        const val = data[i][1];
+        if (Array.isArray(val)) return val;
+        try {
+          const parsed = JSON.parse(String(val));
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {
+          const parts = String(val).split(",").map(function(s) { return s.trim(); }).filter(Boolean);
+          if (parts.length > 0) return parts;
+        }
+      }
+    }
+  } catch (e) {}
+  return ["2026"];
+}
+
+/**
+ * Endpoint para consultar años habilitados
+ */
+function apiGetEnabledYears() {
+  return {
+    success: true,
+    anios_habilitados: getEnabledYears()
+  };
+}
+
+/**
+ * 13. Guardar lista de años habilitados en la hoja CONFIG (solo administradores)
+ */
+function apiAdminSaveEnabledYears(adminDni, years) {
+  if (!checkAdminRole(adminDni)) {
+    return { success: false, message: "Acceso no autorizado para configurar periodos anuales." };
+  }
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let confSheet = ss.getSheetByName(DEFAULT_CONFIG.SHEET_CONFIG);
+    if (!confSheet) {
+      confSheet = ss.insertSheet(DEFAULT_CONFIG.SHEET_CONFIG);
+      confSheet.appendRow(["clave", "valor", "descripcion"]);
+    }
+    const data = confSheet.getDataRange().getValues();
+    let foundRow = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim().toLowerCase() === "anios_habilitados") {
+        foundRow = i + 1;
+        break;
+      }
+    }
+    const jsonStr = Array.isArray(years) ? JSON.stringify(years) : String(years);
+    if (foundRow > 0) {
+      confSheet.getRange(foundRow, 2).setValue(jsonStr);
+      confSheet.getRange(foundRow, 3).setValue("Años y periodos fiscales habilitados para descarga (JSON Array)");
+    } else {
+      confSheet.appendRow(["anios_habilitados", jsonStr, "Años y periodos fiscales habilitados para descarga (JSON Array)"]);
+    }
+    return { 
+      success: true, 
+      message: "Configuración de años y periodos guardada correctamente en Google Sheets." 
+    };
+  } catch (err) {
+    return { success: false, message: "Error al guardar años en CONFIG: " + err.toString() };
+  }
+}
+
 
 

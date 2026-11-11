@@ -19,7 +19,7 @@ const PdfGenerator = {
    * @param {Object} dailyData - Objeto con datos diarios por mes
    * @param {Boolean} includeDaily - Indica si se debe incluir el desglose día a día
    */
-  async generate(user, selectedMonths, atdData, appData, fullAtdData = null, selectedEstab = "ALL", dailyData = null, includeDaily = false) {
+  async generate(user, selectedMonths, atdData, appData, fullAtdData = null, selectedEstab = "ALL", dailyData = null, includeDaily = false, targetYear = null) {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("Error: La librería jsPDF no está cargada.");
       return;
@@ -103,9 +103,10 @@ const PdfGenerator = {
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...secondaryColor);
+    const reportYear = targetYear || CONFIG.ANIO || "2026";
     const monthsText = selectedMonths.length === CONFIG.MESES.length
-      ? "Período Completo: Enero a Noviembre 2026"
-      : `Meses seleccionados: ${selectedMonths.join(", ")} (Año ${CONFIG.ANIO})`;
+      ? `Período Completo: Enero a Noviembre ${reportYear}`
+      : `Meses seleccionados: ${selectedMonths.join(", ")} (Año ${reportYear})`;
     doc.text(monthsText, 105, currentY, { align: "center" });
 
     // Línea divisoria decorativa
@@ -472,7 +473,7 @@ const PdfGenerator = {
         doc.setFontSize(9.5);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...primaryColor);
-        doc.text(`DESGLOSE DETALLADO DÍA A DÍA — MES: ${monthName} ${CONFIG.ANIO}`, 14, currentY);
+        doc.text(`DESGLOSE DETALLADO DÍA A DÍA — MES: ${monthName} ${reportYear}`, 14, currentY);
         currentY += 4;
 
         // Detectar si el mes tiene registros de SIHCE (Citas o Triajes)
