@@ -1126,22 +1126,22 @@ const PdfGenerator = {
       headStyles: {
         fillColor: primaryColor,
         textColor: [255, 255, 255],
-        fontSize: 6.8,
+        fontSize: 7.2,
         fontStyle: "bold",
         halign: "center",
-        cellPadding: 1.5
+        cellPadding: 1.8
       },
       footStyles: {
         fillColor: [226, 232, 240],
         textColor: [15, 23, 42],
-        fontSize: 6.8,
+        fontSize: 7.2,
         fontStyle: "bold",
         halign: "center",
-        cellPadding: 1.5
+        cellPadding: 1.8
       },
       styles: {
-        fontSize: 6.5,
-        cellPadding: 1.4,
+        fontSize: 7,
+        cellPadding: 1.6,
         halign: "center"
       },
       columnStyles: {
@@ -1269,30 +1269,30 @@ const PdfGenerator = {
               {
                 content: `CONSOLIDADO DEL MES (${monthName}):  HIS: ${(sumHisAtcQ1 + sumHisAtcQ2).toLocaleString()} ATC / ${(sumHisAtdQ1 + sumHisAtdQ2).toLocaleString()} ATD   |   TRIAJES: ${(sumTriQ1 + sumTriQ2).toLocaleString()}   |   CITAS ADMISIÓN: ${(sumCitQ1 + sumCitQ2).toLocaleString()}   |   TOTAL ATC: ${(sumAtcQ1 + sumAtcQ2).toLocaleString()}`,
                 colSpan: 12,
-                styles: { halign: "center", fontStyle: "bold", fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 5.6 }
+                styles: { halign: "center", fontStyle: "bold", fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 6.8 }
               }
             ]
           ],
           theme: "grid",
           headStyles: {
-            fontSize: 5.6,
+            fontSize: 6.8,
             fontStyle: "bold",
             halign: "center",
             textColor: [255, 255, 255],
             fillColor: [51, 65, 85],
-            cellPadding: 0.8
+            cellPadding: 1.2
           },
           footStyles: {
             fillColor: [226, 232, 240],
             textColor: [15, 23, 42],
-            fontSize: 5.6,
+            fontSize: 6.8,
             fontStyle: "bold",
             halign: "center",
-            cellPadding: 0.8
+            cellPadding: 1.2
           },
           styles: {
-            fontSize: 5.4,
-            cellPadding: 0.7,
+            fontSize: 6.8,
+            cellPadding: 1.2,
             halign: "center"
           },
           columnStyles: {
@@ -1413,33 +1413,32 @@ const PdfGenerator = {
     currentY += (splitCert.length * 2.8) + 1;
 
     // 6. FIRMAS INSTITUCIONALES Y CÓDIGO QR EN PARALELO
-    const signLineY = includeDaily ? 240 : 165;
+    const signLineY = includeDaily ? 246 : 175;
 
     // Línea 1: Firma Profesional
     doc.setDrawColor(100, 116, 139);
     doc.setLineWidth(0.35);
     doc.line(18, signLineY, 70, signLineY);
-    doc.setFontSize(6.5);
+    doc.setFontSize(6.8);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 41, 59);
-    doc.text("FIRMA DEL PROFESIONAL", 44, signLineY + 3.5, { align: "center" });
+    doc.text("FIRMA DEL PROFESIONAL", 44, signLineY + 3.8, { align: "center" });
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(5.6);
+    doc.setFontSize(5.8);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(user.nombre || "").toUpperCase().substring(0, 30), 44, signLineY + 6.5, { align: "center" });
-    doc.text(`DNI: ${user.dni || "-"}`, 44, signLineY + 9.5, { align: "center" });
+    doc.text(String(user.nombre || "").toUpperCase().substring(0, 30), 44, signLineY + 7, { align: "center" });
+    doc.text(`DNI: ${user.dni || "-"}`, 44, signLineY + 10.2, { align: "center" });
 
-    // Línea 2: Jefatura / Estadística
+    // Línea 2: Encargado del Área de Estadística / Punto de digitación
     doc.line(78, signLineY, 135, signLineY);
-    doc.setFontSize(6.5);
+    doc.setFontSize(6.8);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 41, 59);
-    doc.text("JEFE DE ESTABLECIMIENTO / VoBo", 106.5, signLineY + 3.5, { align: "center" });
+    doc.text("ENCARGADO DEL ÁREA DE ESTADÍSTICA", 106.5, signLineY + 3.8, { align: "center" });
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(5.6);
+    doc.setFontSize(6);
     doc.setTextColor(71, 85, 105);
-    doc.text("Responsable de Estadística e Informática", 106.5, signLineY + 6.5, { align: "center" });
-    doc.text("Red de Servicios de Salud Cusco Sur", 106.5, signLineY + 9.5, { align: "center" });
+    doc.text("Punto de digitación", 106.5, signLineY + 7, { align: "center" });
 
     // QR Code a la derecha
     try {
@@ -1761,18 +1760,18 @@ const PdfGenerator = {
 
     // 6. BLOQUE DE FIRMAS INSTITUCIONALES
     const signBoxY = currentY + 12;
-    // Línea Firma 1 (Estadística)
+    // Línea Firma 1 (Estadística / Punto de Digitación)
     doc.setDrawColor(100, 116, 139);
     doc.setLineWidth(0.4);
     doc.line(25, signBoxY, 85, signBoxY);
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 41, 59);
-    doc.text("RESPONSABLE DE ESTADÍSTICA E INFORMÁTICA", 55, signBoxY + 4, { align: "center" });
+    doc.text("ENCARGADO DEL ÁREA DE ESTADÍSTICA", 55, signBoxY + 4, { align: "center" });
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(...secondaryColor);
-    doc.text("Red de Servicios de Salud Cusco Sur", 55, signBoxY + 8, { align: "center" });
+    doc.text("Punto de digitación", 55, signBoxY + 8, { align: "center" });
 
     // Línea Firma 2 (Dirección Ejecutiva)
     doc.line(125, signBoxY, 185, signBoxY);
