@@ -21,7 +21,7 @@ import glob
 from datetime import datetime
 from collections import defaultdict
 
-EXCEL_PATH = r"E:\Otros\reporte40\REPORTE 40 2026.xlsx"
+EXCEL_PATH = r"E:\Otros\reporte40\ARCHIVOS\REPORTE 40 2026.xlsx"
 OUTPUT_DIR = r"E:\Otros\reporte40\data"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -269,8 +269,8 @@ print(f"   -> Datos diarios HIS procesados para {len(diario_by_dni)} profesional
 
 # 4.5. Integración de Producción SIHCE (Citas de Admisión y Triajes de Enfermería)
 print("4.5. Buscando y procesando archivos del sistema SIHCE (Admisión y Triaje)...")
-citas_files = glob.glob(r"E:\Otros\reporte40\*citas*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*citas*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*citas*.xlsx")
-triaje_files = glob.glob(r"E:\Otros\reporte40\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\*Triajes*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*Triajes*.xlsx")
+citas_files = glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*citas*.xlsx")
+triaje_files = glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*Triajes*.xlsx")
 
 sihce_summary = {"citas": {}, "triajes": {}}
 sihce_csv_rows = []
