@@ -65,6 +65,16 @@ const PdfGenerator = {
         });
 
         // Solo incluir los que realmente tuvieron producción en los meses seleccionados
+        // Protección contra rezagos de sincronización: si no es San Sebastián y su ATC coincide exactamente con las citas de SIHCE sin ATD, descartar ese residuo
+        if (selectedMonths.length === 1 && !est.toUpperCase().includes("SAN SEBASTIAN")) {
+          const mKey = selectedMonths[0];
+          const mDaily = dailyData && dailyData[mKey];
+          const mCitas = mDaily ? (Number(mDaily.total_citas) || 0) : 0;
+          if (atcPeriod === mCitas && atdPeriod === 0 && mCitas > 0) {
+            atcPeriod = 0;
+          }
+        }
+
         if (atcPeriod > 0 || atdPeriod > 0) {
           activeEstabsInPeriod.push({
             estab: est,
@@ -76,8 +86,33 @@ const PdfGenerator = {
       activeEstabsInPeriod.sort((a, b) => b.atc - a.atc);
     }
 
+    const reportYear = targetYear || CONFIG.ANIO || "2026";
+    const isSingleMonth = selectedMonths.length === 1;
+
     // -------------------------------------------------------------
-    // 1. ENCABEZADO INSTITUCIONAL
+    // RUTA OPTIMIZADA: REPORTE MENSUAL EN 1 SOLA PÁGINA (AHORRO DE PAPEL)
+    // Cuando el usuario consulta exactamente 1 mes (con o sin desglose día a día)
+    // -------------------------------------------------------------
+    if (isSingleMonth) {
+      return this._generateSingleMonthPage(doc, {
+        user,
+        mKey: selectedMonths[0],
+        atdData,
+        appData,
+        activeEstabsInPeriod,
+        isConsolidated,
+        selectedEstab,
+        dailyData,
+        includeDaily,
+        reportYear,
+        primaryColor,
+        secondaryColor,
+        accentColor
+      });
+    }
+
+    // -------------------------------------------------------------
+    // 1. ENCABEZADO INSTITUCIONAL MULTI-MES
     // -------------------------------------------------------------
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
@@ -103,7 +138,6 @@ const PdfGenerator = {
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...secondaryColor);
-    const reportYear = targetYear || CONFIG.ANIO || "2026";
     const monthsText = selectedMonths.length === CONFIG.MESES.length
       ? `Período Completo: Enero a Noviembre ${reportYear}`
       : `Meses seleccionados: ${selectedMonths.join(", ")} (Año ${reportYear})`;
@@ -431,7 +465,8 @@ const PdfGenerator = {
           textColor: [255, 255, 255],
           fontSize: 8,
           fontStyle: "bold",
-          halign: "center"
+          halign: "center",
+          cellPadding: 2.5
         },
         footStyles: {
           fillColor: [226, 232, 240],
@@ -452,6 +487,8 @@ const PdfGenerator = {
         },
         margin: { left: 14, right: 14 }
       });
+
+      currentY = doc.lastAutoTable.finalY + 8;
     }
 
     // -------------------------------------------------------------
@@ -464,8 +501,8 @@ const PdfGenerator = {
       if (mDaily && mDaily.dias) {
         const monthName = (CONFIG.MESES.find((m) => m.key === mKey)?.label || mKey).toUpperCase();
 
-        // Si queda poco espacio en la página actual, agregar nueva página
-        if (currentY > 165) {
+        // Si queda poco espacio en la página actual (el desglose diario con 16 filas y cabecera multinivel requiere al menos 100mm), agregar nueva página
+        if (currentY > 135) {
           doc.addPage();
           currentY = 20;
         }
@@ -474,7 +511,7 @@ const PdfGenerator = {
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...primaryColor);
         doc.text(`DESGLOSE DETALLADO DÍA A DÍA — MES: ${monthName} ${reportYear}`, 14, currentY);
-        currentY += 4;
+        currentY += 5;
 
         // Detectar si el mes tiene registros de SIHCE (Citas o Triajes)
         const hasSihce = (mDaily.total_citas && mDaily.total_citas > 0) || (mDaily.total_triajes && mDaily.total_triajes > 0);
@@ -744,7 +781,11 @@ const PdfGenerator = {
       if (typeof qrcode === "function") {
         const verifyBase = window.location.href.replace(/[^/]*$/, "") + "validar.html";
         const estabParam = isConsolidated ? "Consolidado Red Cusco Sur" : selectedEstab;
-        const qrUrl = `${verifyBase}?dni=${user.dni}&p=${encodeURIComponent(user.nombre || "")}&e=${encodeURIComponent(estabParam)}&m=${selectedMonths.join(",")}&atc=${sumATC}&atd=${sumATD}`;
+        let sumMultiAPP = 0;
+        if (appData && appData.meses) {
+          selectedMonths.forEach(mK => { sumMultiAPP += Number(appData.meses[mK]) || 0; });
+        }
+        const qrUrl = `${verifyBase}?dni=${user.dni}&p=${encodeURIComponent(user.nombre || "")}&e=${encodeURIComponent(estabParam)}&m=${selectedMonths.join(",")}&atc=${sumATC}&atd=${sumATD}&app=${sumMultiAPP}&his=${sumPeriodHis}&tri=${sumPeriodTriajes}&cit=${sumPeriodCitas}&y=${reportYear}&d=${includeDaily ? 1 : 0}&col=${encodeURIComponent(user.colegio || "")}&mr=${encodeURIComponent(user.microred || "")}`;
 
         const qr = qrcode(0, "M");
         qr.addData(qrUrl);
@@ -791,6 +832,665 @@ const PdfGenerator = {
     const cleanDni = String(user.dni || "reporte");
     const estabSuffix = isConsolidated ? "Consolidado" : selectedEstab.replace(/[^a-zA-Z0-9]/g, "_");
     const filename = `Reporte40_${cleanDni}_${estabSuffix}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+
+    return true;
+  },
+
+  /**
+   * Generador Ultra-Optimizado de 1 Sola Página para Reportes de 1 Mes
+   * (Ahorro de papel institucional: Resumen consolidado + Desglose diario 01 al 31 + Firmas y QR en 1 sola hoja A4)
+   */
+  _generateSingleMonthPage(doc, {
+    user,
+    mKey,
+    atdData,
+    appData,
+    activeEstabsInPeriod,
+    isConsolidated,
+    selectedEstab,
+    dailyData,
+    includeDaily,
+    reportYear,
+    primaryColor,
+    secondaryColor,
+    accentColor
+  }) {
+    const monthObj = CONFIG.MESES.find((m) => m.key === mKey) || { label: mKey };
+    const monthName = monthObj.label.toUpperCase();
+
+    // Cálculos de producción mensual
+    const mData = (atdData && atdData.meses && atdData.meses[mKey]) || { atc: 0, atd: 0 };
+    const sumATC = Number(mData.atc) || 0;
+    const sumATD = Number(mData.atd) || 0;
+    const sumAPP = (appData && appData.meses && Number(appData.meses[mKey])) || 0;
+
+    const mDaily = dailyData && dailyData[mKey];
+    const sumPeriodTriajes = mDaily ? (Number(mDaily.total_triajes) || 0) : 0;
+    const sumPeriodCitas = mDaily ? (Number(mDaily.total_citas) || 0) : 0;
+    const sumPeriodHis = Math.max(0, sumATC - sumPeriodTriajes - sumPeriodCitas);
+    const hasSihce = (sumPeriodTriajes > 0 || sumPeriodCitas > 0);
+
+    // 1. ENCABEZADO INSTITUCIONAL COMPACTO
+    let currentY = 10;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(...secondaryColor);
+    doc.text("GOBIERNO REGIONAL CUSCO — GERESA CUSCO", 105, currentY, { align: "center" });
+
+    currentY += 4.5;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text(CONFIG.INSTITUCION || "RED DE SERVICIOS DE SALUD CUSCO SUR", 105, currentY, { align: "center" });
+
+    currentY += 4.5;
+    doc.setFontSize(10);
+    doc.setTextColor(30, 41, 59);
+    doc.text("REPORTE MENSUAL DE PRODUCCIÓN ASISTENCIAL (REPORTE 40)", 105, currentY, { align: "center" });
+
+    currentY += 4;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+
+    let estabDisplay = String(user.establecimiento || "No especificado");
+    if (!isConsolidated) {
+      estabDisplay = selectedEstab;
+    } else if (activeEstabsInPeriod.length > 1) {
+      const estabNames = activeEstabsInPeriod.map(e => e.estab).join(", ");
+      estabDisplay = `Consolidado (${activeEstabsInPeriod.length} IPRESS: ${estabNames})`;
+      if (estabDisplay.length > 55) {
+        estabDisplay = `Consolidado (${activeEstabsInPeriod.length} IPRESS en el mes)`;
+      }
+    } else if (activeEstabsInPeriod.length === 1) {
+      estabDisplay = activeEstabsInPeriod[0].estab;
+    }
+
+    doc.text(`MES: ${monthName} ${reportYear}   —   ÁMBITO: ${estabDisplay}`, 105, currentY, { align: "center" });
+
+    currentY += 3;
+    doc.setDrawColor(...primaryColor);
+    doc.setLineWidth(0.6);
+    doc.line(14, currentY, 196, currentY);
+
+    // 2. CAJA DE DATOS DEL PROFESIONAL (2 FILAS, ALTURA 14mm)
+    currentY += 3;
+    const boxH = 14;
+    doc.setFillColor(...accentColor);
+    doc.roundedRect(14, currentY, 182, boxH, 1.5, 1.5, "F");
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.25);
+    doc.roundedRect(14, currentY, 182, boxH, 1.5, 1.5, "D");
+
+    doc.setFontSize(7.2);
+    const col1 = 17;
+    const col2 = 88;
+    const col3 = 145;
+
+    // Fila 1
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("Personal:", col1, currentY + 4.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(user.nombre || "No especificado").substring(0, 36), col1 + 14, currentY + 4.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("MicroRed:", col2, currentY + 4.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(user.microred || "-"), col2 + 15, currentY + 4.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("Colegio:", col3, currentY + 4.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(user.colegio || "-").substring(0, 18), col3 + 13, currentY + 4.5);
+
+    // Fila 2
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("DNI:", col1, currentY + 10.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(user.dni || "-"), col1 + 14, currentY + 10.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("IPRESS:", col2, currentY + 10.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    const boxEstab = activeEstabsInPeriod.length > 1
+      ? `Consolidado (${activeEstabsInPeriod.length} IPRESS)`
+      : (estabDisplay.length > 28 ? estabDisplay.substring(0, 26) + "..." : estabDisplay);
+    doc.text(boxEstab, col2 + 15, currentY + 10.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(51, 65, 85);
+    doc.text("Emisión:", col3, currentY + 10.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    doc.text(new Date().toLocaleDateString("es-PE"), col3 + 13, currentY + 10.5);
+
+    currentY += boxH + 3.5;
+
+    // 3. TABLA 1: RESUMEN MENSUAL CONSOLIDADO DE PRODUCCIÓN (1 SOLA TABLA ELEGANTE)
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...primaryColor);
+    doc.text(`1. RESUMEN MENSUAL CONSOLIDADO DE PRODUCCIÓN (MES: ${monthName} ${reportYear})`, 14, currentY);
+    currentY += 2;
+
+    // Calcular distribución detallada por establecimiento (HIS, Triajes, Citas, APP)
+    // Regla Asistencial Oficial: Citas de Admisión y Triajes de SIHCE pertenecen a C.S. SAN SEBASTIAN.
+    // Los demás establecimientos (ej. Rondocán) corresponden estrictamente a producción asistencial de consultorios HIS.
+    const estabDetails = activeEstabsInPeriod.map(eItem => {
+      const estName = eItem.estab;
+      const rawAtc = Number(eItem.atc) || 0;
+      const estAtd = Number(eItem.atd) || 0;
+
+      let estApp = 0;
+      if (appData && appData.por_establecimiento && appData.por_establecimiento[estName]) {
+        estApp = Number(appData.por_establecimiento[estName]?.meses?.[mKey]) || 0;
+      }
+
+      let estCit = 0;
+      let estTri = 0;
+      let estHis = 0;
+      let finalAtc = rawAtc;
+
+      // SIHCE (Citas de Admisión y Triajes) pertenece exclusivamente a C.S. SAN SEBASTIAN
+      const isSihceEstab = estName.toUpperCase().includes("SAN SEBASTIAN") || (activeEstabsInPeriod.length === 1 && hasSihce);
+
+      if (isSihceEstab) {
+        estCit = sumPeriodCitas;
+        estTri = sumPeriodTriajes;
+        // Si rawAtc ya contiene SIHCE incorporado (ej. 468 = 375 HIS + 93 Citas):
+        if (rawAtc >= sumPeriodHis + estCit + estTri) {
+          estHis = rawAtc - estCit - estTri;
+          finalAtc = rawAtc;
+        } else {
+          // Si rawAtc contiene únicamente la producción de consultorio HIS original (ej. 375):
+          estHis = Math.max(rawAtc, sumPeriodHis);
+          finalAtc = estHis + estCit + estTri;
+        }
+      } else {
+        // En cualquier otra IPRESS (ej. Rondocán), toda la producción registrada es 100% asistencial HIS
+        estHis = rawAtc;
+        estCit = 0;
+        estTri = 0;
+        finalAtc = rawAtc;
+      }
+
+      return {
+        estab: estName,
+        atc: finalAtc,
+        atd: estAtd,
+        app: estApp,
+        his: estHis,
+        tri: estTri,
+        cit: estCit
+      };
+    });
+
+    // Si ningún establecimiento tuvo APP asignada directamente pero sumAPP > 0:
+    const totalAllocApp = estabDetails.reduce((acc, ed) => acc + ed.app, 0);
+    if (totalAllocApp === 0 && sumAPP > 0) {
+      const primaryEst = estabDetails.find(ed => ed.atd > 0) || estabDetails[0];
+      if (primaryEst) primaryEst.app = sumAPP;
+    }
+
+    let summaryHead = [];
+    let summaryBody = [];
+    let summaryFoot = null;
+
+    if (hasSihce) {
+      summaryHead = [["ÁMBITO / ESTABLECIMIENTO", "ATENCIONES HIS", "TRIAJES (SIHCE)", "CITAS ADM. (SIHCE)", "TOTAL ATC", "ATENDIDOS (ATD)", "ACTIVIDADES APP", "TOTAL PROD."]];
+      if (activeEstabsInPeriod.length > 1) {
+        estabDetails.forEach(ed => {
+          const estProd = ed.atc + ed.app;
+          summaryBody.push([
+            ed.estab,
+            ed.his > 0 ? ed.his.toLocaleString() : "-",
+            ed.tri > 0 ? ed.tri.toLocaleString() : "-",
+            ed.cit > 0 ? ed.cit.toLocaleString() : "-",
+            ed.atc > 0 ? ed.atc.toLocaleString() : "-",
+            ed.atd > 0 ? ed.atd.toLocaleString() : "-",
+            ed.app > 0 ? ed.app.toLocaleString() : "-",
+            estProd > 0 ? estProd.toLocaleString() : "-"
+          ]);
+        });
+        summaryFoot = [[
+          `TOTAL CONSOLIDADO (${monthName})`,
+          sumPeriodHis.toLocaleString(),
+          sumPeriodTriajes > 0 ? sumPeriodTriajes.toLocaleString() : "0",
+          sumPeriodCitas > 0 ? sumPeriodCitas.toLocaleString() : "0",
+          sumATC.toLocaleString(),
+          sumATD.toLocaleString(),
+          sumAPP > 0 ? sumAPP.toLocaleString() : "-",
+          (sumATC + sumAPP).toLocaleString()
+        ]];
+      } else {
+        summaryBody = [[
+          estabDisplay,
+          sumPeriodHis.toLocaleString(),
+          sumPeriodTriajes > 0 ? sumPeriodTriajes.toLocaleString() : "-",
+          sumPeriodCitas > 0 ? sumPeriodCitas.toLocaleString() : "-",
+          sumATC.toLocaleString(),
+          sumATD.toLocaleString(),
+          sumAPP > 0 ? sumAPP.toLocaleString() : "-",
+          (sumATC + sumAPP).toLocaleString()
+        ]];
+      }
+    } else {
+      summaryHead = [["ÁMBITO / ESTABLECIMIENTO", "ATENCIONES (ATC)", "ATENDIDOS (ATD)", "ACTIVIDADES (APP)", "TOTAL PRODUCCIÓN GENERAL"]];
+      if (activeEstabsInPeriod.length > 1) {
+        estabDetails.forEach(ed => {
+          const estProd = ed.atc + ed.app;
+          summaryBody.push([
+            ed.estab,
+            ed.atc > 0 ? ed.atc.toLocaleString() : "-",
+            ed.atd > 0 ? ed.atd.toLocaleString() : "-",
+            ed.app > 0 ? ed.app.toLocaleString() : "-",
+            estProd > 0 ? estProd.toLocaleString() : "-"
+          ]);
+        });
+        summaryFoot = [[
+          `TOTAL CONSOLIDADO (${monthName})`,
+          sumATC.toLocaleString(),
+          sumATD.toLocaleString(),
+          sumAPP > 0 ? sumAPP.toLocaleString() : "-",
+          (sumATC + sumAPP).toLocaleString()
+        ]];
+      } else {
+        summaryBody = [[
+          estabDisplay,
+          sumATC.toLocaleString(),
+          sumATD.toLocaleString(),
+          sumAPP > 0 ? sumAPP.toLocaleString() : "-",
+          (sumATC + sumAPP).toLocaleString()
+        ]];
+      }
+    }
+
+    doc.autoTable({
+      startY: currentY,
+      head: summaryHead,
+      body: summaryBody,
+      foot: summaryFoot,
+      theme: "grid",
+      pageBreak: "avoid",
+      headStyles: {
+        fillColor: primaryColor,
+        textColor: [255, 255, 255],
+        fontSize: 6.8,
+        fontStyle: "bold",
+        halign: "center",
+        cellPadding: 1.5
+      },
+      footStyles: {
+        fillColor: [226, 232, 240],
+        textColor: [15, 23, 42],
+        fontSize: 6.8,
+        fontStyle: "bold",
+        halign: "center",
+        cellPadding: 1.5
+      },
+      styles: {
+        fontSize: 6.5,
+        cellPadding: 1.4,
+        halign: "center"
+      },
+      columnStyles: {
+        0: { halign: "left", fontStyle: "bold" }
+      },
+      margin: { left: 14, right: 14 }
+    });
+
+    currentY = doc.lastAutoTable.finalY + 3;
+
+    let sumAtcQ1 = 0, sumAtcQ2 = 0;
+    let sumHisAtcQ1 = 0, sumHisAtdQ1 = 0, sumTriQ1 = 0, sumCitQ1 = 0;
+    let sumHisAtcQ2 = 0, sumHisAtdQ2 = 0, sumTriQ2 = 0, sumCitQ2 = 0;
+
+    // 4. TABLA 2: DESGLOSE DETALLADO DÍA A DÍA (01 AL 31) SI CORRESPONDE
+    if (includeDaily && dailyData && dailyData[mKey] && dailyData[mKey].dias) {
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...primaryColor);
+      doc.text(`2. REGISTRO Y DESGLOSE DETALLADO DÍA A DÍA (DÍAS 01 AL 31) — ${monthName} ${reportYear}`, 14, currentY);
+      currentY += 2;
+
+      if (hasSihce) {
+        const dailyBody = [];
+        for (let d = 1; d <= 16; d++) {
+          const dLeft = (d < 10 ? "0" : "") + d;
+          const leftInfo = mDaily.dias[dLeft] || { atc: 0, atd: 0, citas: 0, triajes: 0 };
+          const leftAtc = Number(leftInfo.atc) || 0;
+          const leftAtd = Number(leftInfo.atd) || 0;
+          const leftTri = Number(leftInfo.triajes) || 0;
+          const leftCit = Number(leftInfo.citas) || 0;
+          const leftHisAtc = Math.max(0, leftAtc - leftTri - leftCit);
+
+          sumHisAtcQ1 += leftHisAtc;
+          sumHisAtdQ1 += leftAtd;
+          sumTriQ1 += leftTri;
+          sumCitQ1 += leftCit;
+          sumAtcQ1 += leftAtc;
+
+          const dRightNum = d + 16;
+          let dRightStr = "—";
+          let rightHisAtcStr = "—", rightHisAtdStr = "—", rightTriStr = "—", rightCitStr = "—", rightAtcStr = "—";
+
+          if (dRightNum <= 31) {
+            const dRight = (dRightNum < 10 ? "0" : "") + dRightNum;
+            dRightStr = `Día ${dRight}`;
+            const rightInfo = mDaily.dias[dRight] || { atc: 0, atd: 0, citas: 0, triajes: 0 };
+            const rightAtc = Number(rightInfo.atc) || 0;
+            const rightAtd = Number(rightInfo.atd) || 0;
+            const rightTri = Number(rightInfo.triajes) || 0;
+            const rightCit = Number(rightInfo.citas) || 0;
+            const rightHisAtc = Math.max(0, rightAtc - rightTri - rightCit);
+
+            sumHisAtcQ2 += rightHisAtc;
+            sumHisAtdQ2 += rightAtd;
+            sumTriQ2 += rightTri;
+            sumCitQ2 += rightCit;
+            sumAtcQ2 += rightAtc;
+
+            rightHisAtcStr = rightHisAtc > 0 ? rightHisAtc.toLocaleString() : "-";
+            rightHisAtdStr = rightAtd > 0 ? rightAtd.toLocaleString() : "-";
+            rightTriStr = rightTri > 0 ? rightTri.toLocaleString() : "-";
+            rightCitStr = rightCit > 0 ? rightCit.toLocaleString() : "-";
+            rightAtcStr = rightAtc > 0 ? rightAtc.toLocaleString() : "-";
+          }
+
+          dailyBody.push([
+            `Día ${dLeft}`,
+            leftHisAtc > 0 ? leftHisAtc.toLocaleString() : "-",
+            leftAtd > 0 ? leftAtd.toLocaleString() : "-",
+            leftTri > 0 ? leftTri.toLocaleString() : "-",
+            leftCit > 0 ? leftCit.toLocaleString() : "-",
+            leftAtc > 0 ? leftAtc.toLocaleString() : "-",
+            dRightStr,
+            rightHisAtcStr,
+            rightHisAtdStr,
+            rightTriStr,
+            rightCitStr,
+            rightAtcStr
+          ]);
+        }
+
+        doc.autoTable({
+          startY: currentY,
+          pageBreak: "avoid",
+          head: [
+            [
+              { content: "PRIMERA QUINCENA (DÍAS 01 AL 16)", colSpan: 6, styles: { halign: "center", fillColor: [30, 64, 175], textColor: [255, 255, 255] } },
+              { content: "SEGUNDA QUINCENA (DÍAS 17 AL 31)", colSpan: 6, styles: { halign: "center", fillColor: [15, 118, 110], textColor: [255, 255, 255] } }
+            ],
+            [
+              { content: "DÍA", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "HIS", colSpan: 2, styles: { halign: "center" } },
+              { content: "TRIAJE", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "CITAS", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "TOTAL", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "DÍA", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "HIS", colSpan: 2, styles: { halign: "center" } },
+              { content: "TRIAJE", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "CITAS", rowSpan: 2, styles: { valign: "middle", halign: "center" } },
+              { content: "TOTAL", rowSpan: 2, styles: { valign: "middle", halign: "center" } }
+            ],
+            [
+              "ATC", "ATD",
+              "ATC", "ATD"
+            ]
+          ],
+          body: dailyBody,
+          foot: [
+            [
+              "SUBTOTAL",
+              sumHisAtcQ1 > 0 ? sumHisAtcQ1.toLocaleString() : "-",
+              sumHisAtdQ1 > 0 ? sumHisAtdQ1.toLocaleString() : "-",
+              sumTriQ1 > 0 ? sumTriQ1.toLocaleString() : "-",
+              sumCitQ1 > 0 ? sumCitQ1.toLocaleString() : "-",
+              sumAtcQ1.toLocaleString(),
+              "SUBTOTAL",
+              sumHisAtcQ2 > 0 ? sumHisAtcQ2.toLocaleString() : "-",
+              sumHisAtdQ2 > 0 ? sumHisAtdQ2.toLocaleString() : "-",
+              sumTriQ2 > 0 ? sumTriQ2.toLocaleString() : "-",
+              sumCitQ2 > 0 ? sumCitQ2.toLocaleString() : "-",
+              sumAtcQ2.toLocaleString()
+            ],
+            [
+              {
+                content: `CONSOLIDADO DEL MES (${monthName}):  HIS: ${(sumHisAtcQ1 + sumHisAtcQ2).toLocaleString()} ATC / ${(sumHisAtdQ1 + sumHisAtdQ2).toLocaleString()} ATD   |   TRIAJES: ${(sumTriQ1 + sumTriQ2).toLocaleString()}   |   CITAS ADMISIÓN: ${(sumCitQ1 + sumCitQ2).toLocaleString()}   |   TOTAL ATC: ${(sumAtcQ1 + sumAtcQ2).toLocaleString()}`,
+                colSpan: 12,
+                styles: { halign: "center", fontStyle: "bold", fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 5.6 }
+              }
+            ]
+          ],
+          theme: "grid",
+          headStyles: {
+            fontSize: 5.6,
+            fontStyle: "bold",
+            halign: "center",
+            textColor: [255, 255, 255],
+            fillColor: [51, 65, 85],
+            cellPadding: 0.8
+          },
+          footStyles: {
+            fillColor: [226, 232, 240],
+            textColor: [15, 23, 42],
+            fontSize: 5.6,
+            fontStyle: "bold",
+            halign: "center",
+            cellPadding: 0.8
+          },
+          styles: {
+            fontSize: 5.4,
+            cellPadding: 0.7,
+            halign: "center"
+          },
+          columnStyles: {
+            0: { halign: "center", fontStyle: "bold", cellWidth: 15 },
+            1: { halign: "center", cellWidth: 14 },
+            2: { halign: "center", cellWidth: 14 },
+            3: { halign: "center", cellWidth: 15 },
+            4: { halign: "center", cellWidth: 15 },
+            5: { halign: "center", fontStyle: "bold", cellWidth: 18 },
+            6: { halign: "center", fontStyle: "bold", cellWidth: 15 },
+            7: { halign: "center", cellWidth: 14 },
+            8: { halign: "center", cellWidth: 14 },
+            9: { halign: "center", cellWidth: 15 },
+            10: { halign: "center", cellWidth: 15 },
+            11: { halign: "center", fontStyle: "bold", cellWidth: 18 }
+          },
+          margin: { left: 14, right: 14 }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2.5;
+      } else {
+        const dailyBody = [];
+        for (let d = 1; d <= 16; d++) {
+          const dLeft = (d < 10 ? "0" : "") + d;
+          const leftInfo = mDaily.dias[dLeft] || { atc: 0, atd: 0 };
+          const leftAtc = Number(leftInfo.atc) || 0;
+          const leftAtd = Number(leftInfo.atd) || 0;
+          sumAtcQ1 += leftAtc;
+
+          const dRightNum = d + 16;
+          let dRightStr = "—";
+          let rightAtcStr = "—", rightAtdStr = "—";
+
+          if (dRightNum <= 31) {
+            const dRight = (dRightNum < 10 ? "0" : "") + dRightNum;
+            dRightStr = `Día ${dRight}`;
+            const rightInfo = mDaily.dias[dRight] || { atc: 0, atd: 0 };
+            const rightAtc = Number(rightInfo.atc) || 0;
+            const rightAtd = Number(rightInfo.atd) || 0;
+            sumAtcQ2 += rightAtc;
+            rightAtcStr = rightAtc > 0 ? rightAtc.toLocaleString() : "-";
+            rightAtdStr = rightAtd > 0 ? rightAtd.toLocaleString() : "-";
+          }
+
+          dailyBody.push([
+            `Día ${dLeft}`,
+            leftAtc > 0 ? leftAtc.toLocaleString() : "-",
+            leftAtd > 0 ? leftAtd.toLocaleString() : "-",
+            dRightStr,
+            rightAtcStr,
+            rightAtdStr
+          ]);
+        }
+
+        doc.autoTable({
+          startY: currentY,
+          pageBreak: "avoid",
+          head: [
+            [
+              { content: "PRIMERA QUINCENA (DÍAS 01 AL 16)", colSpan: 3, styles: { halign: "center", fillColor: [30, 64, 175] } },
+              { content: "SEGUNDA QUINCENA (DÍAS 17 AL 31)", colSpan: 3, styles: { halign: "center", fillColor: [15, 118, 110] } }
+            ],
+            ["DÍA", "ATC", "ATD", "DÍA", "ATC", "ATD"]
+          ],
+          body: dailyBody,
+          foot: [
+            [
+              "SUBTOTAL Q1",
+              sumAtcQ1.toLocaleString(),
+              "-",
+              "SUBTOTAL Q2",
+              sumAtcQ2.toLocaleString(),
+              "-"
+            ]
+          ],
+          theme: "grid",
+          headStyles: {
+            fontSize: 6.5,
+            fontStyle: "bold",
+            halign: "center",
+            textColor: [255, 255, 255],
+            fillColor: [51, 65, 85]
+          },
+          footStyles: {
+            fillColor: [226, 232, 240],
+            textColor: [15, 23, 42],
+            fontSize: 6.5,
+            fontStyle: "bold",
+            halign: "center"
+          },
+          styles: {
+            fontSize: 6,
+            cellPadding: 1,
+            halign: "center"
+          },
+          columnStyles: {
+            0: { halign: "center", fontStyle: "bold", cellWidth: 26 },
+            1: { halign: "center", cellWidth: 33 },
+            2: { halign: "center", cellWidth: 32 },
+            3: { halign: "center", fontStyle: "bold", cellWidth: 26 },
+            4: { halign: "center", cellWidth: 33 },
+            5: { halign: "center", cellWidth: 32 }
+          },
+          margin: { left: 14, right: 14 }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 2.5;
+      }
+    }
+
+    // 5. NOTA DE CERTIFICACIÓN INSTITUCIONAL
+    doc.setFontSize(5.6);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(100, 116, 139);
+    const certText = "* Certificación Oficial: Se certifica la producción combinada y detallada de atenciones del sistema HIS y registros de SIHCE de la Red Cusco Sur. Cualquier adulteración física o discrepancia con el sistema digital anula la validez del presente documento.";
+    const splitCert = doc.splitTextToSize(certText, 182);
+    doc.text(splitCert, 14, currentY);
+    currentY += (splitCert.length * 2.8) + 1;
+
+    // 6. FIRMAS INSTITUCIONALES Y CÓDIGO QR EN PARALELO
+    const signLineY = includeDaily ? 240 : 165;
+
+    // Línea 1: Firma Profesional
+    doc.setDrawColor(100, 116, 139);
+    doc.setLineWidth(0.35);
+    doc.line(18, signLineY, 70, signLineY);
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("FIRMA DEL PROFESIONAL", 44, signLineY + 3.5, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(5.6);
+    doc.setTextColor(71, 85, 105);
+    doc.text(String(user.nombre || "").toUpperCase().substring(0, 30), 44, signLineY + 6.5, { align: "center" });
+    doc.text(`DNI: ${user.dni || "-"}`, 44, signLineY + 9.5, { align: "center" });
+
+    // Línea 2: Jefatura / Estadística
+    doc.line(78, signLineY, 135, signLineY);
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 41, 59);
+    doc.text("JEFE DE ESTABLECIMIENTO / VoBo", 106.5, signLineY + 3.5, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(5.6);
+    doc.setTextColor(71, 85, 105);
+    doc.text("Responsable de Estadística e Informática", 106.5, signLineY + 6.5, { align: "center" });
+    doc.text("Red de Servicios de Salud Cusco Sur", 106.5, signLineY + 9.5, { align: "center" });
+
+    // QR Code a la derecha
+    try {
+      if (typeof qrcode === "function") {
+        const verifyBase = window.location.href.replace(/[^/]*$/, "") + "validar.html";
+        const estabParam = isConsolidated ? (activeEstabsInPeriod.length > 1 ? "Consolidado Red Cusco Sur" : estabDisplay) : selectedEstab;
+        let qrUrl = `${verifyBase}?dni=${user.dni}&p=${encodeURIComponent(user.nombre || "")}&e=${encodeURIComponent(estabParam)}&m=${mKey}&atc=${sumATC}&atd=${sumATD}&app=${sumAPP}&his=${sumPeriodHis}&tri=${sumPeriodTriajes}&cit=${sumPeriodCitas}&y=${reportYear}&d=${includeDaily ? 1 : 0}&col=${encodeURIComponent(user.colegio || "")}&mr=${encodeURIComponent(user.microred || "")}`;
+        if (includeDaily) {
+          qrUrl += `&q1=${sumAtcQ1}&q2=${sumAtcQ2}`;
+        }
+
+        const qr = qrcode(0, "M");
+        qr.addData(qrUrl);
+        qr.make();
+        const qrDataUrl = qr.createDataURL(4, 0);
+
+        doc.addImage(qrDataUrl, "PNG", 154, signLineY - 18, 26, 26);
+        doc.setFontSize(6);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(...primaryColor);
+        doc.text("VERIFICACIÓN DIGITAL", 167, signLineY + 11, { align: "center" });
+        doc.setFontSize(4.8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Escanear código QR para cotejo", 167, signLineY + 13.5, { align: "center" });
+        doc.text("con la base de datos oficial", 167, signLineY + 16, { align: "center" });
+      }
+    } catch (e) {
+      console.warn("QR Error:", e);
+    }
+
+    // 7. PIE DE PÁGINA (GARANTIZADO PÁGINA 1 DE 1)
+    const nowDateTime = new Date().toLocaleString("es-PE", {
+      dateStyle: "short",
+      timeStyle: "medium"
+    });
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.4);
+    doc.line(14, 282, 196, 282);
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(148, 163, 184);
+    doc.text(CONFIG.AUTOR, 14, 287);
+    doc.text(`Generado: ${nowDateTime}`, 105, 287, { align: "center" });
+    doc.text("Página 1 de 1", 196, 287, { align: "right" });
+
+    // Guardar archivo PDF
+    const cleanDni = String(user.dni || "reporte");
+    const estabSuffix = isConsolidated ? "Consolidado" : selectedEstab.replace(/[^a-zA-Z0-9]/g, "_");
+    const filename = `Reporte40_${cleanDni}_${monthName}_${estabSuffix}_${new Date().toISOString().slice(0, 10)}.pdf`;
     doc.save(filename);
 
     return true;

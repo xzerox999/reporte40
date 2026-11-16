@@ -303,14 +303,16 @@ async function initDashboard() {
         });
         return {
           meses: consMeses,
-          total: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.total || 0), 0)
+          total: activeEstabs.reduce((acc, e) => acc + (porEst[e]?.total || 0), 0),
+          por_establecimiento: userAppData.por_establecimiento
         };
       }
 
       if (!isIpressActive(currentUser.establecimiento)) {
         return { meses: {}, total: 0, disabled: true };
       }
-      return userAppData.consolidado || userAppData;
+      const baseApp = userAppData.consolidado || userAppData;
+      return { ...baseApp, por_establecimiento: userAppData.por_establecimiento };
     }
 
     if (!isIpressActive(selectedEstab)) {
@@ -1055,6 +1057,21 @@ async function initDashboard() {
     if (!baseAtd) return localAtd;
 
     const merged = JSON.parse(JSON.stringify(baseAtd));
+
+    // 1. Saneamiento de por_establecimiento contra los datos auditados locales
+    // Evita que rezagos antiguos de Google Sheets (donde citas de SIHCE fueron asignadas por error alfabético a Rondocán)
+    // contaminen la producción del usuario.
+    if (localAtd && localAtd.por_establecimiento && merged.por_establecimiento) {
+      Object.keys(merged.por_establecimiento).forEach(est => {
+        if (localAtd.por_establecimiento[est]) {
+          if (!est.toUpperCase().includes("SAN SEBASTIAN")) {
+            merged.por_establecimiento[est] = JSON.parse(JSON.stringify(localAtd.por_establecimiento[est]));
+          }
+        }
+      });
+    }
+
+    // 2. Integración de SIHCE en el establecimiento principal (San Sebastián) y consolidado
     CONFIG.MESES.forEach(m => {
       const mKey = m.key;
       const dMonthAtc = dailyData?.[mKey]?.total_atc || 0;
@@ -1065,25 +1082,43 @@ async function initDashboard() {
         const curAtc = Number(merged.consolidado.meses[mKey].atc) || 0;
         if (targetAtc > curAtc) {
           merged.consolidado.meses[mKey].atc = targetAtc;
-          const pEst = merged.establecimiento_principal;
-          if (pEst && merged.por_establecimiento?.[pEst]?.meses?.[mKey]) {
-            merged.por_establecimiento[pEst].meses[mKey].atc = targetAtc;
-          }
+        }
+      }
+
+      // Asegurar que San Sebastián tenga el total con SIHCE
+      const pEst = merged.establecimiento_principal || "SAN SEBASTIAN";
+      if (merged.por_establecimiento && merged.por_establecimiento[pEst] && merged.por_establecimiento[pEst].meses?.[mKey]) {
+        const sanSebAtc = Number(merged.por_establecimiento[pEst].meses[mKey].atc) || 0;
+        if (targetAtc > sanSebAtc) {
+          merged.por_establecimiento[pEst].meses[mKey].atc = targetAtc;
         }
       }
     });
 
+    // 3. Recalcular totales por establecimiento y consolidado
+    if (merged.por_establecimiento) {
+      Object.keys(merged.por_establecimiento).forEach(est => {
+        const estObj = merged.por_establecimiento[est];
+        if (estObj && estObj.meses) {
+          let eAtc = 0, eAtd = 0;
+          CONFIG.MESES.forEach(m => {
+            eAtc += Number(estObj.meses[m.key]?.atc) || 0;
+            eAtd += Number(estObj.meses[m.key]?.atd) || 0;
+          });
+          estObj.total_atc = eAtc;
+          estObj.total_atd = eAtd;
+        }
+      });
+    }
+
     if (merged.consolidado?.meses) {
-      let sumTot = 0;
+      let sumTot = 0, sumTotAtd = 0;
       CONFIG.MESES.forEach(m => {
         sumTot += Number(merged.consolidado.meses[m.key]?.atc) || 0;
+        sumTotAtd += Number(merged.consolidado.meses[m.key]?.atd) || 0;
       });
       merged.consolidado.total_atc = sumTot;
-
-      const pEst = merged.establecimiento_principal;
-      if (pEst && merged.por_establecimiento?.[pEst]) {
-        merged.por_establecimiento[pEst].total_atc = sumTot;
-      }
+      merged.consolidado.total_atd = sumTotAtd;
     }
 
     return merged;

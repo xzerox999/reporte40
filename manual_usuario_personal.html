@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual de Usuario — Sistema Reporte 40</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm 14mm 14mm 14mm;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+      background: #ffffff;
+      font-size: 11pt;
+      line-height: 1.45;
+    }
+
+    .page {
+      page-break-after: always;
+      position: relative;
+      min-height: 265mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Encabezado de página */
+    .header-bar {
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 8px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title-left {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #1e40af;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-title-right {
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Pie de página */
+    .footer-bar {
+      border-top: 1px solid #cbd5e1;
+      padding-top: 6px;
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    /* Portada */
+    .cover-container {
+      text-align: center;
+      padding: 30px 15px 10px 15px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.15;
+      margin: 0 0 10px 0;
+    }
+
+    .cover-subtitle {
+      font-size: 14pt;
+      color: #2563eb;
+      font-weight: 700;
+      margin: 0 0 25px 0;
+    }
+
+    .cover-desc-box {
+      background: #f8fafc;
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 16px 20px;
+      max-width: 620px;
+      text-align: left;
+      color: #334155;
+      font-size: 10.5pt;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 620px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 25px;
+    }
+
+    .index-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .index-num {
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 11pt;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .index-text {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .index-sub {
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 400;
+    }
+
+    /* Secciones de Pasos */
+    .step-section {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .step-circle {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 12pt;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+    }
+
+    .step-title {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .step-desc {
+      font-size: 10pt;
+      color: #334155;
+      margin: 0 0 12px 0;
+    }
+
+    /* Simuladores Visuales de UI */
+    .mock-container {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .callout-bubble {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ef4444;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 9pt;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .mock-input-group {
+      background: #ffffff;
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(59,130,246,0.15);
+    }
+
+    .mock-label {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #1e40af;
+      text-transform: uppercase;
+    }
+
+    .mock-val {
+      font-size: 11pt;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    .mock-btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 10.5pt;
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tip-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #16a34a;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 9pt;
+      color: #166534;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .warning-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #d97706;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 9pt;
+      color: #92400e;
+      margin-top: 8px;
+    }
+
+    /* Meses mock */
+    .months-mock-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .month-pill {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .month-pill.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+      box-shadow: 0 2px 4px rgba(37,99,235,0.3);
+    }
+
+    /* KPI Mock */
+    .kpi-row {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .kpi-card {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .kpi-blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .kpi-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .kpi-amber { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+
+    .kpi-num { font-size: 14pt; font-weight: 900; line-height: 1.1; }
+    .kpi-lbl { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+    /* Tabla resumen */
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-top: 8px;
+    }
+    .mini-table th {
+      background: #1e40af;
+      color: #ffffff;
+      padding: 6px 8px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .mini-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: center;
+      color: #334155;
+    }
+    .mini-table tr:nth-child(even) td { background: #f8fafc; }
+    .mini-table td:nth-child(2) { text-align: left; font-weight: 700; }
+
+    .faq-item {
+      margin-bottom: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+
+    .faq-q {
+      font-weight: 800;
+      font-size: 10pt;
+      color: #1e40af;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .faq-a {
+      font-size: 9pt;
+      color: #334155;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 1: PORTADA Y PRESENTACIÓN -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Red de Servicios de Salud Cusco Sur</span>
+      <span class="header-title-right">Dirección Regional de Salud • Cusco</span>
+    </div>
+
+    <div class="cover-container">
+      <div class="cover-badge">Guía Oficial de Capacitación y Uso Rápido</div>
+      <h1 class="cover-title">MANUAL DE USUARIO<br>SISTEMA REPORTE 40</h1>
+      <div class="cover-subtitle">Consulta de Producción Asistencial (HIS) y Emisión de Reportes Oficiales en PDF</div>
+
+      <div class="cover-desc-box">
+        <strong>¡Estimado(a) colega de la salud!</strong><br>
+        Esta guía ha sido elaborada de forma práctica, directa y paso a paso para que aprendas a consultar tu producción mensual acumulada, verificar tus atenciones y descargar tu reporte oficial en PDF en menos de un minuto, desde cualquier computadora o teléfono móvil.
+      </div>
+
+      <div class="index-grid">
+        <div class="index-card">
+          <div class="index-num">1</div>
+          <div>
+            <div class="index-text">Paso 1: Ingreso al Sistema</div>
+            <div class="index-sub">DNI y contraseña inicial</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">2</div>
+          <div>
+            <div class="index-text">Paso 2: Conoce tu Pantalla</div>
+            <div class="index-sub">Verifica tus datos y sede</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">3</div>
+          <div>
+            <div class="index-text">Paso 3: Selector de Años</div>
+            <div class="index-sub">Consulta de periodos anuales</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">4</div>
+          <div>
+            <div class="index-text">Paso 4: Selección de Meses</div>
+            <div class="index-sub">Por qué vienen desmarcados</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">5</div>
+          <div>
+            <div class="index-text">Paso 5: Filtro por IPRESS</div>
+            <div class="index-sub">Si rotaste en varios centros</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">6</div>
+          <div>
+            <div class="index-text">Paso 6: Vista Día a Día</div>
+            <div class="index-sub">Desglose del día 01 al 31</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">7</div>
+          <div>
+            <div class="index-text">Paso 7: Descarga de PDF</div>
+            <div class="index-sub">Reporte listo para presentar</div>
+          </div>
+        </div>
+
+        <div class="index-card">
+          <div class="index-num">8</div>
+          <div>
+            <div class="index-text">Paso 8: Cambiar Contraseña</div>
+            <div class="index-sub">Protege tu cuenta personal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 1</span>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 2: PASO 1 Y PASO 2 -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Paso a Paso • Acceso y Reconocimiento de Pantalla</span>
+      <span class="header-title-right">Sistema Reporte 40</span>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">1</div>
+        <h2 class="step-title">¿Cómo Ingresar a tu Cuenta? (Inicio de Sesión)</h2>
+      </div>
+      <p class="step-desc">
+        Abre el navegador en tu computadora o celular e ingresa al enlace institucional proporcionado por la Red Cusco Sur. Verás la siguiente pantalla de bienvenida:
+      </p>
+
+      <div class="mock-container">
+        <div style="font-weight: 800; color: #1e40af; margin-bottom: 8px; font-size: 9pt;">
+          ACCESO AL SISTEMA — PERSONAL DE SALUD
+        </div>
+        
+        <div class="mock-input-group">
+          <div>
+            <span class="callout-bubble">1</span>
+            <span class="mock-label">Número de DNI:</span>
+          </div>
+          <span class="mock-val">47048123</span>
+        </div>
+
+        <div class="mock-input-group">
+          <div>
+            <span class="callout-bubble">2</span>
+            <span class="mock-label">Contraseña:</span>
+          </div>
+          <span class="mock-val">••••••••</span>
+        </div>
+
+        <div class="mock-btn-primary">
+          <span class="callout-bubble" style="background:#ffffff; color:#1d4ed8;">3</span>
+          INICIAR SESIÓN EN EL SISTEMA
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <span>💡 <strong>¿Cuál es mi contraseña inicial?</strong> Si es la primera vez que ingresas, tu contraseña es <strong>tu propio número de DNI</strong>. Digítalo tal como está y haz clic en Iniciar Sesión.</span>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">2</div>
+        <h2 class="step-title">Conoce tu Encabezado y Datos Personales</h2>
+      </div>
+      <p class="step-desc">
+        Una vez adentro, en la parte superior verás tu información institucional. Tómate 5 segundos para verificar que tus datos sean correctos:
+      </p>
+
+      <div class="mock-container" style="background: #ffffff; border: 2px solid #2563eb;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="callout-bubble">1</span>
+            <strong style="color:#0f172a; font-size:11pt;">TRUJILLO VEGA ALVARO</strong>
+            <span style="background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:12px; font-size:8pt; font-weight:700;">DNI: 47048123</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="callout-bubble">3</span>
+            <span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:8pt; font-weight:700; color:#334155;">🌙 Modo Oscuro</span>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:15px; font-size:8.5pt; color:#475569;">
+          <div><span class="callout-bubble" style="width:18px;height:18px;font-size:7.5pt;">2</span> <strong>Establecimiento:</strong> C.S. SAN JERONIMO</div>
+          <div><strong>MicroRed:</strong> CUSCO SUR</div>
+          <div><strong>Colegio:</strong> C.M.P. 58941</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <span>🌙 <strong>Tip para el cansancio visual:</strong> Si trabajas de noche o de madrugada, haz clic en el botón <strong>"Modo Oscuro"</strong> para poner la pantalla en fondo oscuro y descansar tu vista.</span>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 2</span>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 3: PASO 3 Y PASO 4 -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Paso a Paso • Selección de Años y Meses</span>
+      <span class="header-title-right">Sistema Reporte 40</span>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">3</div>
+        <h2 class="step-title">Selector de Años (Periodo Fiscal Multi-Anual)</h2>
+      </div>
+      <p class="step-desc">
+        El sistema cuenta con soporte para múltiples años de producción. El comportamiento es muy sencillo:
+      </p>
+
+      <div class="mock-container">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <strong style="color:#0f172a; font-size:9.5pt;">Periodo Fiscal / Año del Reporte:</strong>
+            <div style="color:#64748b; font-size:8pt;">Selecciona el año que deseas consultar con un solo clic</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <div style="background:#2563eb; color:#ffffff; font-weight:800; padding:6px 16px; border-radius:6px; font-size:9pt; box-shadow:0 2px 4px rgba(37,99,235,0.3);">
+              ✓ 2026
+            </div>
+            <div style="background:#ffffff; color:#64748b; font-weight:700; border:1px solid #cbd5e1; padding:6px 16px; border-radius:6px; font-size:9pt;">
+              2027
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul style="font-size:9.5pt; color:#334155; margin:8px 0 0 15px; padding:0;">
+        <li style="margin-bottom:4px;"><strong>Si solo hay 1 año habilitado (ej. 2026):</strong> El selector no se mostrará; entrarás directo a ese año sin hacer nada extra.</li>
+        <li><strong>Si hay 2 o más años habilitados (ej. 2026 y 2027):</strong> Verás los botones azules. Solo haz un clic sobre el año que necesitas y todas las tablas se actualizarán al instante.</li>
+      </ul>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">4</div>
+        <h2 class="step-title">Selección de Meses (¡Por qué vienen apagados!)</h2>
+      </div>
+      <p class="step-desc">
+        Al ingresar, <strong>todos los meses aparecen apagados en gris por defecto</strong>. Esto es una medida de protección para evitar que por error imprimas todo el año si solo necesitas el reporte de un mes específico.
+      </p>
+
+      <div class="mock-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:9pt; font-weight:800; color:#1e40af;">SELECCIÓN DE MESES PARA TU REPORTE:</span>
+          <div style="display:flex; gap:6px;">
+            <span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:7.5pt; font-weight:700; padding:3px 8px; border-radius:4px;">
+              [ Todos ]
+            </span>
+            <span style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; font-size:7.5pt; font-weight:700; padding:3px 8px; border-radius:4px;">
+              [ Limpiar ]
+            </span>
+          </div>
+        </div>
+
+        <div class="months-mock-grid">
+          <div class="month-pill">ENE</div>
+          <div class="month-pill">FEB</div>
+          <div class="month-pill">MAR</div>
+          <div class="month-pill">ABR</div>
+          <div class="month-pill">MAY</div>
+          <div class="month-pill">JUN</div>
+          <div class="month-pill">JUL</div>
+          <div class="month-pill">AGO</div>
+          <div class="month-pill">SET</div>
+          <div class="month-pill active">OCT (Activo)</div>
+          <div class="month-pill">NOV</div>
+          <div class="month-pill">DIC</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+        <div class="tip-box" style="margin-top:0;">
+          <span>🎯 <strong>Para un solo mes:</strong> Haz un clic sobre el mes que te pide tu jefatura (ej. <code>OCT</code>). Se pondrá en color azul resaltado.</span>
+        </div>
+        <div class="tip-box" style="margin-top:0;">
+          <span>📅 <strong>Para todo el año:</strong> Si requieres el periodo acumulado anual completo, haz clic en el botón superior <strong>"Todos"</strong>.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 3</span>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 4: PASO 5 Y PASO 6 -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Paso a Paso • Establecimientos y Modo Diario</span>
+      <span class="header-title-right">Sistema Reporte 40</span>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">5</div>
+        <h2 class="step-title">Filtro por Establecimiento (Rotaciones o Guardias)</h2>
+      </div>
+      <p class="step-desc">
+        ¿Hiciste coberturas, destaques o guardias en más de un centro o puesto de salud? El sistema detecta automáticamente tus sedes y activa el selector de IPRESS:
+      </p>
+
+      <div class="mock-container">
+        <div style="font-size:8.5pt; font-weight:700; color:#1e40af; margin-bottom:6px;">
+          FILTRO DE ÁMBITO / ESTABLECIMIENTO DE SALUD:
+        </div>
+        <div style="background:#ffffff; border:1px solid #94a3b8; border-radius:6px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:9.5pt; font-weight:700; color:#0f172a;">
+            🏢 Consolidado Total Red Cusco Sur (Suma de todas tus sedes)
+          </span>
+          <span style="color:#64748b; font-size:8pt;">▼</span>
+        </div>
+      </div>
+
+      <div style="font-size:9pt; color:#334155; margin-top:6px;">
+        <strong>Tienes dos opciones de consulta:</strong>
+        <ul style="margin:4px 0 0 15px; padding:0;">
+          <li><strong>Opción Consolidado:</strong> Suma toda tu producción médica en la Red Cusco Sur (ideal para constancias generales).</li>
+          <li><strong>Opción IPRESS Individual:</strong> Permite ver únicamente las atenciones realizadas en esa sede (ideal para informes dirigidos al jefe de un establecimiento en particular).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PASO 6 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">6</div>
+        <h2 class="step-title">Consulta Día a Día (Desglose Diario del 01 al 31)</h2>
+      </div>
+      <p class="step-desc">
+        Cuando marcas <strong>un solo mes</strong> en el selector, el sistema habilita el botón especial de <strong>Desglose Diario</strong>:
+      </p>
+
+      <div class="mock-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:8px 12px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:12pt;">📊</span>
+            <div>
+              <strong style="color:#1e40af; font-size:9pt;">Ver Desglose Diario de Producción (Día a Día)</strong>
+              <div style="color:#64748b; font-size:7.5pt;">Muestra cuántos pacientes atendiste cada día del mes</div>
+            </div>
+          </div>
+          <div style="background:#2563eb; color:#fff; font-size:8pt; font-weight:700; padding:4px 10px; border-radius:12px;">
+            ACTIVADO [ON]
+          </div>
+        </div>
+
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th style="width:40px;">Día</th>
+              <th>Fecha de Atención</th>
+              <th>Atenciones (ATC)</th>
+              <th>Pacientes (ATD)</th>
+              <th>Citas / Triajes SIHCE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>01</td><td>Jueves 01 de Octubre</td><td>18</td><td>12</td><td>18</td></tr>
+            <tr><td>02</td><td>Viernes 02 de Octubre</td><td>22</td><td>15</td><td>22</td></tr>
+            <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+            <tr><td>31</td><td>Sábado 31 de Octubre</td><td>20</td><td>14</td><td>20</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip-box">
+        <span>📈 <strong>Conciliación transparente:</strong> Si tu centro utiliza SIHCE, la tabla diaria te muestra tanto lo registrado en HIS como las citas de admisión y triajes de enfermería.</span>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 4</span>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 5: PASO 7 Y PASO 8 -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Paso a Paso • Descarga de PDF y Seguridad</span>
+      <span class="header-title-right">Sistema Reporte 40</span>
+    </div>
+
+    <!-- PASO 7 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">7</div>
+        <h2 class="step-title">Descargar tu Reporte Oficial en PDF</h2>
+      </div>
+      <p class="step-desc">
+        Una vez elegidos los meses y el establecimiento, genera tu documento oficial con un solo clic:
+      </p>
+
+      <div class="mock-container" style="text-align:center; padding:18px;">
+        <div style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color:#ffffff; font-weight:900; font-size:12pt; padding:14px; border-radius:8px; box-shadow:0 4px 10px rgba(37,99,235,0.35); display:inline-block; max-width:380px; width:100%;">
+          📄 Descargar Reporte en PDF
+        </div>
+        <div style="color:#64748b; font-size:8pt; margin-top:6px;">
+          El archivo se descargará con el nombre: <code>Reporte40_TU_DNI_Fecha.pdf</code>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px; font-size:9pt; color:#334155;">
+        <strong>¿Qué contiene tu PDF oficial descargado?</strong>
+        <ul style="margin:4px 0 0 15px; padding:0;">
+          <li>Membrete oficial de la Red de Servicios de Salud Cusco Sur y Gobierno Regional Cusco.</li>
+          <li>Tus datos profesionales completos (Nombre, DNI, Colegio y Sede).</li>
+          <li>Cuadro resumen de indicadores (Total Atenciones ATC, Pacientes ATD y Promoción APP).</li>
+          <li>Tabla detallada por meses y (si activaste el modo diario) el anexo del día 01 al 31.</li>
+          <li>Pie de página oficial con fecha, hora exacta y código de auditoría para su validez legal.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PASO 8 -->
+    <div class="step-section">
+      <div class="step-header">
+        <div class="step-circle">8</div>
+        <h2 class="step-title">Cambiar tu Contraseña por Seguridad</h2>
+      </div>
+      <p class="step-desc">
+        Para asegurar que nadie más acceda a tu información, cambia tu contraseña desde tu menú de perfil:
+      </p>
+
+      <div class="mock-container">
+        <div style="font-size:9pt; font-weight:800; color:#1e40af; margin-bottom:8px;">
+          CAMBIO DE CONTRASEÑA PERSONAL
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="mock-input-group" style="margin-bottom:0;">
+            <span class="mock-label">1. Clave Actual:</span>
+            <span class="mock-val">••••••••</span>
+          </div>
+          <div class="mock-input-group" style="margin-bottom:0;">
+            <span class="mock-label">2. Nueva Clave:</span>
+            <span class="mock-val">MiClaveSegura26</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <span>🔒 <strong>Tranquilidad garantizada:</strong> Tu nueva clave queda guardada de forma cifrada e intransferible. Si alguna vez la olvidas, solicita al Responsable de Estadística de la Red Cusco Sur que la restaure a tu número de DNI.</span>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 5</span>
+    </div>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- PÁGINA 6: GLOSARIO Y PREGUNTAS FRECUENTES -->
+  <!-- ============================================================= -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="header-title-left">Glosario de Indicadores y Preguntas Frecuentes</span>
+      <span class="header-title-right">Sistema Reporte 40</span>
+    </div>
+
+    <!-- GLOSARIO -->
+    <div class="step-section" style="margin-bottom:14px;">
+      <h3 style="font-size:11pt; font-weight:800; color:#1e40af; margin:0 0 8px 0;">
+        📚 Glosario de Indicadores Sanitarios (HIS)
+      </h3>
+      <div class="kpi-row" style="margin:0;">
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-num">ATC</div>
+          <div class="kpi-lbl">Atenciones Médicas</div>
+          <p style="font-size:7.5pt; color:#475569; margin:4px 0 0 0;">Total de actos médicos o atenciones asistenciales brindadas en el periodo.</p>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-num">ATD</div>
+          <div class="kpi-lbl">Pacientes Atendidos</div>
+          <p style="font-size:7.5pt; color:#475569; margin:4px 0 0 0;">Cantidad de personas únicas atendidas (se cuenta 1 vez por paciente en el año).</p>
+        </div>
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-num">APP</div>
+          <div class="kpi-lbl">Promoción de Salud</div>
+          <p style="font-size:7.5pt; color:#475569; margin:4px 0 0 0;">Talleres, sesiones educativas y actividades preventivas extramurales.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREGUNTAS FRECUENTES -->
+    <div class="step-section">
+      <h3 style="font-size:11pt; font-weight:800; color:#1e40af; margin:0 0 10px 0;">
+        ❓ Preguntas Frecuentes del Personal
+      </h3>
+
+      <div class="faq-item">
+        <div class="faq-q">⚠️ ¿Qué significa si sale un aviso de "Establecimiento en Auditoría"?</div>
+        <div class="faq-a">
+          Significa que la Oficina de Estadística de la Red Cusco Sur se encuentra conciliando la base de datos de esa IPRESS en particular. Solo debes esperar unos momentos a que finalice el proceso o comunicarte con el área de Estadística.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">📱 ¿Puedo entrar al sistema desde mi teléfono celular?</div>
+        <div class="faq-a">
+          <strong>Sí, totalmente.</strong> La página es 100% responsiva y se adapta a cualquier pantalla de teléfono inteligente, tablet o laptop. Incluso puedes instalarla como acceso directo en tu pantalla de inicio.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">🎓 Soy personal SERUMS, ¿cómo solicito mi reporte acumulado?</div>
+        <div class="faq-a">
+          Para tu trámite final de SERUMS (ej. de Mayo a Mayo), el Administrador de la Red puede emitir tu <strong>Reporte Certificado Especial SERUMS</strong> directamente desde el panel central con firma y sello.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">📞 ¿Con quién me comunico si no encuentro mi DNI o mis datos no coinciden?</div>
+        <div class="faq-a">
+          Comunícate directamente con la <strong>Oficina de Estadística e Informática de la Red de Servicios de Salud Cusco Sur</strong> para que actualicen tu registro en el padrón oficial del sistema.
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTA FINAL -->
+    <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; text-align:center; font-size:8.5pt; color:#1e40af;">
+      <strong>RED DE SERVICIOS DE SALUD CUSCO SUR — GOBIERNO REGIONAL CUSCO</strong><br>
+      Dirección Ejecutiva • Oficina de Estadística e Informática • Sistema de Información HIS<br>
+      <span style="color:#64748b; font-size:7.5pt;">Guía y Sistema desarrollados por xzerox99 • 2026</span>
+    </div>
+
+    <div class="footer-bar">
+      <span>Sistema Oficial Reporte 40 • Red Cusco Sur</span>
+      <span>Página 6</span>
+    </div>
+  </div>
+
+</body>
+</html>

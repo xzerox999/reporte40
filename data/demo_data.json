@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09 14:07:54",
+  "generated_at": "2026-11-16 10:22:04",
   "admin": {
     "dni": "46638223",
     "password_hash": "00c803d2bb6e38f04a41882a17ec10ef40855fba37fcbea08d29777c3e2cc6ea"
@@ -72,8 +72,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "PAUCARTAMBO",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -133,8 +133,8 @@
       "nombre": "ARIAS ILAQUITA MARILUZ",
       "establecimiento": "PAUCARTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "KCAURY"
+        "KCAURY",
+        "PAUCARTAMBO"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -155,8 +155,8 @@
       "nombre": "SOSA IBEROS LOURDES",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -186,9 +186,9 @@
       "nombre": "SUPO TORDOYA VIRGINIA",
       "establecimiento": "PARURO",
       "establecimientos": [
+        "CCOCHIRIHUAY",
         "PARURO",
-        "OMACHA",
-        "CCOCHIRIHUAY"
+        "OMACHA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -208,8 +208,8 @@
       "nombre": "QUISPE QUISPE ROSA LUZ",
       "establecimiento": "CUSIPATA",
       "establecimientos": [
-        "CUSIPATA",
-        "QUIQUIJANA"
+        "QUIQUIJANA",
+        "CUSIPATA"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -219,8 +219,8 @@
       "nombre": "LOAIZA YAMPASI LILIAN GLADYS",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -240,8 +240,8 @@
       "nombre": "ESPERILLA VELASQUEZ ILA ANGELA",
       "establecimiento": "PUESTO DE SALUD MARCACONGA",
       "establecimientos": [
-        "ACOPIA",
-        "PUESTO DE SALUD MARCACONGA"
+        "PUESTO DE SALUD MARCACONGA",
+        "ACOPIA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -251,8 +251,8 @@
       "nombre": "NEYRA VELARDE ELENA JUSTINA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -332,8 +332,8 @@
       "nombre": "PARI PANDIA INES",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -363,8 +363,8 @@
       "nombre": "MAMANI PASACA GLADYS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -414,8 +414,8 @@
       "nombre": "CUTIPA QUILLA AYDEE YANETH",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -535,8 +535,8 @@
       "nombre": "GUTIERREZ QUISPE YOLANDA MARCIA",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "CONCHACALLE",
         "TUPAC AMARU",
+        "CONCHACALLE",
         "SAN SEBASTIAN"
       ],
       "microred": "",
@@ -817,8 +817,8 @@
       "nombre": "SOTELO PALOMINO GLADIS",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -918,8 +918,8 @@
       "nombre": "DUEÐAS CUSIHUALLPA LIBIA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -1129,8 +1129,8 @@
       "nombre": "RAMIREZ GUTIERREZ JAVIER",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -1201,8 +1201,8 @@
       "nombre": "SALAS INFANTAS FLOR DE MARIA",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -1463,8 +1463,8 @@
       "nombre": "OROZ RAMOS OLGA DUNIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -1474,8 +1474,8 @@
       "nombre": "MENA AEDO TATIANA",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "URCOS",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "URCOS"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -1668,8 +1668,8 @@
       "nombre": "URIBE CORREDOR JULIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -1679,8 +1679,8 @@
       "nombre": "RAMOS CUSIHUAMAN ELISA",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "HUARA HUARA",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "HUARA HUARA"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -1700,11 +1700,11 @@
       "nombre": "ARROYO ARROYO JOSE LUIS",
       "establecimiento": "SANTA ROSA",
       "establecimientos": [
-        "OROPESA",
-        "SANTA ROSA",
         "INCACANCHA",
+        "TINKI",
         "PAUCARTAMBO",
-        "TINKI"
+        "SANTA ROSA",
+        "OROPESA"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -2065,8 +2065,8 @@
       "nombre": "TEJADA BIAMONT MARIA JESUS",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -2196,8 +2196,8 @@
       "nombre": "UMIYAURI GONZALES ABELARDO SANTIAGO",
       "establecimiento": "MENTAL COMUNITARIO HUARO",
       "establecimientos": [
-        "MENTAL COMUNITARIO HUARO",
-        "PILCOPATA"
+        "PILCOPATA",
+        "MENTAL COMUNITARIO HUARO"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -2227,8 +2227,8 @@
       "nombre": "MANRIQUE SAICO JUDIT",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
         "ACCAMANA",
+        "SAN JERONIMO",
         "PACCARECTAMBO"
       ],
       "microred": "CUSCO",
@@ -2289,8 +2289,8 @@
       "nombre": "AGUILAR KALLA ESPERANZA JULIANA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -2423,9 +2423,9 @@
       "establecimiento": "OROPESA",
       "establecimientos": [
         "OROPESA",
-        "TINKI",
         "CCARHUAYO",
-        "OCONGATE"
+        "OCONGATE",
+        "TINKI"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -2445,17 +2445,17 @@
       "nombre": "ESCOBAR LOPEZ JHONNY",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "OROPESA",
-        "ANDAHUAYLILLAS",
         "HUANCARANI",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "ACCAMANA",
         "SAN JERONIMO",
         "ACOMAYO",
+        "TUPAC AMARU",
         "URCOS",
-        "SAN SEBASTIAN"
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "ACCAMANA",
+        "SAYLLA",
+        "ANDAHUAYLILLAS",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -2506,8 +2506,8 @@
       "nombre": "TORRES LOVATON ELIZABETH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "POMACANCHI"
       ],
       "microred": "NO PERTENECE A NINGUNA MICRORED",
       "colegio": ""
@@ -2607,8 +2607,8 @@
       "nombre": "CHE MORVEL- DANIEL RICARDO",
       "establecimiento": "QUIQUIJANA",
       "establecimientos": [
-        "QUIQUIJANA",
-        "OCONGATE"
+        "OCONGATE",
+        "QUIQUIJANA"
       ],
       "microred": "",
       "colegio": ""
@@ -2671,8 +2671,8 @@
       "nombre": "CHINO LIMA RINA",
       "establecimiento": "SANTA ROSA",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "SANTA ROSA"
+        "SANTA ROSA",
+        "PAUCARTAMBO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -2743,8 +2743,8 @@
       "nombre": "LLANCAY LOAYZA MALU INDIRA",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -2814,8 +2814,8 @@
       "nombre": "LIZARASO CANDIA SOLEDAD",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "QUIQUIJANA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "QUIQUIJANA"
       ],
       "microred": "NO PERTENECE A NINGUNA MICRORED",
       "colegio": ""
@@ -2975,8 +2975,8 @@
       "nombre": "CORDOVA PERALTA MARIBEL ROCIO",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "QUIQUIJANA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "QUIQUIJANA"
       ],
       "microred": "",
       "colegio": ""
@@ -3006,8 +3006,8 @@
       "nombre": "VILLEGAS OSORIO MILUSKA BEATRIZ",
       "establecimiento": "MENTAL SAN SEBASTIAN",
       "establecimientos": [
-        "MENTAL SAN SEBASTIAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "MENTAL SAN SEBASTIAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -3027,8 +3027,8 @@
       "nombre": "ARAUJO HUAMAN JOSE DAVID",
       "establecimiento": "CHALLABAMBA",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "CHALLABAMBA"
+        "CHALLABAMBA",
+        "PAUCARTAMBO"
       ],
       "microred": "",
       "colegio": ""
@@ -3209,8 +3209,8 @@
       "nombre": "ZANABRIA HUARACCALLO ROSAURA",
       "establecimiento": "RONDOCAN",
       "establecimientos": [
-        "RONDOCAN",
-        "SAN JERONIMO"
+        "SAN JERONIMO",
+        "RONDOCAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -3260,8 +3260,8 @@
       "nombre": "SOTA DE SALCEDO DEISY MARINA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -3341,8 +3341,8 @@
       "nombre": "DELGADILLO DEZA GLORIA",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "SAYLLA",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAYLLA"
       ],
       "microred": "",
       "colegio": ""
@@ -3524,8 +3524,8 @@
       "nombre": "TINTAYA TINTAYA AYDEE",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "TINKI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "TINKI"
       ],
       "microred": "",
       "colegio": ""
@@ -3535,8 +3535,8 @@
       "nombre": "ALATA AGUILAR RUTH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -3687,8 +3687,8 @@
       "nombre": "ROCA PERALTA FREDY",
       "establecimiento": "CHALLABAMBA",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "CHALLABAMBA"
+        "CHALLABAMBA",
+        "PAUCARTAMBO"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -4300,8 +4300,8 @@
       "nombre": "CCORIHUAMAN MAYTA JAVIER",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4372,8 +4372,8 @@
       "nombre": "FERNANDEZ TAIRO NADIA JULIA",
       "establecimiento": "PICHIHUA COLQUEPATA",
       "establecimientos": [
-        "PICHIHUA COLQUEPATA",
-        "HUANCARANI"
+        "HUANCARANI",
+        "PICHIHUA COLQUEPATA"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -4506,8 +4506,8 @@
       "nombre": "HUAYLLANI HALANOCCA ELSA JANET",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4557,14 +4557,14 @@
       "nombre": "CALLO QUISPE CARLOS CARLYLE",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "CCAPI",
-        "COLCHA",
         "PACCARECTAMBO",
-        "CCOCHIRIHUAY",
+        "ACCHA",
         "PARURO",
-        "OMACHA",
+        "CCOCHIRIHUAY",
         "ANTAPALLPA",
-        "ACCHA"
+        "OMACHA",
+        "COLCHA",
+        "CCAPI"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -4594,8 +4594,8 @@
       "nombre": "CHILE CHILLIHUANI MARIA ISABEL",
       "establecimiento": "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
       "establecimientos": [
-        "COLQUEPATA",
-        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO"
+        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
+        "COLQUEPATA"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -4746,8 +4746,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4787,9 +4787,9 @@
       "nombre": "MAZA FLORES LISBETH",
       "establecimiento": "CUSIPATA",
       "establecimientos": [
+        "PUESTO DE SALUD SANGARARA",
         "MENTAL COMUNITARIO HUARO",
-        "CUSIPATA",
-        "PUESTO DE SALUD SANGARARA"
+        "CUSIPATA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4849,8 +4849,8 @@
       "nombre": "TTITO QUISPE JENY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4860,8 +4860,8 @@
       "nombre": "ALARCON CARREÐO APARICIO",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4901,8 +4901,8 @@
       "nombre": "ZEGARRA ZAVALA PEREGRINA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -4922,8 +4922,8 @@
       "nombre": "ROMERO MACUAGA EDISON",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -5023,15 +5023,15 @@
       "nombre": "CAHUANA MENDOZA JUDITH MARCELA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "OROPESA",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "ACCAMANA",
-        "PARURO",
         "SAN JERONIMO",
         "ACOMAYO",
-        "SAN SEBASTIAN"
+        "TUPAC AMARU",
+        "PARURO",
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "ACCAMANA",
+        "SAYLLA",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -5112,9 +5112,9 @@
       "nombre": "CRESPO TRUJILLO BRITH IRAYA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
+        "TUPAC AMARU",
         "CENTRO DE SALUD POMACANCHI",
-        "TUPAC AMARU"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -5155,8 +5155,8 @@
       "nombre": "SAMANEZ SORIA BENNY YESIKA",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -5317,8 +5317,8 @@
       "nombre": "CARRILLO ALMANACIN DHARNELY",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "PARURO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "PARURO"
       ],
       "microred": "",
       "colegio": ""
@@ -5328,8 +5328,8 @@
       "nombre": "COLQUE TORRES ANY SHEILA",
       "establecimiento": "URCOS",
       "establecimientos": [
-        "URCOS",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "URCOS"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -5489,10 +5489,10 @@
       "nombre": "CANDIA GUTIERREZ ALDO",
       "establecimiento": "ACCHA",
       "establecimientos": [
-        "ANTAPALLPA",
-        "PUESTO DE SALUD DE HUASQUILLAY",
         "OMACHA",
-        "ACCHA"
+        "ACCHA",
+        "ANTAPALLPA",
+        "PUESTO DE SALUD DE HUASQUILLAY"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -5805,17 +5805,17 @@
       "nombre": "ZAMALLOA CHAMORRO LIDA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "OROPESA",
-        "ANDAHUAYLILLAS",
         "HUANCARANI",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "ACCAMANA",
         "SAN JERONIMO",
         "ACOMAYO",
+        "TUPAC AMARU",
         "URCOS",
-        "SAN SEBASTIAN"
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "ACCAMANA",
+        "SAYLLA",
+        "ANDAHUAYLILLAS",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -5826,8 +5826,8 @@
       "establecimiento": "OROPESA",
       "establecimientos": [
         "OROPESA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -5868,9 +5868,9 @@
       "nombre": "GALLEGOS PUMA VERONICA CARMEN",
       "establecimiento": "ACCHA",
       "establecimientos": [
-        "PUESTO DE SALUD DE HUASQUILLAY",
+        "ACCHA",
         "OMACHA",
-        "ACCHA"
+        "PUESTO DE SALUD DE HUASQUILLAY"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -5890,9 +5890,9 @@
       "nombre": "TAMAYO CHOQUE JUAN CARLOS",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "POMACANCHI",
+        "TUPAC AMARU",
         "PILCOPATA",
-        "TUPAC AMARU"
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -5902,14 +5902,14 @@
       "nombre": "HUILLCANINA PAUCAR GLADYS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "CENTRO DE SALUD POMACANCHI",
-        "ACCAMANA",
+        "SAN JERONIMO",
+        "COLQUEPATA",
+        "TINKI",
         "PAUCARTAMBO",
         "POMACANCHI",
-        "SAN JERONIMO",
-        "TINKI",
         "SAN SEBASTIAN",
-        "COLQUEPATA",
+        "ACCAMANA",
+        "CENTRO DE SALUD POMACANCHI",
         "QUIQUIJANA"
       ],
       "microred": "ACOMAYO",
@@ -5940,8 +5940,8 @@
       "nombre": "ECHEGARAY NAVARRO LUCILA",
       "establecimiento": "SAYLLA",
       "establecimientos": [
-        "SAYLLA",
-        "OCONGATE"
+        "OCONGATE",
+        "SAYLLA"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -6012,8 +6012,8 @@
       "nombre": "CCAHUANTICO ESPIRILLA GLADYS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -6043,8 +6043,8 @@
       "nombre": "YAMPARA VILCA GYOVANNA BEATRIZ",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "CCATCCA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "CCATCCA"
       ],
       "microred": "",
       "colegio": ""
@@ -6084,8 +6084,8 @@
       "nombre": "NINA FUENTES ROY DARWIN",
       "establecimiento": "QUIQUIJANA",
       "establecimientos": [
-        "QUIQUIJANA",
-        "URCOS"
+        "URCOS",
+        "QUIQUIJANA"
       ],
       "microred": "",
       "colegio": ""
@@ -6095,9 +6095,9 @@
       "nombre": "HUALLPA SANCHEZ MARISOL",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
-        "RONDOCAN",
+        "ACCAMANA",
         "SAN JERONIMO",
-        "ACCAMANA"
+        "RONDOCAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -6238,8 +6238,8 @@
       "nombre": "ARIAS CABRERA JORGE RAUL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -6279,8 +6279,8 @@
       "nombre": "MORA VALER NOEMI",
       "establecimiento": "QUIQUIJANA",
       "establecimientos": [
-        "QUIQUIJANA",
-        "URCOS"
+        "URCOS",
+        "QUIQUIJANA"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -6340,8 +6340,8 @@
       "nombre": "VENTURA FLORES ANALI ROSMERY",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "HUANCARANI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "HUANCARANI"
       ],
       "microred": "",
       "colegio": ""
@@ -6392,8 +6392,8 @@
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
         "TUPAC AMARU",
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -6442,7 +6442,7 @@
     "42103944": {
       "dni": "42103944",
       "nombre": "DAZA CACERES RUTH MERY",
-      "establecimiento": "ACCHA",
+      "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
         "ACCHA",
         "SAN SEBASTIAN"
@@ -6486,8 +6486,8 @@
       "establecimiento": "SANTA ROSA",
       "establecimientos": [
         "OROPESA",
-        "PAUCARTAMBO",
-        "SANTA ROSA"
+        "SANTA ROSA",
+        "PAUCARTAMBO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -6517,8 +6517,8 @@
       "nombre": "CONDORI CHAMPI JUSTINA GERMANIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -6578,8 +6578,8 @@
       "nombre": "CASTILLO TAPIA JENNIFER",
       "establecimiento": "CUSIPATA",
       "establecimientos": [
-        "CUSIPATA",
-        "QUIQUIJANA"
+        "QUIQUIJANA",
+        "CUSIPATA"
       ],
       "microred": "",
       "colegio": ""
@@ -6617,10 +6617,10 @@
     "42260590": {
       "dni": "42260590",
       "nombre": "MAURI SURCO MARUJA",
-      "establecimiento": "HUANCARANI",
+      "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "HUANCARANI",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "HUANCARANI"
       ],
       "microred": "",
       "colegio": ""
@@ -6700,8 +6700,8 @@
       "nombre": "QUISPE BERRIO SUREIMA",
       "establecimiento": "VIZCOCHONI",
       "establecimientos": [
-        "VIZCOCHONI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "VIZCOCHONI"
       ],
       "microred": "",
       "colegio": ""
@@ -6721,10 +6721,10 @@
       "nombre": "CHURATA ZARATE SOLEDAD",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "ANTAPALLPA",
         "CCOCHIRIHUAY",
         "ACCHA",
-        "PARURO"
+        "PARURO",
+        "ANTAPALLPA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -6775,8 +6775,8 @@
       "nombre": "CHINO MAMANI RUBI ESTHER",
       "establecimiento": "URCOS",
       "establecimientos": [
-        "HUARO",
         "KCAURY",
+        "HUARO",
         "URCOS"
       ],
       "microred": "URCOS",
@@ -6837,8 +6837,8 @@
       "nombre": "VARGAS SOTO KRISS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -6889,8 +6889,8 @@
       "nombre": "PACHECO CAMARGO ALFIO JAMIL",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "CCATCCA",
-        "MARCAPATA"
+        "MARCAPATA",
+        "CCATCCA"
       ],
       "microred": "",
       "colegio": ""
@@ -6960,8 +6960,8 @@
       "nombre": "LOVON JOVE CARMEN ROSA",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "RONDOCAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "RONDOCAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -6971,8 +6971,8 @@
       "nombre": "MAMANI ASLLA CELIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -6982,9 +6982,9 @@
       "nombre": "FERNANDEZ QUISPE WENDY",
       "establecimiento": "PARURO",
       "establecimientos": [
+        "CCOCHIRIHUAY",
         "PARURO",
-        "OMACHA",
-        "CCOCHIRIHUAY"
+        "OMACHA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -7057,8 +7057,8 @@
       "nombre": "SOTO PANIURA MARIBEL",
       "establecimiento": "RONDOCAN",
       "establecimientos": [
-        "RONDOCAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "RONDOCAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -7088,8 +7088,8 @@
       "nombre": "CAHUA OLIVARES WILSON",
       "establecimiento": "ANDAHUAYLILLAS",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
-        "CCATCCA"
+        "CCATCCA",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -7230,8 +7230,8 @@
       "nombre": "HUARANGA MARMANILLO HIVRAHIM",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "QUINCE MIL"
+        "QUINCE MIL",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -7262,8 +7262,8 @@
       "nombre": "MONTUFAR NUÐEZ MARGOT",
       "establecimiento": "MENTAL SAN SEBASTIAN",
       "establecimientos": [
-        "MENTAL SAN SEBASTIAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "MENTAL SAN SEBASTIAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -7273,8 +7273,8 @@
       "nombre": "MAMANI CHECYA DORIS",
       "establecimiento": "PUESTO DE SALUD MARCACONGA",
       "establecimientos": [
-        "CUSIPATA",
-        "PUESTO DE SALUD MARCACONGA"
+        "PUESTO DE SALUD MARCACONGA",
+        "CUSIPATA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7364,8 +7364,8 @@
       "nombre": "NINAN CUSIPUMA NAYZA",
       "establecimiento": "QUIQUIJANA",
       "establecimientos": [
-        "QUIQUIJANA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "QUIQUIJANA"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -7385,9 +7385,9 @@
       "nombre": "HERRERA ROZAS LISBETH",
       "establecimiento": "ACOMAYO",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
+        "PILLPINTO",
         "ACOMAYO",
-        "PILLPINTO"
+        "ANDAHUAYLILLAS"
       ],
       "microred": "",
       "colegio": ""
@@ -7409,8 +7409,8 @@
       "establecimientos": [
         "SANTA ROSA",
         "PARURO",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7501,8 +7501,8 @@
       "nombre": "ACHAHUI CHAVEZ LOURDES",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "CCATCCA",
-        "INCACANCHA"
+        "INCACANCHA",
+        "CCATCCA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -7573,8 +7573,8 @@
       "nombre": "MAZA QUIÐONES VICTORIA CORINA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "ACOMAYO",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "ACOMAYO"
       ],
       "microred": "",
       "colegio": ""
@@ -7646,8 +7646,8 @@
       "nombre": "BENITES TAPASCO HENRY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7657,8 +7657,8 @@
       "nombre": "PAUCAR HUANCA MIRIAM SOLEDAD",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7678,8 +7678,8 @@
       "nombre": "QUISPE CCARHUARUPAY JOSE SERGIO",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "TINKI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "TINKI"
       ],
       "microred": "NO PERTENECE A NINGUNA MICRORED",
       "colegio": ""
@@ -7731,8 +7731,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "PAUCARTAMBO",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7803,8 +7803,8 @@
       "nombre": "SUYLLO TORRES PATRICIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7914,8 +7914,8 @@
       "nombre": "CHOQUISACA CCOA ROCIO",
       "establecimiento": "ANDAHUAYLILLAS",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
-        "URCOS"
+        "URCOS",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "",
       "colegio": ""
@@ -7945,8 +7945,8 @@
       "nombre": "SEGURA DELGADO MONICA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -7956,8 +7956,8 @@
       "nombre": "QUISPE SARAVIA MAGDA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8029,9 +8029,9 @@
       "nombre": "ILLACONZA TOROBEO EDITH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
+        "CENTRO DE SALUD POMACANCHI",
         "ACOMAYO",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8061,9 +8061,9 @@
       "nombre": "OVIEDO GRANADA SHIRLEY MIRIAM",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
         "ACCAMANA",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8093,9 +8093,9 @@
       "nombre": "TITO CHACMANI JULY",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "ANTAPALLPA",
         "CCOCHIRIHUAY",
         "PARURO",
+        "ANTAPALLPA",
         "COLCHA"
       ],
       "microred": "",
@@ -8227,9 +8227,9 @@
       "nombre": "QUISPE BERNO MAGDA",
       "establecimiento": "PACCARECTAMBO",
       "establecimientos": [
-        "POMACANCHI",
         "CENTRO DE SALUD POMACANCHI",
-        "PACCARECTAMBO"
+        "PACCARECTAMBO",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8359,8 +8359,8 @@
       "nombre": "CORBACHO CARAZAS LUZ ANGELICA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -8510,9 +8510,9 @@
       "nombre": "ALARCON ESCALANTE GILMER",
       "establecimiento": "PARURO",
       "establecimientos": [
+        "CCOCHIRIHUAY",
         "PARURO",
-        "CCAPI",
-        "CCOCHIRIHUAY"
+        "CCAPI"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -8542,8 +8542,8 @@
       "nombre": "ESCALANTE TITO MARIELA ROCIO",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -8684,8 +8684,8 @@
       "nombre": "CCALACHUA CHICAÐA GRACIELA INES",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8786,10 +8786,10 @@
       "nombre": "QUIJANO OLARTE YOVANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
+        "TUPAC AMARU",
         "POMACANCHI",
-        "CCATCCA",
         "CENTRO DE SALUD POMACANCHI",
-        "TUPAC AMARU"
+        "CCATCCA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8800,8 +8800,8 @@
       "establecimiento": "SANTA ROSA",
       "establecimientos": [
         "SANTA ROSA",
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -8811,8 +8811,8 @@
       "nombre": "LIVANO ECHEVARRIA CARLA LEONOR",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "CUSIPATA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "CUSIPATA"
       ],
       "microred": "NO PERTENECE A NINGUNA MICRORED",
       "colegio": ""
@@ -8822,8 +8822,8 @@
       "nombre": "DELGADO RAMOS SHAYLA YULIANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8853,8 +8853,8 @@
       "nombre": "ROJAS TUPA FIORELA KATERIN",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -8874,8 +8874,8 @@
       "nombre": "QUISPE ORCCOAPAZA MARY LUZ",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -8915,8 +8915,8 @@
       "nombre": "MEZA CASTRO SONIA",
       "establecimiento": "SANTA ROSA",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "SANTA ROSA"
+        "SANTA ROSA",
+        "PAUCARTAMBO"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -8986,8 +8986,8 @@
       "nombre": "TINTAYA AIMA DAISY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9077,13 +9077,13 @@
       "nombre": "CALDERON FUENTES LADY VICTORIA",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "KCAURY",
-        "PAMPACAMARA",
         "CCARHUAYO",
-        "CCATCCA",
-        "QUINCE MIL",
         "CHICHINA",
-        "MARCAPATA"
+        "QUINCE MIL",
+        "MARCAPATA",
+        "KCAURY",
+        "CCATCCA",
+        "PAMPACAMARA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -9133,8 +9133,8 @@
       "nombre": "QUISPE YAURI EDER ALBERTO",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9145,9 +9145,9 @@
       "establecimiento": "HUARA HUARA",
       "establecimientos": [
         "KCAURY",
+        "SAN SEBASTIAN",
         "HUARA HUARA",
-        "QUIQUIJANA",
-        "SAN SEBASTIAN"
+        "QUIQUIJANA"
       ],
       "microred": "",
       "colegio": ""
@@ -9178,8 +9178,8 @@
       "nombre": "ZARATE UNDA KELLYN YATIVE",
       "establecimiento": "CUSIPATA",
       "establecimientos": [
-        "CUSIPATA",
-        "PILCOPATA"
+        "PILCOPATA",
+        "CUSIPATA"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -9219,8 +9219,8 @@
       "nombre": "PEZO CARMONA LIVIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9290,10 +9290,10 @@
       "nombre": "DUEÐAS POVEA MELISSA",
       "establecimiento": "CCATCCA",
       "establecimientos": [
+        "CHICHINA",
         "KCAURY",
-        "CCATCCA",
         "PAMPACAMARA",
-        "CHICHINA"
+        "CCATCCA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -9303,8 +9303,8 @@
       "nombre": "QUISPE BOCANGEL SANDRA",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "CCATCCA",
-        "ACOMAYO"
+        "ACOMAYO",
+        "CCATCCA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -9407,8 +9407,8 @@
       "nombre": "CONZA ROCCA YESICA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9448,8 +9448,8 @@
       "nombre": "QUISPE CHULLCA BERNARDINA",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "PARURO",
         "CCOCHIRIHUAY",
+        "PARURO",
         "COLCHA"
       ],
       "microred": "PARURO",
@@ -9470,9 +9470,9 @@
       "nombre": "SALAS FLORES MARIELA ELIANA",
       "establecimiento": "ACOMAYO",
       "establecimientos": [
-        "POMACANCHI",
+        "CENTRO DE SALUD POMACANCHI",
         "ACOMAYO",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9553,9 +9553,9 @@
       "nombre": "HILAQUITA CHOQUEHUILLCA LUCY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
+        "OCONGATE",
         "TINKI",
-        "OCONGATE"
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -9605,8 +9605,8 @@
       "nombre": "MAMANI LOAYZA SONIA MAGDALENA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "PAUCARTAMBO"
       ],
       "microred": "",
       "colegio": ""
@@ -9644,7 +9644,7 @@
     "45174655": {
       "dni": "45174655",
       "nombre": "HUARANCCA LEVITA YONY",
-      "establecimiento": "CHILLIHUANI",
+      "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
         "SAN SEBASTIAN",
         "CHILLIHUANI"
@@ -9677,8 +9677,8 @@
       "nombre": "CALCINA QUISPE DAYANIRA LEYLY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9729,8 +9729,8 @@
       "nombre": "QUISPE APAZA YESSIKA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9858,23 +9858,23 @@
     "45477143": {
       "dni": "45477143",
       "nombre": "COATA LIPA NIDIA",
-      "establecimiento": "LUCRE",
+      "establecimiento": "HUANCARANI",
       "establecimientos": [
-        "LUCRE",
-        "PILLPINTO",
-        "KCAURY",
-        "ANDAHUAYLILLAS",
-        "CUSIPATA",
-        "PAMPACAMARA",
-        "YAURISQUE",
         "HUANCARANI",
-        "QUIQUIJANA",
-        "CCATCCA",
         "SAN JERONIMO",
-        "URCOS",
-        "SAN SEBASTIAN",
+        "KCAURY",
+        "ACOS",
+        "CCATCCA",
+        "CUSIPATA",
+        "LUCRE",
         "HUARO",
-        "ACOS"
+        "SAN SEBASTIAN",
+        "URCOS",
+        "ANDAHUAYLILLAS",
+        "PAMPACAMARA",
+        "PILLPINTO",
+        "YAURISQUE",
+        "QUIQUIJANA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9904,8 +9904,8 @@
       "nombre": "MEJIA SOTA MARGOT",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -9946,9 +9946,9 @@
       "nombre": "TAYPE PARI ANA MARIA",
       "establecimiento": "PARURO",
       "establecimientos": [
+        "CCOCHIRIHUAY",
         "PARURO",
         "OMACHA",
-        "CCOCHIRIHUAY",
         "COLCHA"
       ],
       "microred": "PARURO",
@@ -10031,8 +10031,8 @@
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
         "SANTA ROSA",
-        "SAN JERONIMO",
-        "ACCAMANA"
+        "ACCAMANA",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -10143,8 +10143,8 @@
       "nombre": "NIETO GONZALES CHRISTHEL MAGALY",
       "establecimiento": "MENTAL SAN SEBASTIAN",
       "establecimientos": [
-        "MENTAL SAN SEBASTIAN",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "MENTAL SAN SEBASTIAN"
       ],
       "microred": "",
       "colegio": ""
@@ -10175,8 +10175,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10256,8 +10256,8 @@
       "nombre": "CHAVEZ MAMANI PEDRO ABRAHAM",
       "establecimiento": "HUANCARANI",
       "establecimientos": [
-        "PARURO",
-        "HUANCARANI"
+        "HUANCARANI",
+        "PARURO"
       ],
       "microred": "",
       "colegio": ""
@@ -10267,13 +10267,13 @@
       "nombre": "CUYA TUEROS DANESA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "OROPESA",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "PARURO",
         "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "TUPAC AMARU",
+        "PARURO",
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "SAYLLA",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -10293,14 +10293,14 @@
       "nombre": "CONDORI VILLAFUERTE HENRY",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "OROPESA",
-        "ANDAHUAYLILLAS",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
         "SAN JERONIMO",
+        "TUPAC AMARU",
         "URCOS",
-        "SAN SEBASTIAN"
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "SAYLLA",
+        "ANDAHUAYLILLAS",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -10380,8 +10380,8 @@
       "nombre": "CABALLERO JAUJA MILAGROS SARA",
       "establecimiento": "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
       "establecimientos": [
-        "COLQUEPATA",
-        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO"
+        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
+        "COLQUEPATA"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -10441,8 +10441,8 @@
       "nombre": "QUILLI VARGAS BRIGIDA BEATRIZ",
       "establecimiento": "OCONGATE",
       "establecimientos": [
-        "POMACANCHI",
-        "OCONGATE"
+        "OCONGATE",
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -10482,8 +10482,8 @@
       "nombre": "CURSE QUISPE ROXANA",
       "establecimiento": "HUASAC",
       "establecimientos": [
-        "PUESTO DE SALUD SANGARARA",
         "AYRE",
+        "PUESTO DE SALUD SANGARARA",
         "HUASAC"
       ],
       "microred": "ACOMAYO",
@@ -10545,8 +10545,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10556,8 +10556,8 @@
       "nombre": "RIO BOLIVAR CLARA ELENA",
       "establecimiento": "MENTAL SAN SEBASTIAN",
       "establecimientos": [
-        "MENTAL SAN SEBASTIAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "MENTAL SAN SEBASTIAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -10577,8 +10577,8 @@
       "nombre": "QUISPE ESPIRILLA YOVANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10618,9 +10618,9 @@
       "nombre": "ALVARADO SILVA YNES OLIVIA",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JUAN DE POMACANCHI",
+        "URCOS",
         "SAN JERONIMO",
-        "URCOS"
+        "SAN JUAN DE POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -10650,8 +10650,8 @@
       "nombre": "ARBIETO PINO HECTOR HUGO",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "CUSIPATA",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "CUSIPATA"
       ],
       "microred": "",
       "colegio": ""
@@ -10681,8 +10681,8 @@
       "nombre": "CHAMPI CONDORI DENIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10722,8 +10722,8 @@
       "nombre": "MAMANI QUISPE NOHEMI",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10835,8 +10835,8 @@
       "nombre": "SALOMA CARAZAS TANIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10856,8 +10856,8 @@
       "nombre": "YUTO COTARMA YESILA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10877,8 +10877,8 @@
       "nombre": "QUISPE QUISPE MARIA LISBETH",
       "establecimiento": "ACCHA",
       "establecimientos": [
-        "OMACHA",
-        "ACCHA"
+        "ACCHA",
+        "OMACHA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -10898,8 +10898,8 @@
       "nombre": "SULLA CHOQUE YASMIN NERISOL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -10929,8 +10929,8 @@
       "nombre": "CCALLOCONDO TTURUCO VALERIO",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11010,9 +11010,9 @@
       "nombre": "QUISPE LIPA YANET",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
+        "PUESTO DE SALUD MARCACONGA",
         "CENTRO DE SALUD POMACANCHI",
-        "POMACANCHI",
-        "PUESTO DE SALUD MARCACONGA"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11062,8 +11062,8 @@
       "nombre": "FARFAN CARRASCO YENIFER EUGENIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11073,8 +11073,8 @@
       "nombre": "MEDRANO HUAMPA DELLI",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11104,11 +11104,11 @@
       "nombre": "GUERRERO GUEVARA KEYLLA IRIS",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "CCAPI",
-        "COLCHA",
-        "CCOCHIRIHUAY",
         "PARURO",
-        "ANTAPALLPA"
+        "CCOCHIRIHUAY",
+        "ANTAPALLPA",
+        "COLCHA",
+        "CCAPI"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -11118,9 +11118,9 @@
       "nombre": "QUISPE ZEVALLOS LIZANDRO JUNIOR",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
+        "CENTRO DE SALUD POMACANCHI",
         "ACOMAYO",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11260,9 +11260,9 @@
       "nombre": "APARICIO MAMANI KELLY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
+        "CENTRO DE SALUD POMACANCHI",
         "TINKI",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11373,8 +11373,8 @@
       "nombre": "QUISPE YNGA CALLAÐAUPA MILAGROS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11424,9 +11424,9 @@
       "nombre": "TORRES PUMAHUILLCA ROXANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
         "CUSIPATA",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11497,8 +11497,8 @@
       "nombre": "NINA NINA ROBERT",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11518,9 +11518,9 @@
       "nombre": "HANCCO GUTIERREZ HERMELINDA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
+        "CENTRO DE SALUD POMACANCHI",
         "SAN JUAN DE POMACANCHI",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11540,8 +11540,8 @@
       "nombre": "QUISPE DELGADO JOSE MARCILINO",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11581,8 +11581,8 @@
       "nombre": "MAYO QUISPE AMADOR",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11592,8 +11592,8 @@
       "nombre": "FLORES LLOCCLLA MARITZA MONICA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "OCONGATE",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "OCONGATE"
       ],
       "microred": "",
       "colegio": ""
@@ -11703,8 +11703,8 @@
       "nombre": "ROZAS FARFAN ANABEL",
       "establecimiento": "SAN SEBASTIAN",
       "establecimientos": [
-        "POMACANCHI",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "POMACANCHI"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -11735,8 +11735,8 @@
       "nombre": "QUISPE CHUPTAYA WASHINGTON",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11786,8 +11786,8 @@
       "nombre": "MAMANI SANCHEZ ARISTIDES HARBER",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11808,8 +11808,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "PAUCARTAMBO",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -11839,8 +11839,8 @@
       "nombre": "FELIX SAAVEDRA FLOR DE MARIA",
       "establecimiento": "MENTAL SAN SEBASTIAN",
       "establecimientos": [
-        "MENTAL SAN SEBASTIAN",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "MENTAL SAN SEBASTIAN"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -11901,8 +11901,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "PARURO",
-        "POMACANCHI",
-        "COLCHA"
+        "COLCHA",
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -11912,8 +11912,8 @@
       "nombre": "SURCO QUISPE CELIA",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "CCATCCA",
-        "MARCAPATA"
+        "MARCAPATA",
+        "CCATCCA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -11973,8 +11973,8 @@
       "nombre": "JOACHIN HUAMAN AYDEE",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12004,8 +12004,8 @@
       "nombre": "ARAPA PUCHO NANCY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12025,8 +12025,8 @@
       "nombre": "VERA SALIZAR ROMINA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "URCOS",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "URCOS"
       ],
       "microred": "",
       "colegio": ""
@@ -12097,8 +12097,8 @@
       "nombre": "QUISPE CHUIZO MARIZET",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12158,8 +12158,8 @@
       "nombre": "MENDOZA QUISPE DEYSI KARINA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12169,8 +12169,8 @@
       "nombre": "YLLA LABRA ERIKA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12211,8 +12211,8 @@
       "nombre": "CHALLCO CACERES NOEMI",
       "establecimiento": "MOLLOMARCA",
       "establecimientos": [
-        "MOLLOMARCA",
-        "HUASAC"
+        "HUASAC",
+        "MOLLOMARCA"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -12263,8 +12263,8 @@
       "nombre": "SACACA QUISPE LISBETH",
       "establecimiento": "KCAURY",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "KCAURY"
+        "KCAURY",
+        "PAUCARTAMBO"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -12315,8 +12315,8 @@
       "nombre": "MOSCOSO QUISPETUPA CAROL STEFANIE",
       "establecimiento": "QUIQUIJANA",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "QUIQUIJANA"
+        "QUIQUIJANA",
+        "PAUCARTAMBO"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -12326,8 +12326,8 @@
       "nombre": "POCCO CRUZ DEYSI",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12407,8 +12407,8 @@
       "nombre": "GOMEZ MAMANI KELLY FLOR DE MARIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "URCOS"
+        "URCOS",
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -12428,8 +12428,8 @@
       "nombre": "CASTRO MAYTA EVELYN GABRIELA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12439,8 +12439,8 @@
       "nombre": "CCACCYA CAPCHA BETZI MELISSA DOMI",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12502,8 +12502,8 @@
       "nombre": "SANI LOPEZ CLEOFE",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12533,8 +12533,8 @@
       "nombre": "AQUINO RAMIREZ ANTHONY ISRAEL",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "PARURO",
-        "CCOCHIRIHUAY"
+        "CCOCHIRIHUAY",
+        "PARURO"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -12605,11 +12605,11 @@
       "nombre": "TORRES BELLIDO ROSALI",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "OROPESA",
-        "CENTRO DE SALUD POMACANCHI",
+        "SAN JERONIMO",
         "TUPAC AMARU",
         "SANTA ROSA",
-        "SAN JERONIMO",
+        "OROPESA",
+        "CENTRO DE SALUD POMACANCHI",
         "POMACANCHI"
       ],
       "microred": "ACOMAYO",
@@ -12630,8 +12630,8 @@
       "nombre": "QUINTANA YAURIS ALFREDO ROBINSON",
       "establecimiento": "MOLLOMARCA",
       "establecimientos": [
-        "MOLLOMARCA",
-        "ACOMAYO"
+        "ACOMAYO",
+        "MOLLOMARCA"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -12661,8 +12661,8 @@
       "nombre": "HUAMAN ZEGARRA FLORA AYDEE",
       "establecimiento": "PICHIHUA COLQUEPATA",
       "establecimientos": [
-        "PICHIHUA COLQUEPATA",
-        "ACOMAYO"
+        "ACOMAYO",
+        "PICHIHUA COLQUEPATA"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12673,8 +12673,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12684,9 +12684,9 @@
       "nombre": "SINZAYA CACHERA YONI VILMA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
+        "PILCOPATA",
         "CENTRO DE SALUD POMACANCHI",
-        "POMACANCHI",
-        "PILCOPATA"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12741,8 +12741,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12762,9 +12762,9 @@
       "nombre": "SEQUEIROS ZEGARRA MARIA ISABEL",
       "establecimiento": "ACCAMANA",
       "establecimientos": [
+        "ACCAMANA",
         "SAN JERONIMO",
-        "SANTA LUCIA",
-        "ACCAMANA"
+        "SANTA LUCIA"
       ],
       "microred": "CUSCO",
       "colegio": ""
@@ -12835,8 +12835,8 @@
       "nombre": "HUAMAN NAVARRO CANDY LESLY",
       "establecimiento": "ACCHA",
       "establecimientos": [
-        "OMACHA",
-        "ACCHA"
+        "ACCHA",
+        "OMACHA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -12868,8 +12868,8 @@
       "nombre": "CUADROS OLLACHICA ROXANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12899,8 +12899,8 @@
       "nombre": "RIMACHI AGUIRRE ELMER",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -12970,8 +12970,8 @@
       "nombre": "MEZA SANCHEZ YOLANDA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13051,10 +13051,10 @@
       "nombre": "ANTONIO PADILLA ALEXANDER",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "TINKI",
         "INCACANCHA",
+        "TUPAC AMARU",
         "OCONGATE",
-        "TUPAC AMARU"
+        "TINKI"
       ],
       "microred": "",
       "colegio": ""
@@ -13064,8 +13064,8 @@
       "nombre": "GONZALO APAZA JOHN CRISTIAN",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13115,8 +13115,8 @@
       "nombre": "LEVITA HUAMANI ROLANDO",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "SAN SEBASTIAN",
+        "SAN JERONIMO"
       ],
       "microred": "",
       "colegio": ""
@@ -13126,8 +13126,8 @@
       "nombre": "PILLCO PILARES LADY MEYLYN",
       "establecimiento": "CCOLCA",
       "establecimientos": [
-        "URPAY",
-        "CCOLCA"
+        "CCOLCA",
+        "URPAY"
       ],
       "microred": "",
       "colegio": ""
@@ -13137,8 +13137,8 @@
       "nombre": "CAYO MAMANI TANIA SANDRA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13209,8 +13209,8 @@
       "nombre": "HUARHUACHI DIAZ GIMENA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13230,8 +13230,8 @@
       "nombre": "MOLLEHUANCA RAMOS KARINA",
       "establecimiento": "OCONGATE",
       "establecimientos": [
-        "CUSIPATA",
-        "OCONGATE"
+        "OCONGATE",
+        "CUSIPATA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -13241,8 +13241,8 @@
       "nombre": "UÐURUCO TTITO YORKA ERMELINDA",
       "establecimiento": "CCATCCA",
       "establecimientos": [
-        "CCATCCA",
-        "HUANCARANI"
+        "HUANCARANI",
+        "CCATCCA"
       ],
       "microred": "",
       "colegio": ""
@@ -13412,8 +13412,8 @@
       "nombre": "CUTIRE ARONE ELIANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13474,9 +13474,9 @@
       "nombre": "FLORES PAUCAR SOAMI STEFANI",
       "establecimiento": "TINKI",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
         "KCAURY",
-        "TINKI"
+        "TINKI",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -13527,8 +13527,8 @@
       "nombre": "AIQUI ILLAPUMA YULY",
       "establecimiento": "OCONGATE",
       "establecimientos": [
-        "TINKI",
-        "OCONGATE"
+        "OCONGATE",
+        "TINKI"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -13538,8 +13538,8 @@
       "nombre": "CUSI HUAMAN ANGEL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -13599,8 +13599,8 @@
       "nombre": "MIRANDA MARTINEZ ROXANA ABIGAIL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "PILCOPATA"
+        "PILCOPATA",
+        "POMACANCHI"
       ],
       "microred": "",
       "colegio": ""
@@ -13710,8 +13710,8 @@
       "nombre": "AYALA AQUINO YAQUELIN",
       "establecimiento": "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO"
+        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
+        "PAUCARTAMBO"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -13912,8 +13912,8 @@
       "nombre": "MALDONADO LOPEZ LUZ MARGARITA",
       "establecimiento": "OCONGATE",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "OCONGATE"
+        "OCONGATE",
+        "PAUCARTAMBO"
       ],
       "microred": "",
       "colegio": ""
@@ -13994,10 +13994,10 @@
       "nombre": "CHAMPI QUISPE ALICIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
+        "HUANCARANI",
         "COLQUEPATA",
-        "POMACANCHI",
         "CENTRO DE SALUD POMACANCHI",
-        "HUANCARANI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14098,8 +14098,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "PAUCARTAMBO",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14120,10 +14120,10 @@
       "nombre": "TTITO ROCCA YENIFER",
       "establecimiento": "PACCARECTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
+        "PACCARECTAMBO",
         "HUANCA HUANCA",
         "HUANOQUITE",
-        "PACCARECTAMBO"
+        "PAUCARTAMBO"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -14203,8 +14203,8 @@
       "nombre": "VARGAS FLORES JULIO CESAR",
       "establecimiento": "CHALLABAMBA",
       "establecimientos": [
-        "CHALLABAMBA",
-        "ACCHA"
+        "ACCHA",
+        "CHALLABAMBA"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -14254,8 +14254,8 @@
       "nombre": "BRAVO OBLITAS DANAHE ITATI",
       "establecimiento": "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
       "establecimientos": [
-        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO",
-        "AYRE"
+        "AYRE",
+        "MENTAL COMUNITARIO VIRGEN DEL ROSARIO"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -14365,8 +14365,8 @@
       "nombre": "LEGUIA ACUÐA ELIZABETH",
       "establecimiento": "PAUCARTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "PACCARECTAMBO"
+        "PACCARECTAMBO",
+        "PAUCARTAMBO"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -14386,8 +14386,8 @@
       "nombre": "QUISPE SUMA MARIBEL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14458,8 +14458,8 @@
       "nombre": "QUISPE CHOQQUE YANET",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14559,8 +14559,8 @@
       "nombre": "NINA NINA ILDA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14570,8 +14570,8 @@
       "nombre": "KCALA CHOQQUEMAMANI MARIELA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14601,8 +14601,8 @@
       "nombre": "ENRIQUEZ HUAMANI ANALY",
       "establecimiento": "CHALLABAMBA",
       "establecimientos": [
-        "CHALLABAMBA",
-        "CCARHUAYO"
+        "CCARHUAYO",
+        "CHALLABAMBA"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -14632,8 +14632,8 @@
       "nombre": "TARRAGA HANCCO DELFINA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14653,8 +14653,8 @@
       "nombre": "SURCO ALVARO YOVANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14754,8 +14754,8 @@
       "nombre": "VALDIVIA SOBERON JOMAYDA SARITA",
       "establecimiento": "PATRIA",
       "establecimientos": [
-        "PARURO",
-        "PATRIA"
+        "PATRIA",
+        "PARURO"
       ],
       "microred": "PAUCARTAMBO",
       "colegio": ""
@@ -14775,8 +14775,8 @@
       "nombre": "ENRIQUEZ DELGADO RAYZA SHIRLEY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14786,8 +14786,8 @@
       "nombre": "JALLASI CCORIMANYA LIDIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14817,9 +14817,9 @@
       "nombre": "CONDORI CHILE JULIANA",
       "establecimiento": "CHALLABAMBA",
       "establecimientos": [
+        "CENTRO DE SALUD POMACANCHI",
         "CHALLABAMBA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14839,8 +14839,8 @@
       "nombre": "YUCA BENIQUE LOIDITH MILAGROS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -14881,10 +14881,10 @@
       "nombre": "BORDA BERROCAL FIORELA",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "CUSIPATA",
-        "COLCHA",
         "PARURO",
         "URCOS",
+        "CUSIPATA",
+        "COLCHA",
         "QUIQUIJANA"
       ],
       "microred": "URCOS",
@@ -15036,8 +15036,8 @@
       "nombre": "FARFAN GUTIERREZ DANYEL",
       "establecimiento": "PAUCARTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "OCONGATE"
+        "OCONGATE",
+        "PAUCARTAMBO"
       ],
       "microred": "",
       "colegio": ""
@@ -15047,8 +15047,8 @@
       "nombre": "RODRIGUEZ PAUCAR MARINA SHEARMELY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -15108,8 +15108,8 @@
       "nombre": "GUTIERREZ SALAZAR NURIA MABEL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -15279,8 +15279,8 @@
       "nombre": "TAGLE RENDON VIVIANA MILAGROS",
       "establecimiento": "PUESTO DE SALUD DE HUASQUILLAY",
       "establecimientos": [
-        "PUESTO DE SALUD DE HUASQUILLAY",
-        "OMACHA"
+        "OMACHA",
+        "PUESTO DE SALUD DE HUASQUILLAY"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -15290,10 +15290,10 @@
       "nombre": "CCOLLQQUESAÐA PEREZ SONIA",
       "establecimiento": "PACCARECTAMBO",
       "establecimientos": [
-        "POMACANCHI",
         "ACCHA",
         "CENTRO DE SALUD POMACANCHI",
-        "PACCARECTAMBO"
+        "PACCARECTAMBO",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -15373,8 +15373,8 @@
       "nombre": "MELO VALDERRAMA YELITZA",
       "establecimiento": "PAUCARTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "ACOMAYO"
+        "ACOMAYO",
+        "PAUCARTAMBO"
       ],
       "microred": "",
       "colegio": ""
@@ -15588,8 +15588,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -15620,8 +15620,8 @@
       "nombre": "GAMARRA FUENTES MIREYA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -15863,14 +15863,14 @@
       "nombre": "GUERRERO MAMANI SAUL WILDEMAR",
       "establecimiento": "SAN JERONIMO",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "ACCAMANA",
         "SAN JERONIMO",
+        "TUPAC AMARU",
         "URCOS",
-        "SAN SEBASTIAN"
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "ACCAMANA",
+        "SAYLLA",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "",
       "colegio": ""
@@ -15960,8 +15960,8 @@
       "nombre": "CANDIA PERALTA LISET PATRICIA",
       "establecimiento": "ACOMAYO",
       "establecimientos": [
-        "ACOMAYO",
-        "OCONGATE"
+        "OCONGATE",
+        "ACOMAYO"
       ],
       "microred": "",
       "colegio": ""
@@ -16083,8 +16083,8 @@
       "nombre": "QUISPE CUCHUYRUMI ALCIONE",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16166,13 +16166,13 @@
       "nombre": "MAYAUTE ALLCA JENNIE PATRICIA",
       "establecimiento": "TUPAC AMARU",
       "establecimientos": [
-        "OROPESA",
-        "TUPAC AMARU",
-        "SANTA ROSA",
-        "SAYLLA",
-        "PARURO",
         "SAN JERONIMO",
-        "SAN SEBASTIAN"
+        "TUPAC AMARU",
+        "PARURO",
+        "SANTA ROSA",
+        "SAN SEBASTIAN",
+        "SAYLLA",
+        "OROPESA"
       ],
       "microred": "",
       "colegio": ""
@@ -16182,8 +16182,8 @@
       "nombre": "CHUQUIPURA PACUALA YUDITH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16193,8 +16193,8 @@
       "nombre": "LIPE MACHACA HUGO SIMEON",
       "establecimiento": "INCACANCHA",
       "establecimientos": [
-        "TINKI",
-        "INCACANCHA"
+        "INCACANCHA",
+        "TINKI"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -16205,8 +16205,8 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "COLQUEPATA",
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16237,13 +16237,13 @@
       "establecimiento": "POMACANCHI",
       "establecimientos": [
         "OCONGATE",
-        "CENTRO DE SALUD POMACANCHI",
-        "SAYLLA",
-        "ACCAMANA",
-        "PAUCARTAMBO",
         "SAN JERONIMO",
-        "POMACANCHI",
-        "SAN SEBASTIAN"
+        "PAUCARTAMBO",
+        "SAN SEBASTIAN",
+        "ACCAMANA",
+        "SAYLLA",
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16263,8 +16263,8 @@
       "nombre": "MORALES LUDEÐA SHARON SOLEDAD",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "PARURO",
-        "CCOCHIRIHUAY"
+        "CCOCHIRIHUAY",
+        "PARURO"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -16344,8 +16344,8 @@
       "nombre": "YUCRA TICONA JHUDITH RUTH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16416,9 +16416,9 @@
       "nombre": "MAMANI MAMANI GABY FLOR",
       "establecimiento": "PARURO",
       "establecimientos": [
-        "ANTAPALLPA",
         "CCOCHIRIHUAY",
         "PARURO",
+        "ANTAPALLPA",
         "COLCHA"
       ],
       "microred": "PARURO",
@@ -16429,8 +16429,8 @@
       "nombre": "CALLAÐAUPA PUMA ANTHONY EDDY",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16491,9 +16491,9 @@
       "establecimiento": "ANDAHUAYLILLAS",
       "establecimientos": [
         "OROPESA",
-        "ANDAHUAYLILLAS",
         "CUSIPATA",
-        "URCOS"
+        "URCOS",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "",
       "colegio": ""
@@ -16583,8 +16583,8 @@
       "nombre": "TAMAYO FUENTES VALERIA",
       "establecimiento": "HUANCARANI",
       "establecimientos": [
-        "HUANCARANI",
-        "TUPAC AMARU"
+        "TUPAC AMARU",
+        "HUANCARANI"
       ],
       "microred": "",
       "colegio": ""
@@ -16594,8 +16594,8 @@
       "nombre": "ZAPATA GAMARRA NAHS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16665,8 +16665,8 @@
       "nombre": "GUTIERREZ FARFAN MARIA VERONICA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16676,8 +16676,8 @@
       "nombre": "MARQUEZ QUISPE LIZETH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -16879,8 +16879,8 @@
       "nombre": "QUISPE NOALCCA CARMEN LUCERO",
       "establecimiento": "PACCARECTAMBO",
       "establecimientos": [
-        "PAUCARTAMBO",
-        "PACCARECTAMBO"
+        "PACCARECTAMBO",
+        "PAUCARTAMBO"
       ],
       "microred": "PARURO",
       "colegio": ""
@@ -16940,8 +16940,8 @@
       "nombre": "LOPEZ HUILLCA MARIA ELIZABETH",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17112,8 +17112,8 @@
       "nombre": "PARIGUANA ROMERO CARMEN ROSA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17274,9 +17274,9 @@
       "nombre": "CHACNAMA ANCCASI EVELIN MILAGROS",
       "establecimiento": "CUSIPATA",
       "establecimientos": [
-        "POMACANCHI",
         "CUSIPATA",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17357,8 +17357,8 @@
       "nombre": "SULLCA HUAMANI LUZ ALBINA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17368,8 +17368,8 @@
       "nombre": "MAMANI APAZA CARMEN HILARIA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17540,8 +17540,8 @@
       "nombre": "RAMOS TURPO ENMA TATIANA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17723,9 +17723,9 @@
       "nombre": "MUÐOZ ANDIA GILMER CELSO",
       "establecimiento": "OCONGATE",
       "establecimientos": [
-        "TINKI",
         "INCACANCHA",
-        "OCONGATE"
+        "OCONGATE",
+        "TINKI"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -17796,8 +17796,8 @@
       "nombre": "MAMANI CALIXTO BRANDON",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17857,8 +17857,8 @@
       "nombre": "SUTTA HUAYTA ADELINA",
       "establecimiento": "VIZCOCHONI",
       "establecimientos": [
-        "VIZCOCHONI",
-        "CCARHUAYO"
+        "CCARHUAYO",
+        "VIZCOCHONI"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -17928,8 +17928,8 @@
       "nombre": "COAGUILA MARQUEZ PRENDYS SERGIO",
       "establecimiento": "ANDAHUAYLILLAS",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
-        "HUARO"
+        "HUARO",
+        "ANDAHUAYLILLAS"
       ],
       "microred": "URCOS",
       "colegio": ""
@@ -17939,8 +17939,8 @@
       "nombre": "QUISPE QUISPE LEONIDAS",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17950,9 +17950,9 @@
       "nombre": "ASLLA QUISPE BLANCA LUZ",
       "establecimiento": "HUARO",
       "establecimientos": [
-        "ANDAHUAYLILLAS",
+        "HUARO",
         "QUIQUIJANA",
-        "HUARO"
+        "ANDAHUAYLILLAS"
       ],
       "microred": "",
       "colegio": ""
@@ -17972,8 +17972,8 @@
       "nombre": "QUISPE HUILLCA MARISOL",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -17983,8 +17983,8 @@
       "nombre": "CONDORI TUCTA ROSA EXALTACION",
       "establecimiento": "PAMPACAMARA",
       "establecimientos": [
-        "VIZCOCHONI",
-        "PAMPACAMARA"
+        "PAMPACAMARA",
+        "VIZCOCHONI"
       ],
       "microred": "OCONGATE",
       "colegio": ""
@@ -18014,8 +18014,8 @@
       "nombre": "HUALLPA CUSIHUALLPA HILDA",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -18025,8 +18025,8 @@
       "nombre": "CAÐARI KANTE EDWIN",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -18036,8 +18036,8 @@
       "nombre": "HUAMAN LOPEZ MARIA GUADALUPE",
       "establecimiento": "POMACANCHI",
       "establecimientos": [
-        "POMACANCHI",
-        "CENTRO DE SALUD POMACANCHI"
+        "CENTRO DE SALUD POMACANCHI",
+        "POMACANCHI"
       ],
       "microred": "ACOMAYO",
       "colegio": ""
@@ -18209,8 +18209,8 @@
       "nombre": "OCAMPO HUAYCHO CARMEN ROSA",
       "establecimiento": "LUCRE",
       "establecimientos": [
-        "CONCHACALLE",
-        "LUCRE"
+        "LUCRE",
+        "CONCHACALLE"
       ],
       "microred": "",
       "colegio": ""
@@ -19129,7 +19129,7 @@
     "42103944": {
       "dni": "42103944",
       "personal": "DAZA CACERES RUTH MERY",
-      "establecimiento_principal": "ACCHA",
+      "establecimiento_principal": "SAN SEBASTIAN",
       "establecimientos": [
         "ACCHA",
         "SAN SEBASTIAN"
@@ -19224,7 +19224,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 624,
+              "atc": 0,
               "atd": 0
             },
             "NOV": {
@@ -19232,7 +19232,7 @@
               "atd": 0
             }
           },
-          "total_atc": 656,
+          "total_atc": 32,
           "total_atd": 11
         },
         "SAN SEBASTIAN": {
@@ -19274,7 +19274,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 0,
+              "atc": 624,
               "atd": 0
             },
             "NOV": {
@@ -19282,7 +19282,7 @@
               "atd": 0
             }
           },
-          "total_atc": 8,
+          "total_atc": 632,
           "total_atd": 0
         }
       }
@@ -83648,7 +83648,7 @@
     "45174655": {
       "dni": "45174655",
       "personal": "HUARANCCA LEVITA YONY",
-      "establecimiento_principal": "CHILLIHUANI",
+      "establecimiento_principal": "SAN SEBASTIAN",
       "establecimientos": [
         "CHILLIHUANI",
         "SAN SEBASTIAN"
@@ -83743,7 +83743,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 621,
+              "atc": 0,
               "atd": 0
             },
             "NOV": {
@@ -83751,7 +83751,7 @@
               "atd": 0
             }
           },
-          "total_atc": 627,
+          "total_atc": 6,
           "total_atd": 4
         },
         "SAN SEBASTIAN": {
@@ -83793,7 +83793,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 8,
+              "atc": 629,
               "atd": 0
             },
             "NOV": {
@@ -83801,7 +83801,7 @@
               "atd": 0
             }
           },
-          "total_atc": 18,
+          "total_atc": 639,
           "total_atd": 0
         }
       }
@@ -92658,7 +92658,7 @@
     "42260590": {
       "dni": "42260590",
       "personal": "MAURI SURCO MARUJA",
-      "establecimiento_principal": "HUANCARANI",
+      "establecimiento_principal": "SAN SEBASTIAN",
       "establecimientos": [
         "HUANCARANI",
         "SAN SEBASTIAN"
@@ -92753,7 +92753,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 827,
+              "atc": 0,
               "atd": 0
             },
             "NOV": {
@@ -92761,7 +92761,7 @@
               "atd": 0
             }
           },
-          "total_atc": 847,
+          "total_atc": 20,
           "total_atd": 5
         },
         "SAN SEBASTIAN": {
@@ -92803,7 +92803,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 4,
+              "atc": 831,
               "atd": 0
             },
             "NOV": {
@@ -92811,7 +92811,7 @@
               "atd": 0
             }
           },
-          "total_atc": 48,
+          "total_atc": 875,
           "total_atd": 15
         }
       }
@@ -163553,7 +163553,7 @@
               "atd": 0
             },
             "OCT": {
-              "atc": 93,
+              "atc": 0,
               "atd": 0
             },
             "NOV": {
@@ -163561,7 +163561,7 @@
               "atd": 0
             }
           },
-          "total_atc": 108,
+          "total_atc": 15,
           "total_atd": 0
         },
         "SAN SEBASTIAN": {
@@ -163603,7 +163603,7 @@
               "atd": 72
             },
             "OCT": {
-              "atc": 375,
+              "atc": 468,
               "atd": 36
             },
             "NOV": {
@@ -163611,7 +163611,7 @@
               "atd": 6
             }
           },
-          "total_atc": 1873,
+          "total_atc": 1966,
           "total_atd": 344
         }
       }
@@ -230304,116 +230304,6 @@
         }
       }
     },
-    "46638223": {
-      "dni": "46638223",
-      "personal": "PERSONAL ADMISIÓN DNI 46638223",
-      "establecimiento_principal": "SAN SEBASTIAN",
-      "establecimientos": [
-        "SAN SEBASTIAN"
-      ],
-      "consolidado": {
-        "meses": {
-          "ENE": {
-            "atc": 0,
-            "atd": 0
-          },
-          "FEB": {
-            "atc": 0,
-            "atd": 0
-          },
-          "MAR": {
-            "atc": 0,
-            "atd": 0
-          },
-          "ABR": {
-            "atc": 0,
-            "atd": 0
-          },
-          "MAY": {
-            "atc": 0,
-            "atd": 0
-          },
-          "JUN": {
-            "atc": 0,
-            "atd": 0
-          },
-          "JUL": {
-            "atc": 0,
-            "atd": 0
-          },
-          "AGO": {
-            "atc": 0,
-            "atd": 0
-          },
-          "SET": {
-            "atc": 0,
-            "atd": 0
-          },
-          "OCT": {
-            "atc": 4,
-            "atd": 0
-          },
-          "NOV": {
-            "atc": 0,
-            "atd": 0
-          }
-        },
-        "total_atc": 4,
-        "total_atd": 0
-      },
-      "por_establecimiento": {
-        "SAN SEBASTIAN": {
-          "meses": {
-            "ENE": {
-              "atc": 0,
-              "atd": 0
-            },
-            "FEB": {
-              "atc": 0,
-              "atd": 0
-            },
-            "MAR": {
-              "atc": 0,
-              "atd": 0
-            },
-            "ABR": {
-              "atc": 0,
-              "atd": 0
-            },
-            "MAY": {
-              "atc": 0,
-              "atd": 0
-            },
-            "JUN": {
-              "atc": 0,
-              "atd": 0
-            },
-            "JUL": {
-              "atc": 0,
-              "atd": 0
-            },
-            "AGO": {
-              "atc": 0,
-              "atd": 0
-            },
-            "SET": {
-              "atc": 0,
-              "atd": 0
-            },
-            "OCT": {
-              "atc": 4,
-              "atd": 0
-            },
-            "NOV": {
-              "atc": 0,
-              "atd": 0
-            }
-          },
-          "total_atc": 4,
-          "total_atd": 0
-        }
-      }
-    },
     "24468259": {
       "dni": "24468259",
       "personal": "LIVANO VARGAS ASCENCION",
@@ -230520,6 +230410,116 @@
             }
           },
           "total_atc": 6,
+          "total_atd": 0
+        }
+      }
+    },
+    "46638223": {
+      "dni": "46638223",
+      "personal": "PERSONAL ADMISIÓN DNI 46638223",
+      "establecimiento_principal": "SAN SEBASTIAN",
+      "establecimientos": [
+        "SAN SEBASTIAN"
+      ],
+      "consolidado": {
+        "meses": {
+          "ENE": {
+            "atc": 0,
+            "atd": 0
+          },
+          "FEB": {
+            "atc": 0,
+            "atd": 0
+          },
+          "MAR": {
+            "atc": 0,
+            "atd": 0
+          },
+          "ABR": {
+            "atc": 0,
+            "atd": 0
+          },
+          "MAY": {
+            "atc": 0,
+            "atd": 0
+          },
+          "JUN": {
+            "atc": 0,
+            "atd": 0
+          },
+          "JUL": {
+            "atc": 0,
+            "atd": 0
+          },
+          "AGO": {
+            "atc": 0,
+            "atd": 0
+          },
+          "SET": {
+            "atc": 0,
+            "atd": 0
+          },
+          "OCT": {
+            "atc": 4,
+            "atd": 0
+          },
+          "NOV": {
+            "atc": 0,
+            "atd": 0
+          }
+        },
+        "total_atc": 4,
+        "total_atd": 0
+      },
+      "por_establecimiento": {
+        "SAN SEBASTIAN": {
+          "meses": {
+            "ENE": {
+              "atc": 0,
+              "atd": 0
+            },
+            "FEB": {
+              "atc": 0,
+              "atd": 0
+            },
+            "MAR": {
+              "atc": 0,
+              "atd": 0
+            },
+            "ABR": {
+              "atc": 0,
+              "atd": 0
+            },
+            "MAY": {
+              "atc": 0,
+              "atd": 0
+            },
+            "JUN": {
+              "atc": 0,
+              "atd": 0
+            },
+            "JUL": {
+              "atc": 0,
+              "atd": 0
+            },
+            "AGO": {
+              "atc": 0,
+              "atd": 0
+            },
+            "SET": {
+              "atc": 0,
+              "atd": 0
+            },
+            "OCT": {
+              "atc": 4,
+              "atd": 0
+            },
+            "NOV": {
+              "atc": 0,
+              "atd": 0
+            }
+          },
+          "total_atc": 4,
           "total_atd": 0
         }
       }
@@ -538172,6 +538172,203 @@
         "total_atd": 0
       }
     },
+    "24468259": {
+      "OCT": {
+        "mes": "OCT",
+        "dias": {
+          "01": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "02": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "03": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "04": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "05": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "06": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "07": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "08": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "09": {
+            "atc": 2,
+            "atd": 0,
+            "citas": 2,
+            "triajes": 0
+          },
+          "10": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "11": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "12": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "13": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "14": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "15": {
+            "atc": 2,
+            "atd": 0,
+            "citas": 2,
+            "triajes": 0
+          },
+          "16": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "17": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "18": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "19": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "20": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "21": {
+            "atc": 1,
+            "atd": 0,
+            "citas": 1,
+            "triajes": 0
+          },
+          "22": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "23": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "24": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "25": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "26": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "27": {
+            "atc": 1,
+            "atd": 0,
+            "citas": 1,
+            "triajes": 0
+          },
+          "28": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "29": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "30": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          },
+          "31": {
+            "atc": 0,
+            "atd": 0,
+            "citas": 0,
+            "triajes": 0
+          }
+        },
+        "total_atc": 6,
+        "total_atd": 0,
+        "total_triajes": 0,
+        "total_citas": 6
+      }
+    },
     "46638223": {
       "OCT": {
         "mes": "OCT",
@@ -538564,203 +538761,6 @@
         "total_atd": 0,
         "total_triajes": 2,
         "total_citas": 622
-      }
-    },
-    "24468259": {
-      "OCT": {
-        "mes": "OCT",
-        "dias": {
-          "01": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "02": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "03": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "04": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "05": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "06": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "07": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "08": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "09": {
-            "atc": 2,
-            "atd": 0,
-            "citas": 2,
-            "triajes": 0
-          },
-          "10": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "11": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "12": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "13": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "14": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "15": {
-            "atc": 2,
-            "atd": 0,
-            "citas": 2,
-            "triajes": 0
-          },
-          "16": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "17": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "18": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "19": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "20": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "21": {
-            "atc": 1,
-            "atd": 0,
-            "citas": 1,
-            "triajes": 0
-          },
-          "22": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "23": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "24": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "25": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "26": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "27": {
-            "atc": 1,
-            "atd": 0,
-            "citas": 1,
-            "triajes": 0
-          },
-          "28": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "29": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "30": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          },
-          "31": {
-            "atc": 0,
-            "atd": 0,
-            "citas": 0,
-            "triajes": 0
-          }
-        },
-        "total_atc": 6,
-        "total_atd": 0,
-        "total_triajes": 0,
-        "total_citas": 6
       }
     }
   },

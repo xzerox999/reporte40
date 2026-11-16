@@ -269,8 +269,8 @@ print(f"   -> Datos diarios HIS procesados para {len(diario_by_dni)} profesional
 
 # 4.5. Integración de Producción SIHCE (Citas de Admisión y Triajes de Enfermería)
 print("4.5. Buscando y procesando archivos del sistema SIHCE (Admisión y Triaje)...")
-citas_files = glob.glob(r"E:\Otros\reporte40\*citas*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*citas*.xlsx")
-triaje_files = glob.glob(r"E:\Otros\reporte40\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\*Triajes*.xlsx")
+citas_files = glob.glob(r"E:\Otros\reporte40\*citas*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*citas*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*citas*.xlsx")
+triaje_files = glob.glob(r"E:\Otros\reporte40\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\data\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\*Triajes*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*triaje*.xlsx") + glob.glob(r"E:\Otros\reporte40\ARCHIVOS\*Triajes*.xlsx")
 
 sihce_summary = {"citas": {}, "triajes": {}}
 sihce_csv_rows = []
@@ -409,19 +409,29 @@ for dni in all_sihce_dnis:
 
         # Asegurar integración en atd_by_dni (totales mensuales)
         if dni not in atd_by_dni:
-            estab_p = list(dni_meta[dni]["establecimientos"])[0]
-            atd_by_dni[dni].append({
-                "establecimiento": estab_p,
+            atd_by_dni[dni] = []
+
+        # SIHCE (Citas de Admisión y Triajes) pertenece exclusivamente a C.S. SAN SEBASTIAN.
+        # Buscar específicamente SAN SEBASTIAN en atd_by_dni del profesional para no mezclar con otras IPRESS (ej. Rondocán).
+        target_estab = "SAN SEBASTIAN"
+        target_reg = None
+        for reg_item in atd_by_dni[dni]:
+            if reg_item["establecimiento"] == target_estab:
+                target_reg = reg_item
+                break
+
+        if not target_reg:
+            target_reg = {
+                "establecimiento": target_estab,
                 "meses": {m: {"atc": 0, "atd": 0} for m in MESES_KEYS},
                 "total_atc": 0,
                 "total_atd": 0
-            })
+            }
+            atd_by_dni[dni].append(target_reg)
 
-        # Sumar a su establecimiento principal en atd_by_dni
-        reg = atd_by_dni[dni][0]
-        if m_key in reg["meses"]:
-            reg["meses"][m_key]["atc"] += added_to_month
-            reg["total_atc"] += added_to_month
+        if m_key in target_reg["meses"]:
+            target_reg["meses"][m_key]["atc"] += added_to_month
+            target_reg["total_atc"] += added_to_month
 
 # Generar filas para DATA_DIARIO.csv aplanando la información
 diario_rows = []
