@@ -187,6 +187,10 @@ function handleRequest(e, params) {
         responseData = apiAdminSaveEnabledYears(params.adminDni, params.years);
         break;
 
+      case "adminSyncDiario":
+        responseData = apiAdminSyncDiario(params.adminDni, params.rows, params.replaceMonths);
+        break;
+
       default:
         responseData = { success: false, message: "Acción inválida: " + action };
     }
@@ -907,6 +911,93 @@ function apiAdminSaveEnabledYears(adminDni, years) {
     return { success: false, message: "Error al guardar años en CONFIG: " + err.toString() };
   }
 }
+
+/**
+ * 14. Sincronización masiva de DATA_DIARIO directamente a Google Sheets
+ * Soporta reemplazo limpio por mes o actualización completa de filas
+ */
+function apiAdminSyncDiario(adminDni, rows, replaceMonths) {
+  if (!checkAdminRole(adminDni)) {
+    return { success: false, message: "Acceso no autorizado para actualizar DATA_DIARIO." };
+  }
+  if (!rows || !Array.isArray(rows) || rows.length === 0) {
+    return { success: false, message: "No se proporcionaron filas para sincronizar." };
+  }
+
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheetName = getSheetName("hoja_diario", DEFAULT_CONFIG.SHEET_DIARIO);
+    let ws = ss.getSheetByName(sheetName);
+
+    const diarioHeader = ["mes", "dni", "personal"];
+    for (let d = 1; d <= 31; d++) {
+      const tag = (d < 10 ? "0" : "") + d;
+      diarioHeader.push("d" + tag + "_atc");
+      diarioHeader.push("d" + tag + "_atd");
+    }
+    diarioHeader.push("total_atc");
+    diarioHeader.push("total_atd");
+
+    if (!ws) {
+      ws = ss.insertSheet(sheetName);
+      ws.appendRow(diarioHeader);
+    }
+
+    // Si replaceMonths viene especificado (ej: ["ENE", "FEB"]) o si es completo
+    let existingData = ws.getDataRange().getValues();
+    let headerRow = existingData.length > 0 ? existingData[0] : diarioHeader;
+    let finalRows = [];
+
+    let monthsToReplace = new Set();
+    if (replaceMonths && Array.isArray(replaceMonths)) {
+      replaceMonths.forEach(function(m) { monthsToReplace.add(String(m).trim().toUpperCase()); });
+    }
+
+    // Filtrar filas existentes: conservar las de meses que NO se están reemplazando
+    if (existingData.length > 1 && monthsToReplace.size > 0) {
+      for (let i = 1; i < existingData.length; i++) {
+        const rowMonth = String(existingData[i][0]).trim().toUpperCase();
+        if (!monthsToReplace.has(rowMonth)) {
+          finalRows.push(existingData[i]);
+        }
+      }
+    } else if (!replaceMonths || monthsToReplace.size === 0) {
+      // Reemplazo total
+      finalRows = [];
+    }
+
+    // Agregar las nuevas filas
+    for (let j = 0; j < rows.length; j++) {
+      finalRows.push(rows[j]);
+    }
+
+    // Limpiar hoja y reescribir
+    ws.clearContents();
+    ws.appendRow(headerRow);
+
+    if (finalRows.length > 0) {
+      const numCols = headerRow.length;
+      // Normalizar filas a la longitud exacta de columnas
+      const sanitizedRows = finalRows.map(function(r) {
+        let cleanRow = [];
+        for (let c = 0; c < numCols; c++) {
+          cleanRow.push(r[c] !== undefined && r[c] !== null ? r[c] : 0);
+        }
+        return cleanRow;
+      });
+
+      ws.getRange(2, 1, sanitizedRows.length, numCols).setValues(sanitizedRows);
+    }
+
+    return {
+      success: true,
+      message: "DATA_DIARIO sincronizado exitosamente en Google Sheets (" + rows.length + " filas enviadas, total: " + finalRows.length + " filas)."
+    };
+  } catch (err) {
+    return { success: false, message: "Error al sincronizar DATA_DIARIO: " + err.toString() };
+  }
+}
+
 
 
 

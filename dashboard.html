@@ -22,18 +22,77 @@
   <!-- Overlay Bloqueante de Vinculación y Sincronización con BD -->
   <div id="syncDatabaseOverlay" class="sync-overlay">
     <div class="sync-card fade-in">
-      <div class="sync-icon-pulse" id="syncIconContainer">
+      
+      <!-- Gráfico SVG Animado Interactivo y Amable -->
+      <div class="sync-hero-visual mb-3" id="syncHeroVisual">
+        <svg class="sync-svg-canvas" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8" />
+              <stop offset="100%" stop-color="#2563eb" />
+            </linearGradient>
+            <linearGradient id="beamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#2563eb" stop-opacity="0" />
+            </linearGradient>
+            <filter id="svgGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Nube / Nube de Google Sheets -->
+          <g class="sync-cloud-group">
+            <path d="M 50 45 A 18 18 0 0 1 84 35 A 24 24 0 0 1 122 42 A 16 16 0 0 1 118 70 L 48 70 A 15 15 0 0 1 50 45 Z" 
+                  fill="url(#cloudGrad)" filter="url(#svgGlow)" opacity="0.95"/>
+            <!-- Icono Database central en la nube -->
+            <path d="M 72 45 C 72 43 88 43 88 45 C 88 47 72 47 72 45 Z M 72 48 C 72 50 88 50 88 48 M 72 52 C 72 54 88 54 88 52" 
+                  stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+          </g>
+
+          <!-- Haz de sincronización con partículas que descienden -->
+          <polygon points="56,70 110,70 126,112 40,112" fill="url(#beamGrad)" opacity="0.45" class="sync-beam-pulse"/>
+          
+          <!-- Partículas de datos que fluyen -->
+          <circle cx="80" cy="74" r="3" fill="#ffffff" class="sync-particle part-1" />
+          <circle cx="68" cy="82" r="2.5" fill="#38bdf8" class="sync-particle part-2" />
+          <circle cx="92" cy="80" r="2.5" fill="#60a5fa" class="sync-particle part-3" />
+          <circle cx="75" cy="94" r="3.2" fill="#ffffff" class="sync-particle part-4" />
+          <circle cx="86" cy="100" r="2" fill="#38bdf8" class="sync-particle part-5" />
+
+          <!-- Base de Documento / Reporte 40 en destino -->
+          <g transform="translate(56, 96)">
+            <rect x="0" y="0" width="48" height="18" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8"/>
+            <line x1="8" y1="6" x2="26" y2="6" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="12" x2="40" y2="12" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+            <!-- Checklist badge -->
+            <circle cx="40" cy="6" r="4" fill="#10b981" class="sync-check-badge" id="svgCheckBadge" />
+            <path d="M 38 6 L 39.5 7.5 L 42 4.5" stroke="#ffffff" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="sync-icon-pulse d-none" id="syncIconContainer">
         <i class="bi bi-database-fill-gear"></i>
       </div>
+
       <h3 class="h5 fw-bold text-main mb-1" id="syncTitle">Vinculando con Base de Datos</h3>
       <p class="text-muted small mb-0" id="syncSubtitle">Conectando con el repositorio oficial de la Red Cusco Sur...</p>
       
+      <!-- Barra de progreso -->
       <div class="sync-progress">
         <div id="syncProgressBar" class="sync-progress-bar"></div>
       </div>
-      <div class="d-flex justify-content-between text-muted small" style="font-size: 0.78rem;">
-        <span id="syncStepText">Inicializando verificación...</span>
-        <span id="syncPercentText" class="fw-bold text-primary">0%</span>
+      
+      <!-- Detalle numérico y porcentaje con badge -->
+      <div class="d-flex justify-content-between align-items-center text-muted small mt-1" style="font-size: 0.8rem;">
+        <span id="syncStepText" class="text-start pe-2 text-truncate" style="max-width: 75%;">Inicializando verificación...</span>
+        <span id="syncPercentText" class="fw-bold text-primary badge bg-primary-subtle border border-primary-subtle px-2 py-1">0%</span>
+      </div>
+
+      <!-- Detalle dinámico secundario -->
+      <div id="syncSubDetailText" class="text-muted mt-2 small text-start" style="font-size: 0.73rem; opacity: 0.85;">
+        <i class="bi bi-shield-check text-success me-1"></i> Conexión segura con servidor Google Apps Script
       </div>
     </div>
   </div>

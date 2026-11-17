@@ -761,13 +761,13 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(11, 15, 25, 0.88);
-  backdrop-filter: blur(8px);
+  background-color: rgba(11, 15, 25, 0.92);
+  backdrop-filter: blur(10px);
   z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
 }
 
 .sync-overlay.fade-out {
@@ -780,11 +780,99 @@ body {
   background: var(--bg-card);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 2.5rem 2rem;
-  max-width: 460px;
-  width: 90%;
+  padding: 2.2rem 2rem 2rem;
+  max-width: 480px;
+  width: 92%;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.sync-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #38bdf8, #2563eb, #6366f1, #38bdf8);
+  background-size: 200% 100%;
+  animation: syncBorderGlow 2.5s linear infinite;
+}
+
+@keyframes syncBorderGlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Gráfico SVG Animado */
+.sync-hero-visual {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sync-svg-canvas {
+  width: 160px;
+  height: 110px;
+  filter: drop-shadow(0 8px 16px rgba(37, 99, 235, 0.3));
+}
+
+.sync-cloud-group {
+  animation: floatCloud 3s ease-in-out infinite alternate;
+}
+
+@keyframes floatCloud {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-5px); }
+}
+
+.sync-beam-pulse {
+  animation: beamPulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes beamPulse {
+  0% { opacity: 0.25; }
+  100% { opacity: 0.6; }
+}
+
+/* Partículas animadas descendentes */
+.sync-particle {
+  animation: particleDrop 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.part-1 { animation-delay: 0s; }
+.part-2 { animation-delay: 0.3s; }
+.part-3 { animation-delay: 0.6s; }
+.part-4 { animation-delay: 0.9s; }
+.part-5 { animation-delay: 1.2s; }
+
+@keyframes particleDrop {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+}
+
+.sync-check-badge {
+  animation: popBadge 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes popBadge {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1.1); }
 }
 
 .sync-icon-pulse {
@@ -808,19 +896,27 @@ body {
 }
 
 .sync-progress {
-  height: 8px;
-  border-radius: 4px;
+  height: 9px;
+  border-radius: 6px;
   background-color: var(--bg-card-subtle);
   overflow: hidden;
   margin: 1.25rem 0 0.75rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .sync-progress-bar {
-  background: var(--primary-gradient);
+  background: linear-gradient(90deg, #38bdf8 0%, #2563eb 50%, #10b981 100%);
+  background-size: 200% 100%;
   height: 100%;
   width: 0%;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ==================== ALERTA URGENTE DE CAMBIO DE CLAVE ==================== */

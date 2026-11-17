@@ -12,45 +12,62 @@ async function initDashboard() {
   const syncProgressBar = document.getElementById("syncProgressBar");
   const syncPercentText = document.getElementById("syncPercentText");
   const syncStepText = document.getElementById("syncStepText");
+  const syncSubDetailText = document.getElementById("syncSubDetailText");
   const syncTitle = document.getElementById("syncTitle");
   const syncIconContainer = document.getElementById("syncIconContainer");
+  const syncHeroVisual = document.getElementById("syncHeroVisual");
 
   let isOverlayClosed = false;
-  function setSyncProgress(percent, stepMessage, title = null) {
+  let safetyOverlayTimer = null;
+
+  function setSyncProgress(percent, stepMessage, title = null, subDetail = null) {
     if (syncProgressBar) syncProgressBar.style.width = percent + "%";
     if (syncPercentText) syncPercentText.textContent = percent + "%";
     if (syncStepText && stepMessage) syncStepText.textContent = stepMessage;
     if (syncTitle && title) syncTitle.textContent = title;
+    if (syncSubDetailText && subDetail) syncSubDetailText.innerHTML = subDetail;
   }
 
-  function finishSyncOverlay() {
+  function finishSyncOverlay(success = true, finalMessage = "¡Información generada exitosamente!") {
     if (isOverlayClosed) return;
     isOverlayClosed = true;
-    clearTimeout(safetyOverlayTimer);
-    setSyncProgress(100, "¡Sincronización completa con la Red Cusco Sur!", "¡Datos Vinculados Exitosamente!");
-    if (syncIconContainer) {
-      syncIconContainer.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
-      syncIconContainer.style.background = "rgba(16, 185, 129, 0.15)";
-      syncIconContainer.style.color = "#10b981";
+    if (safetyOverlayTimer) clearTimeout(safetyOverlayTimer);
+
+    setSyncProgress(
+      100,
+      finalMessage,
+      "¡Panel Sincronizado!",
+      '<i class="bi bi-check-all text-success me-1"></i> Todos los registros listos para consulta y descarga de PDF'
+    );
+
+    if (syncHeroVisual) {
+      syncHeroVisual.style.transform = "scale(1.05)";
+      syncHeroVisual.style.transition = "transform 0.4s ease";
     }
+
     setTimeout(() => {
       if (syncOverlay) {
         syncOverlay.classList.add("fade-out");
-        setTimeout(() => syncOverlay.remove(), 400);
+        setTimeout(() => syncOverlay.remove(), 450);
       }
-    }, 450);
+    }, 600);
   }
 
-  // Seguro de tiempo máximo: si la red tarda, desbloquea la pantalla automáticamente en 4s
-  const safetyOverlayTimer = setTimeout(() => {
-    finishSyncOverlay();
-  }, 4000);
+  // Seguro de tiempo máximo prudencial: 15 segundos si la red está lenta, para no bloquear al usuario
+  safetyOverlayTimer = setTimeout(() => {
+    finishSyncOverlay(true, "¡Información lista para visualización!");
+  }, 15000);
 
-  setSyncProgress(15, "Verificando credenciales institucionales...");
+  setSyncProgress(
+    15,
+    "Validando credenciales y perfil asistencial...",
+    "Vinculando con Base de Datos",
+    '<i class="bi bi-key-fill text-primary me-1"></i> Verificación de sesión de usuario'
+  );
 
   // 1. Validar autenticación
   if (!Auth.requireAuth()) {
-    finishSyncOverlay();
+    finishSyncOverlay(false);
     return;
   }
 
@@ -1124,9 +1141,14 @@ async function initDashboard() {
     return merged;
   }
 
-  // 2. Cargar datos del usuario desde la API con barra de progreso
+  // 2. Cargar datos del usuario desde la API con barra de progreso sincronizada
   try {
-    setSyncProgress(25, "Consultando base de datos oficial (Google Sheets / HIS)...");
+    setSyncProgress(
+      25,
+      "Consultando repositorio institucional...",
+      "Vinculando con Base de Datos",
+      '<i class="bi bi-cloud-arrow-down text-info me-1"></i> Recuperando datos mensuales (ATD / ATC y APP)...'
+    );
     
     // Cargar datos locales de demo / respaldo / override primero
     const localDemo = await Api.loadDemoData();
@@ -1138,13 +1160,26 @@ async function initDashboard() {
     const localAtd = localAtdMatch?.data || null;
     const localApp = localAppMatch?.data || null;
 
-    setSyncProgress(55, "Sincronizando atenciones (ATC / ATD) y actividades (APP)...");
+    setSyncProgress(
+      55,
+      "Descargando atenciones y producción diaria...",
+      "Sincronizando con Google Sheets",
+      '<i class="bi bi-arrow-repeat text-warning me-1"></i> Leyendo registros día a día del personal asistencial...'
+    );
+
     let res = null;
     try {
       res = await Api.callAppsScript("getData", { dni: currentUser.dni });
     } catch (e) {
       console.warn("Apps Script no disponible o en modo local:", e);
     }
+
+    setSyncProgress(
+      85,
+      "Consolidando atenciones HIS y SIHCE...",
+      "Procesando Información",
+      '<i class="bi bi-gear-wide-connected text-primary me-1"></i> Verificando totales asistenciales y días laborados...'
+    );
 
     if (res && res.success) {
       userDailyData = mergeDiarioWithSihce(res.diario, localDaily);
@@ -1221,10 +1256,30 @@ async function initDashboard() {
         }
       } catch (e) {}
     }
+
+    setSyncProgress(
+      95,
+      "Generando vistas del panel y gráficos...",
+      "Finalizando Vinculación",
+      '<i class="bi bi-pie-chart-fill text-success me-1"></i> Renderizando componentes de usuario...'
+    );
+
   } catch (err) {
     console.error("Error al cargar datos:", err);
   } finally {
-    finishSyncOverlay();
+    // 1. Inicializar y renderizar TODOS los componentes de la interfaz primero
+    checkDefaultPasswordAlert();
+    renderComunicadoBanner();
+    setupYearSelector();
+    setupEstablishmentSelector();
+    renderMonthSelector();
+    updateTablesAndKPIs();
+    if (isDailyModeActive) {
+      updateDailyView();
+    }
+
+    // 2. Recién cuando la pantalla tiene todos los datos listos, cerrar el modal de forma agradable
+    finishSyncOverlay(true, "¡Información generada exitosamente!");
   }
 
   // Verificación de Contraseña por defecto (DNI)
@@ -1238,13 +1293,13 @@ async function initDashboard() {
     }
   }
 
-  // Inicializar componentes
+  // Inicializar componentes cuando el script arranca (para evitar estados inconsistentes)
+  // pero la renderización final con datos reales se ejecuta al completar la carga en el bloque finally.
   checkDefaultPasswordAlert();
   renderComunicadoBanner();
   setupYearSelector();
   setupEstablishmentSelector();
   renderMonthSelector();
-  updateTablesAndKPIs();
 
   // 3. Descarga de PDF
   downloadPdfBtn.addEventListener("click", async () => {

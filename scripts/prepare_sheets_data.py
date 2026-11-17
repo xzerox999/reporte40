@@ -175,6 +175,19 @@ for r in ws_app.iter_rows(min_row=8, values_only=True):
 print("4. Procesando hoja 'ipress personal x dia' (Producción Día a Día)...")
 diario_by_dni = defaultdict(dict)
 
+# Cargar meses diarios acumulados previamente (ej. Octubre ya procesado) para preservarlos al incorporar Setiembre
+prev_json_path = os.path.join(OUTPUT_DIR, "demo_data.json")
+if os.path.exists(prev_json_path):
+    try:
+        with open(prev_json_path, "r", encoding="utf-8") as f_prev:
+            prev_bundle = json.load(f_prev)
+            if "diario" in prev_bundle:
+                for p_dni, p_dict in prev_bundle["diario"].items():
+                    diario_by_dni[p_dni].update(p_dict)
+        print(f"   -> Se cargaron {len(diario_by_dni)} registros diarios de meses previos.")
+    except Exception as e:
+        print("   -> Aviso leyendo datos previos:", e)
+
 if 'ipress personal x dia' in wb.sheetnames:
     ws_dia = wb['ipress personal x dia']
     current_m_key = None
@@ -398,21 +411,25 @@ for dni in all_sihce_dnis:
             if d_str not in m_entry['dias']:
                 m_entry['dias'][d_str] = {'atc': 0, 'atd': 0, 'citas': 0, 'triajes': 0}
 
+            prev_c = m_entry['dias'][d_str].get('citas', 0)
+            prev_t = m_entry['dias'][d_str].get('triajes', 0)
+            delta = max(0, c_val - prev_c) + max(0, t_val - prev_t)
+
             m_entry['dias'][d_str]['citas'] = c_val
             m_entry['dias'][d_str]['triajes'] = t_val
-            m_entry['dias'][d_str]['atc'] += (c_val + t_val)
-            added_to_month += (c_val + t_val)
+            m_entry['dias'][d_str]['atc'] += delta
+            added_to_month += delta
 
         m_entry['total_atc'] += added_to_month
         m_entry['total_triajes'] = sum(t_days.values())
         m_entry['total_citas'] = sum(c_days.values())
 
         # Asegurar integración en atd_by_dni (totales mensuales)
+        total_sihce_mes = sum(c_days.values()) + sum(t_days.values())
         if dni not in atd_by_dni:
             atd_by_dni[dni] = []
 
         # SIHCE (Citas de Admisión y Triajes) pertenece exclusivamente a C.S. SAN SEBASTIAN.
-        # Buscar específicamente SAN SEBASTIAN en atd_by_dni del profesional para no mezclar con otras IPRESS (ej. Rondocán).
         target_estab = "SAN SEBASTIAN"
         target_reg = None
         for reg_item in atd_by_dni[dni]:
@@ -430,8 +447,8 @@ for dni in all_sihce_dnis:
             atd_by_dni[dni].append(target_reg)
 
         if m_key in target_reg["meses"]:
-            target_reg["meses"][m_key]["atc"] += added_to_month
-            target_reg["total_atc"] += added_to_month
+            target_reg["meses"][m_key]["atc"] += total_sihce_mes
+            target_reg["total_atc"] += total_sihce_mes
 
 # Generar filas para DATA_DIARIO.csv aplanando la información
 diario_rows = []
