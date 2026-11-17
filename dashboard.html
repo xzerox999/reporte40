@@ -216,9 +216,14 @@
         </div>
 
         <div class="col-lg-4 text-lg-end">
-          <button id="downloadPdfBtn" class="btn-primary-custom w-100 w-lg-auto shadow-sm">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte en PDF
-          </button>
+          <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+            <button id="previewPdfBtn" type="button" class="btn-secondary-custom shadow-sm d-inline-flex align-items-center justify-content-center gap-2" title="Previsualizar el documento PDF antes de descargarlo">
+              <i class="bi bi-eye-fill text-primary"></i> Vista Previa
+            </button>
+            <button id="downloadPdfBtn" class="btn-primary-custom flex-grow-1 flex-lg-grow-0 shadow-sm">
+              <i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte en PDF
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -300,12 +305,17 @@
       </div>
     </div>
 
-    <!-- Tarjetas de Resumen KPI -->
-    <div class="row g-3 mb-4 fade-in">
+    <!-- Tarjetas de Resumen KPI con Iconos SVG Animados -->
+    <div class="row g-3 mb-3 fade-in">
       <div class="col-md-4">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.15); color: #3b82f6;">
-            <i class="bi bi-clipboard2-pulse"></i>
+            <!-- SVG Animado Pulso ECG (Atenciones ATC) -->
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="18" cy="18" r="16" stroke="currentColor" stroke-opacity="0.2" stroke-width="2"/>
+              <path class="kpi-ecg-line" d="M4 19 H10 L13.5 10 L17.5 26 L21.5 14 L24.5 19 H32" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="kpi-spark-dot" cx="31" cy="19" r="2.2" fill="currentColor"/>
+            </svg>
           </div>
           <div>
             <div id="kpiATC" class="stat-number">0</div>
@@ -317,7 +327,12 @@
       <div class="col-md-4">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.15); color: #10b981;">
-            <i class="bi bi-people"></i>
+            <!-- SVG Animado Personas con Onda Radar (Atendidos ATD) -->
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle class="kpi-radar-ring" cx="18" cy="18" r="12" stroke="currentColor" stroke-width="1.6" stroke-opacity="0.5"/>
+              <circle cx="18" cy="13" r="4.5" stroke="currentColor" stroke-width="2.2"/>
+              <path d="M9.5 27.5 C9.5 22.8 13.3 20 18 20 C22.7 20 26.5 22.8 26.5 27.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
           </div>
           <div>
             <div id="kpiATD" class="stat-number">0</div>
@@ -329,7 +344,13 @@
       <div class="col-md-4">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.15); color: #6366f1;">
-            <i class="bi bi-activity"></i>
+            <!-- SVG Animado Barras de Promoción APP -->
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect class="kpi-bar-1" x="6" y="18" width="5.5" height="11" rx="2" fill="currentColor" fill-opacity="0.85"/>
+              <rect class="kpi-bar-2" x="15.2" y="12" width="5.5" height="17" rx="2" fill="currentColor"/>
+              <rect class="kpi-bar-3" x="24.5" y="7" width="5.5" height="22" rx="2" fill="currentColor" fill-opacity="0.9"/>
+              <circle class="kpi-spark-dot" cx="27.2" cy="4.2" r="1.8" fill="#38bdf8"/>
+            </svg>
           </div>
           <div>
             <div id="kpiAPP" class="stat-number">0</div>
@@ -339,24 +360,114 @@
       </div>
     </div>
 
-    <!-- Gráfico Interactivo de Tendencia Mensual (Chart.js) -->
-    <div class="app-card mb-4 fade-in">
+    <!-- Tarjetas de Récords Personales / Insights Automáticos -->
+    <div id="insightsRow" class="row g-3 mb-4 fade-in d-none">
+      <div class="col-md-4">
+        <div class="insight-pill-card">
+          <div class="insight-pill-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+            <i class="bi bi-trophy-fill"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="text-muted small fw-semibold" style="font-size: 0.74rem;">Mes más productivo</div>
+            <div id="insightBestMonth" class="fw-bold text-main text-truncate" style="font-size: 0.9rem;">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="insight-pill-card">
+          <div class="insight-pill-icon" style="background: rgba(56, 189, 248, 0.16); color: #0284c7;">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="text-muted small fw-semibold" style="font-size: 0.74rem;">Día récord del período</div>
+            <div id="insightBestDay" class="fw-bold text-main text-truncate" style="font-size: 0.9rem;">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="insight-pill-card">
+          <div class="insight-pill-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            <i class="bi bi-speedometer2"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="text-muted small fw-semibold" style="font-size: 0.74rem;">Promedio de rendimiento</div>
+            <div id="insightAvgDaily" class="fw-bold text-main text-truncate" style="font-size: 0.9rem;">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos Interactivos: Barras de Tendencia + Dona de Composición -->
+    <div id="chartContainerCard" class="app-card mb-4 fade-in">
       <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div class="d-flex align-items-center gap-2">
           <i class="bi bi-graph-up-arrow text-primary fs-5"></i>
-          <h4 class="h6 fw-bold mb-0 text-main">Evolución y Comparativo Mensual (ATC vs ATD)</h4>
+          <h4 class="h6 fw-bold mb-0 text-main" id="chartHeaderTitle">Evolución y Comparativo Mensual (ATC vs ATD)</h4>
         </div>
-        <div class="d-flex align-items-center gap-2 small">
+        <div class="d-flex align-items-center gap-3 small flex-wrap">
           <span class="d-inline-flex align-items-center gap-1 text-muted">
             <span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:3px;"></span> Atenciones (ATC)
           </span>
-          <span class="d-inline-flex align-items-center gap-1 text-muted ms-2">
+          <span class="d-inline-flex align-items-center gap-1 text-muted">
             <span style="display:inline-block;width:12px;height:12px;background:#10b981;border-radius:3px;"></span> Atendidos (ATD)
           </span>
+          <button id="btnFullscreenChart" type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" title="Ampliar gráficos a pantalla completa">
+            <i class="bi bi-arrows-fullscreen"></i> <span class="d-none d-sm-inline">Ampliar</span>
+          </button>
         </div>
       </div>
-      <div style="position: relative; height: 260px; width: 100%;">
-        <canvas id="productionChart"></canvas>
+
+      <div class="row g-4 align-items-center">
+        <!-- Gráfico Principal de Barras -->
+        <div class="col-lg-8">
+          <div class="chart-canvas-wrap" style="position: relative; height: 270px; width: 100%;">
+            <canvas id="productionChart"></canvas>
+
+            <!-- Ilustración SVG Animada cuando hay 0 meses seleccionados -->
+            <div id="chartEmptyState" class="chart-empty-overlay">
+              <svg width="115" height="90" viewBox="0 0 120 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g class="empty-calendar-float">
+                  <rect x="18" y="16" width="76" height="62" rx="10" fill="var(--bg-card-subtle)" stroke="#3b82f6" stroke-width="2.2"/>
+                  <path d="M18 30 H94" stroke="#3b82f6" stroke-width="2"/>
+                  <line x1="36" y1="10" x2="36" y2="22" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+                  <line x1="76" y1="10" x2="76" y2="22" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+                  <rect x="28" y="38" width="14" height="10" rx="2.5" fill="#3b82f6" fill-opacity="0.28"/>
+                  <rect x="49" y="38" width="14" height="10" rx="2.5" fill="#10b981" fill-opacity="0.35"/>
+                  <rect x="70" y="38" width="14" height="10" rx="2.5" fill="#6366f1" fill-opacity="0.28"/>
+                  <rect x="28" y="54" width="14" height="10" rx="2.5" fill="#94a3b8" fill-opacity="0.25"/>
+                  <rect x="49" y="54" width="14" height="10" rx="2.5" fill="#3b82f6" fill-opacity="0.45"/>
+                </g>
+                <g class="empty-loupe-scan">
+                  <circle cx="84" cy="62" r="14" fill="var(--bg-card)" stroke="#10b981" stroke-width="2.8"/>
+                  <path d="M78 62 L82.5 66.5 L90.5 58" stroke="#10b981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="94" y1="72" x2="104" y2="82" stroke="#10b981" stroke-width="3.4" stroke-linecap="round"/>
+                </g>
+              </svg>
+              <p class="fw-bold text-main mb-1 mt-2 small">Selecciona uno o más meses arriba</p>
+              <span class="text-muted" style="font-size: 0.78rem;">Tus gráficos de evolución, composición y récords aparecerán aquí al instante.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico de Dona: Composición de Producción -->
+        <div class="col-lg-4">
+          <div class="p-3 rounded-4 border h-100 d-flex flex-column justify-content-between" style="background-color: var(--bg-card-subtle); border-color: var(--border-color) !important;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="small fw-bold text-main"><i class="bi bi-pie-chart-fill text-primary me-1"></i> Composición</span>
+              <span id="compositionTotalBadge" class="badge bg-primary-subtle text-primary small">0 total</span>
+            </div>
+            <div style="position: relative; height: 185px; width: 100%;">
+              <canvas id="compositionChart"></canvas>
+              <div id="compositionEmptyState" class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center text-muted small text-center" style="inset:0;">
+                <i class="bi bi-pie-chart fs-2 opacity-50 mb-1"></i>
+                <span style="font-size:0.75rem;">Sin datos en el período</span>
+              </div>
+            </div>
+            <div id="compositionLegend" class="d-flex flex-wrap justify-content-center gap-2 mt-2 small" style="font-size: 0.74rem;">
+              <!-- Dinámico -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -367,11 +478,80 @@
           <i class="bi bi-calendar2-range text-primary fs-5"></i>
           <div>
             <h4 class="h6 fw-bold mb-0 text-main" id="dailySectionTitle">Desglose Diario de Producción</h4>
-            <small class="text-muted">Registro detallado día a día del 01 al 31 (Atenciones ATC y Atendidos ATD)</small>
+            <small class="text-muted">Mapa de calor, comparativa por quincena y registro detallado día a día (01 al 31)</small>
           </div>
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="badge bg-primary-subtle text-primary fw-semibold" id="dailyTotalBadge">0 días con actividad</span>
+        </div>
+      </div>
+
+      <!-- Comparativa Visual 1ra vs 2da Quincena -->
+      <div id="quincenaComparisonBox" class="quincena-card mb-3 d-none">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <span class="small fw-bold text-main">
+            <i class="bi bi-bar-chart-steps text-primary me-1"></i> Comparativa por Quincenas (ATC)
+          </span>
+          <span id="quincenaWinnerBadge" class="badge bg-success-subtle text-success small">-</span>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="fw-semibold text-main">1ra Quincena (Días 01 – 15)</span>
+              <span id="q1Text" class="fw-bold text-primary">0 ATC (0%)</span>
+            </div>
+            <div class="quincena-bar-track">
+              <div id="q1Bar" class="quincena-bar-fill quincena-bar-q1" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="fw-semibold text-main">2da Quincena (Días 16 – 31)</span>
+              <span id="q2Text" class="fw-bold text-success">0 ATC (0%)</span>
+            </div>
+            <div class="quincena-bar-track">
+              <div id="q2Bar" class="quincena-bar-fill quincena-bar-q2" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mapa de Calor Mensual (31 días estilo calendario) -->
+      <div id="dailyHeatmapWrapper" class="mb-3 d-none">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <span class="small fw-bold text-main">
+            <i class="bi bi-grid-3x3-gap-fill text-primary me-1"></i> Mapa de Calor del Mes <span class="text-muted fw-normal">(haz clic en un día para ubicarlo en la tabla)</span>
+          </span>
+          <div class="d-flex align-items-center gap-1 small text-muted" style="font-size: 0.72rem;">
+            <span>Menor</span>
+            <span class="heatmap-lvl-0 d-inline-block rounded" style="width:12px;height:12px;border:1px solid var(--border-color);"></span>
+            <span class="heatmap-lvl-1 d-inline-block rounded" style="width:12px;height:12px;"></span>
+            <span class="heatmap-lvl-2 d-inline-block rounded" style="width:12px;height:12px;"></span>
+            <span class="heatmap-lvl-3 d-inline-block rounded" style="width:12px;height:12px;"></span>
+            <span class="heatmap-lvl-4 d-inline-block rounded" style="width:12px;height:12px;"></span>
+            <span>Mayor</span>
+          </div>
+        </div>
+        <div id="dailyHeatmapGrid" class="heatmap-calendar-grid">
+          <!-- 31 cuadritos dinámicos -->
+        </div>
+      </div>
+
+      <!-- Filtros Rápidos y Orden en 1 Clic -->
+      <div id="dailyFilterBar" class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div class="d-flex flex-wrap gap-2" role="group" aria-label="Filtros rápidos de días">
+          <button type="button" class="daily-filter-pill active" data-daily-filter="all">
+            <i class="bi bi-calendar3 me-1"></i> Todos los días (31)
+          </button>
+          <button type="button" class="daily-filter-pill" data-daily-filter="active">
+            <i class="bi bi-fire me-1"></i> Solo días con actividad
+          </button>
+          <button type="button" class="daily-filter-pill d-none" id="dailyFilterSihceBtn" data-daily-filter="sihce">
+            <i class="bi bi-hospital me-1"></i> Solo con Citas / Triaje SIHCE
+          </button>
+        </div>
+        <div class="small text-muted">
+          <i class="bi bi-arrow-down-up me-1"></i> Haz clic en <strong>Día</strong>, <strong>ATC</strong> o <strong>ATD</strong> para ordenar
         </div>
       </div>
       
@@ -380,9 +560,15 @@
         <table class="custom-table table-sm daily-matrix-table" id="dailyTable">
           <thead>
             <tr>
-              <th class="text-center" style="width: 90px;">Día</th>
-              <th class="text-center">Atenciones (ATC)</th>
-              <th class="text-center">Atendidos (ATD)</th>
+              <th class="text-center sortable-th" data-daily-sort="day" style="width: 95px;">
+                Día <i class="bi bi-sort-numeric-down ms-1 small" id="sortIconDay"></i>
+              </th>
+              <th class="text-center sortable-th" data-daily-sort="atc">
+                Atenciones (ATC) <i class="bi bi-arrow-down-up ms-1 small opacity-50" id="sortIconAtc"></i>
+              </th>
+              <th class="text-center sortable-th" data-daily-sort="atd">
+                Atendidos (ATD) <i class="bi bi-arrow-down-up ms-1 small opacity-50" id="sortIconAtd"></i>
+              </th>
               <th>Actividad Diaria</th>
             </tr>
           </thead>
@@ -603,6 +789,33 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">
             <i class="bi bi-check-lg me-1"></i> Entendido, Ir al Sistema
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Vista Previa del PDF -->
+  <div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-labelledby="pdfPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 960px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
+            <div>
+              <h5 class="modal-title h6 fw-bold text-main mb-0" id="pdfPreviewModalLabel">Vista Previa del Reporte Oficial (PDF)</h5>
+              <small id="pdfPreviewSubtitle" class="text-muted">Revisa tu documento antes de descargarlo</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body p-2" style="background: #1e293b;">
+          <iframe id="pdfPreviewFrame" title="Vista previa del reporte PDF" style="width: 100%; height: 72vh; border: none; border-radius: 8px; background: #fff;"></iframe>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn-primary-custom" id="btnDownloadFromPreview">
+            <i class="bi bi-download me-1"></i> Descargar PDF Ahora
           </button>
         </div>
       </div>

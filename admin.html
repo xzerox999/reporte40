@@ -66,12 +66,16 @@
       </button>
     </div>
 
-    <!-- Tarjetas KPI -->
-    <div class="row g-3 mb-4 fade-in">
+    <!-- Tarjetas KPI con Iconos SVG Animados -->
+    <div class="row g-3 mb-3 fade-in">
       <div class="col-sm-6 col-lg-3">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.15); color: #3b82f6;">
-            <i class="bi bi-people-fill"></i>
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle class="kpi-radar-ring" cx="18" cy="18" r="12" stroke="currentColor" stroke-width="1.6" stroke-opacity="0.45"/>
+              <circle cx="18" cy="13" r="4.5" stroke="currentColor" stroke-width="2.2"/>
+              <path d="M9.5 27.5 C9.5 22.8 13.3 20 18 20 C22.7 20 26.5 22.8 26.5 27.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
           </div>
           <div>
             <div id="statTotalUsers" class="stat-number">-</div>
@@ -83,7 +87,10 @@
       <div class="col-sm-6 col-lg-3">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.15); color: #10b981;">
-            <i class="bi bi-cloud-arrow-down-fill"></i>
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path class="kpi-ecg-line" d="M18 7 V22 M12 16 L18 22 L24 16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 26 H28" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
           </div>
           <div>
             <div id="statTotalDownloads" class="stat-number">-</div>
@@ -95,7 +102,11 @@
       <div class="col-sm-6 col-lg-3">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-            <i class="bi bi-building"></i>
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect class="kpi-bar-1" x="6" y="15" width="7" height="14" rx="1.5" fill="currentColor" fill-opacity="0.8"/>
+              <rect class="kpi-bar-2" x="14.5" y="9" width="7" height="20" rx="1.5" fill="currentColor"/>
+              <rect class="kpi-bar-3" x="23" y="13" width="7" height="16" rx="1.5" fill="currentColor" fill-opacity="0.85"/>
+            </svg>
           </div>
           <div>
             <div id="statTotalEstabs" class="stat-number">-</div>
@@ -107,7 +118,11 @@
       <div class="col-sm-6 col-lg-3">
         <div class="stat-card">
           <div class="stat-icon" style="background-color: rgba(99, 102, 241, 0.15); color: #6366f1;">
-            <i class="bi bi-clock-history"></i>
+            <svg class="kpi-svg-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="18" cy="18" r="11" stroke="currentColor" stroke-width="2.2"/>
+              <path d="M18 12 V18 L22.5 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle class="kpi-spark-dot" cx="28" cy="9" r="2.2" fill="#38bdf8"/>
+            </svg>
           </div>
           <div>
             <div id="statTodayDownloads" class="stat-number">-</div>
@@ -117,11 +132,29 @@
       </div>
     </div>
 
+    <!-- Barra de Estado de Base de Datos (Última actualización y meses con desglose diario) -->
+    <div id="adminDataStatusBar" class="admin-status-bar d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 fade-in small">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-database-check text-success fs-6"></i>
+        <span class="text-muted">Última actualización local:</span>
+        <strong id="adminLastUpdatedText" class="text-main">-</strong>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="text-muted">Meses diarios cargados:</span>
+        <span id="adminDailyMonthsBadges" class="d-inline-flex flex-wrap gap-1">-</span>
+      </div>
+    </div>
+
     <!-- Pestañas de Navegación -->
     <ul class="nav nav-pills mb-3 gap-2" id="adminTabs" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="tab-logs-btn" data-bs-toggle="pill" data-bs-target="#tab-logs" type="button" role="tab">
           <i class="bi bi-journal-text me-1"></i> Log de Auditoría de Descargas
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-analytics-btn" data-bs-toggle="pill" data-bs-target="#tab-analytics" type="button" role="tab">
+          <i class="bi bi-bar-chart-fill me-1"></i> Analítica y Ranking IPRESS
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -160,10 +193,22 @@
             <h2 class="h6 fw-bold mb-0 text-main">
               <i class="bi bi-clock-history text-primary me-2"></i>Historial de Descargas de Reportes
             </h2>
-            <div class="d-flex gap-2">
-              <div class="input-group input-group-sm" style="max-width: 260px;">
+            <div class="d-flex flex-wrap gap-2">
+              <select id="logDateFilter" class="form-select form-select-sm" style="width: auto;">
+                <option value="all">Todas las fechas</option>
+                <option value="today">Hoy</option>
+                <option value="7d">Últimos 7 días</option>
+                <option value="month">Este mes</option>
+              </select>
+              <select id="logTypeFilter" class="form-select form-select-sm" style="width: auto;">
+                <option value="all">Todos los tipos</option>
+                <option value="DIARIO">PDF Diario</option>
+                <option value="MENSUAL">PDF Mensual</option>
+                <option value="SERUMS">Reporte SERUMS</option>
+              </select>
+              <div class="input-group input-group-sm" style="max-width: 240px;">
                 <span class="input-group-text bg-transparent text-muted"><i class="bi bi-search"></i></span>
-                <input type="text" id="logSearchInput" class="form-control" placeholder="Buscar por DNI o nombre...">
+                <input type="text" id="logSearchInput" class="form-control" placeholder="Buscar DNI, nombre o IPRESS...">
               </div>
               <button id="btnExportLogsExcel" class="btn btn-sm btn-outline-success">
                 <i class="bi bi-file-earmark-excel"></i> Exportar Log
@@ -191,6 +236,50 @@
           <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
             <span id="logsCountText">Mostrando 0 registros</span>
             <span>Registrado en tiempo real</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA EXTRA: ANALÍTICA Y RANKING IPRESS -->
+      <div class="tab-pane fade" id="tab-analytics" role="tabpanel">
+        <div class="row g-4 mb-4">
+          <div class="col-lg-7">
+            <div class="app-card h-100 fade-in">
+              <div class="app-card-header">
+                <h2 class="h6 fw-bold mb-0 text-main">
+                  <i class="bi bi-trophy-fill text-warning me-2"></i>Top 10 IPRESS con Mayor Producción (ATC)
+                </h2>
+              </div>
+              <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="adminTopIpressChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="app-card h-100 fade-in">
+              <div class="app-card-header">
+                <h2 class="h6 fw-bold mb-0 text-main">
+                  <i class="bi bi-pie-chart-fill text-primary me-2"></i>Participación por MicroRed
+                </h2>
+              </div>
+              <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="adminMicroredChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Semáforo de Cobertura: IPRESS con 0 atenciones -->
+        <div class="app-card fade-in">
+          <div class="app-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h2 class="h6 fw-bold mb-0 text-main">
+              <i class="bi bi-stoplights-fill text-danger me-2"></i>Semáforo de Cobertura de Establecimientos
+            </h2>
+            <span id="adminZeroIpressBadge" class="badge-custom badge-success">Verificando...</span>
+          </div>
+          <div id="adminZeroIpressList" class="small text-muted">
+            Analizando producción acumulada de las IPRESS...
           </div>
         </div>
       </div>
@@ -744,6 +833,8 @@
   <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
   <!-- SheetJS para exportar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Chart.js para gráficos administrativos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- Librerías de Generación PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>

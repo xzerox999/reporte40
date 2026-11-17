@@ -1382,3 +1382,319 @@ body {
   .app-card { padding: 1.15rem; }
   .month-selector-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ==================== ICONOS SVG ANIMADOS EN KPIs ==================== */
+.kpi-svg-icon {
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+}
+
+.kpi-ecg-line {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+  animation: ecgPulseDraw 2.6s ease-in-out infinite;
+}
+
+@keyframes ecgPulseDraw {
+  0% { stroke-dashoffset: 90; opacity: 0.4; }
+  45% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: -45; opacity: 0.85; }
+  100% { stroke-dashoffset: -90; opacity: 0.4; }
+}
+
+.kpi-radar-ring {
+  transform-origin: center;
+  animation: kpiRipple 2.4s ease-out infinite;
+}
+
+@keyframes kpiRipple {
+  0% { transform: scale(0.75); opacity: 0.75; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.kpi-bar-1 { transform-origin: bottom; animation: kpiBarWave 1.8s ease-in-out infinite 0s; }
+.kpi-bar-2 { transform-origin: bottom; animation: kpiBarWave 1.8s ease-in-out infinite 0.25s; }
+.kpi-bar-3 { transform-origin: bottom; animation: kpiBarWave 1.8s ease-in-out infinite 0.5s; }
+
+@keyframes kpiBarWave {
+  0%, 100% { transform: scaleY(0.75); opacity: 0.8; }
+  50% { transform: scaleY(1.12); opacity: 1; }
+}
+
+.kpi-spark-dot {
+  animation: sparkTwinkle 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes sparkTwinkle {
+  0% { transform: scale(0.8); opacity: 0.65; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+
+/* ==================== TARJETAS DE RÉCORDS / INSIGHTS ==================== */
+.insight-pill-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+}
+
+.insight-pill-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.insight-pill-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+/* ==================== ESTADO VACÍO SVG ANIMADO EN GRÁFICO ==================== */
+.chart-empty-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  z-index: 4;
+  transition: opacity 0.3s ease;
+}
+
+.empty-calendar-float {
+  animation: floatEmptyCal 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes floatEmptyCal {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-6px); }
+}
+
+.empty-loupe-scan {
+  animation: scanLoupe 3.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes scanLoupe {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  35% { transform: translate(7px, -4px) rotate(6deg); }
+  70% { transform: translate(-5px, 3px) rotate(-5deg); }
+}
+
+/* ==================== MODO PANTALLA COMPLETA DE GRÁFICO ==================== */
+.chart-card-fullscreen {
+  position: fixed !important;
+  inset: 16px !important;
+  z-index: 1055 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55) !important;
+}
+
+.chart-card-fullscreen .chart-canvas-wrap {
+  height: calc(100vh - 200px) !important;
+  min-height: 320px !important;
+}
+
+/* ==================== MAPA DE CALOR Y QUINCENAS DIARIAS ==================== */
+.quincena-card {
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.quincena-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background-color: var(--border-color);
+  overflow: hidden;
+}
+
+.quincena-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quincena-bar-q1 {
+  background: linear-gradient(90deg, #3b82f6, #06b6d4);
+}
+
+.quincena-bar-q2 {
+  background: linear-gradient(90deg, #6366f1, #10b981);
+}
+
+.heatmap-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 0.45rem;
+}
+
+.heatmap-tile {
+  position: relative;
+  border-radius: 10px;
+  padding: 0.45rem 0.25rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  user-select: none;
+}
+
+.heatmap-tile:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+  z-index: 2;
+}
+
+.heatmap-tile .hm-day {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.heatmap-tile .hm-val {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.heatmap-lvl-0 { background-color: var(--bg-card-subtle); color: var(--text-dim); }
+.heatmap-lvl-1 { background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); color: #2563eb; }
+.heatmap-lvl-2 { background-color: rgba(59, 130, 246, 0.35); border-color: rgba(59, 130, 246, 0.55); color: #1e3a8a; }
+.heatmap-lvl-3 { background-color: rgba(37, 99, 235, 0.72); border-color: #2563eb; color: #ffffff; }
+.heatmap-lvl-4 { background: linear-gradient(135deg, #2563eb, #10b981); border-color: transparent; color: #ffffff; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35); }
+
+[data-theme="dark"] .heatmap-lvl-1 { background-color: rgba(56, 189, 248, 0.14); border-color: rgba(56, 189, 248, 0.32); color: #7dd3fc; }
+[data-theme="dark"] .heatmap-lvl-2 { background-color: rgba(56, 189, 248, 0.32); border-color: rgba(56, 189, 248, 0.55); color: #e0f2fe; }
+[data-theme="dark"] .heatmap-lvl-3 { background-color: rgba(37, 99, 235, 0.78); border-color: #60a5fa; color: #ffffff; }
+
+.heatmap-row-highlight td {
+  animation: rowFlash 1.4s ease;
+}
+
+@keyframes rowFlash {
+  0% { background-color: rgba(37, 99, 235, 0.28); }
+  100% { background-color: transparent; }
+}
+
+/* ==================== FILTROS Y ORDEN EN TABLA DIARIA ==================== */
+.daily-filter-pill {
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.daily-filter-pill:hover {
+  border-color: var(--primary);
+  color: var(--text-main);
+}
+
+.daily-filter-pill.active {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.sortable-th:hover {
+  color: var(--primary) !important;
+}
+
+/* ==================== DESTELLO / CONFETI ÉXITO PDF ==================== */
+.btn-pdf-success {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
+}
+
+.pdf-sparkle-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  animation: pdfSparkleFly 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pdfSparkleFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx, 0px), var(--ty, -40px)) scale(0);
+    opacity: 0;
+  }
+}
+
+.pdf-svg-check path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawSvgCheck 0.45s ease forwards;
+}
+
+@keyframes drawSvgCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ==================== ADMIN STATUS PILL BAR ==================== */
+.admin-status-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 1rem;
+  box-shadow: var(--card-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-ecg-line,
+  .kpi-radar-ring,
+  .kpi-bar-1,
+  .kpi-bar-2,
+  .kpi-bar-3,
+  .kpi-spark-dot,
+  .empty-calendar-float,
+  .empty-loupe-scan,
+  .sync-cloud-group,
+  .sync-beam-pulse,
+  .sync-particle,
+  .sync-check-badge {
+    animation: none !important;
+  }
+}

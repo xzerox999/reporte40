@@ -216,6 +216,7 @@ async function initDashboard() {
   const appTableTotal = document.getElementById("appTableTotal");
 
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+  const previewPdfBtn = document.getElementById("previewPdfBtn");
 
   // Elementos de Control de Modo Diario
   const toggleDailyReport = document.getElementById("toggleDailyReport");
@@ -228,6 +229,48 @@ async function initDashboard() {
   const dailyTotalATD = document.getElementById("dailyTotalATD");
   const dailyDaysActiveText = document.getElementById("dailyDaysActiveText");
   const dailyTotalBadge = document.getElementById("dailyTotalBadge");
+
+  // Estado de filtro y ordenamiento en tabla diaria
+  let dailyFilterMode = "all"; // 'all' | 'active' | 'sihce'
+  let dailySortKey = "day";    // 'day' | 'atc' | 'atd'
+  let dailySortDir = "asc";    // 'asc' | 'desc'
+
+  // Helper de Contador en Vivo (Count-Up) para KPIs
+  const counterAnimations = new WeakMap();
+  function animateCounter(el, targetValue, duration = 520) {
+    if (!el) return;
+    const target = Math.max(0, Math.round(Number(targetValue) || 0));
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const startVal = Number(el.dataset.currentVal || 0);
+
+    if (reduced || startVal === target) {
+      el.dataset.currentVal = String(target);
+      el.textContent = target.toLocaleString();
+      return;
+    }
+
+    if (counterAnimations.has(el)) {
+      cancelAnimationFrame(counterAnimations.get(el));
+    }
+
+    const startTime = performance.now();
+    function step(now) {
+      const elapsed = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - elapsed, 3); // easeOutCubic
+      const current = Math.round(startVal + (target - startVal) * eased);
+      el.textContent = current.toLocaleString();
+      if (elapsed < 1) {
+        const rafId = requestAnimationFrame(step);
+        counterAnimations.set(el, rafId);
+      } else {
+        el.dataset.currentVal = String(target);
+        el.textContent = target.toLocaleString();
+        counterAnimations.delete(el);
+      }
+    }
+    const rafId = requestAnimationFrame(step);
+    counterAnimations.set(el, rafId);
+  }
 
   // Mostrar datos del usuario en la interfaz
   navUserName.textContent = currentUser.nombre ? currentUser.nombre.split(" ")[0] : "Personal";
@@ -444,7 +487,16 @@ async function initDashboard() {
     const monthData = userDailyData && userDailyData[mKey];
     if (dailyTableBody) dailyTableBody.innerHTML = "";
 
+    const quincenaBox = document.getElementById("quincenaComparisonBox");
+    const heatmapWrapper = document.getElementById("dailyHeatmapWrapper");
+    const heatmapGrid = document.getElementById("dailyHeatmapGrid");
+    const filterBar = document.getElementById("dailyFilterBar");
+    const filterSihceBtn = document.getElementById("dailyFilterSihceBtn");
+
     if (!monthData || !monthData.dias) {
+      if (quincenaBox) quincenaBox.classList.add("d-none");
+      if (heatmapWrapper) heatmapWrapper.classList.add("d-none");
+      if (filterBar) filterBar.classList.add("d-none");
       if (dailyTableBody) {
         dailyTableBody.innerHTML = `
           <tr>
@@ -468,71 +520,212 @@ async function initDashboard() {
     let daysWithActivity = 0;
     let sumATC = 0;
     let sumATD = 0;
+    let q1Atc = 0;
+    let q2Atc = 0;
+    let hasSihceDays = false;
 
     const maxATC = Math.max(...Object.values(dias).map(d => Number(d.atc) || 0), 1);
+    const dayItems = [];
 
     for (let d = 1; d <= 31; d++) {
       const dTag = (d < 10 ? "0" : "") + d;
       const dInfo = dias[dTag] || { atc: 0, atd: 0 };
       const atc = Number(dInfo.atc) || 0;
       const atd = Number(dInfo.atd) || 0;
+      const citas = Number(dInfo.citas) || 0;
+      const triajes = Number(dInfo.triajes) || 0;
       const hasActivity = atc > 0 || atd > 0;
+      const hasSihce = citas > 0 || triajes > 0;
+      if (hasSihce) hasSihceDays = true;
 
       if (hasActivity) {
         daysWithActivity++;
         sumATC += atc;
         sumATD += atd;
       }
+      if (d <= 15) q1Atc += atc;
+      else q2Atc += atc;
 
-      const citas = Number(dInfo.citas) || 0;
-      const triajes = Number(dInfo.triajes) || 0;
-      const hisAtc = Math.max(0, atc - citas - triajes);
+      dayItems.push({ d, dTag, atc, atd, citas, triajes, hasActivity, hasSihce });
+    }
 
-      let detailBadges = [];
-      if (hisAtc > 0) {
-        detailBadges.push(`<span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1" title="Atenciones médicas / asistenciales del sistema HIS">${hisAtc} HIS</span>`);
-      }
-      if (triajes > 0) {
-        detailBadges.push(`<span class="badge bg-success-subtle text-success border border-success-subtle me-1" title="Triajes de enfermería registrados en SIHCE">${triajes} triajes</span>`);
-      }
-      if (citas > 0) {
-        detailBadges.push(`<span class="badge bg-info-subtle text-info border border-info-subtle me-1" title="Citas reservadas registradas en SIHCE Admisión">${citas} citas</span>`);
-      }
+    // A. Comparativa Visual 1ra vs 2da Quincena
+    if (quincenaBox) {
+      const totalQ = q1Atc + q2Atc;
+      const q1Pct = totalQ > 0 ? Math.round((q1Atc / totalQ) * 100) : 0;
+      const q2Pct = totalQ > 0 ? Math.round((q2Atc / totalQ) * 100) : 0;
+      const q1Text = document.getElementById("q1Text");
+      const q2Text = document.getElementById("q2Text");
+      const q1Bar = document.getElementById("q1Bar");
+      const q2Bar = document.getElementById("q2Bar");
+      const qWinner = document.getElementById("quincenaWinnerBadge");
 
-      let detailLabel = "";
-      if (detailBadges.length > 0) {
-        detailLabel = detailBadges.join("");
-      } else if (hasActivity) {
-        detailLabel = `<span class="text-muted small">${atc} pac.</span>`;
+      if (q1Text) q1Text.textContent = `${q1Atc.toLocaleString()} ATC (${q1Pct}%)`;
+      if (q2Text) q2Text.textContent = `${q2Atc.toLocaleString()} ATC (${q2Pct}%)`;
+      if (q1Bar) q1Bar.style.width = `${q1Pct}%`;
+      if (q2Bar) q2Bar.style.width = `${q2Pct}%`;
+      if (qWinner) {
+        if (totalQ === 0) {
+          qWinner.className = "badge bg-secondary-subtle text-secondary small";
+          qWinner.textContent = "Sin producción registrada";
+        } else if (q1Atc > q2Atc) {
+          qWinner.className = "badge bg-primary-subtle text-primary small";
+          qWinner.innerHTML = `<i class="bi bi-trophy-fill me-1"></i> Mayor carga en 1ra Quincena (+${(q1Atc - q2Atc).toLocaleString()} ATC)`;
+        } else if (q2Atc > q1Atc) {
+          qWinner.className = "badge bg-success-subtle text-success small";
+          qWinner.innerHTML = `<i class="bi bi-trophy-fill me-1"></i> Mayor carga en 2da Quincena (+${(q2Atc - q1Atc).toLocaleString()} ATC)`;
+        } else {
+          qWinner.className = "badge bg-info-subtle text-info small";
+          qWinner.textContent = "Producción equilibrada en ambas quincenas";
+        }
+      }
+      quincenaBox.classList.remove("d-none");
+    }
+
+    // B. Mapa de Calor Mensual (31 cuadritos clicables)
+    if (heatmapWrapper && heatmapGrid) {
+      heatmapGrid.innerHTML = "";
+      dayItems.forEach((item) => {
+        let lvl = 0;
+        if (item.atc > 0) {
+          const ratio = item.atc / maxATC;
+          if (ratio >= 0.8) lvl = 4;
+          else if (ratio >= 0.5) lvl = 3;
+          else if (ratio >= 0.25) lvl = 2;
+          else lvl = 1;
+        }
+        const tile = document.createElement("div");
+        tile.className = `heatmap-tile heatmap-lvl-${lvl}`;
+        const sihceHint = item.hasSihce ? ` | ${item.triajes} triajes, ${item.citas} citas` : "";
+        tile.title = `Día ${item.dTag}: ${item.atc} ATC, ${item.atd} ATD${sihceHint}`;
+        tile.innerHTML = `<span class="hm-day">${item.dTag}</span><span class="hm-val">${item.atc > 0 ? item.atc : "·"}</span>`;
+        tile.addEventListener("click", () => {
+          // Si el filtro activo oculta ese día, cambiar a 'all' para ubicarlo
+          if (dailyFilterMode !== "all") {
+            dailyFilterMode = "all";
+            document.querySelectorAll(".daily-filter-pill").forEach(p => {
+              p.classList.toggle("active", p.dataset.dailyFilter === "all");
+            });
+            updateDailyView();
+          }
+          const targetRow = document.getElementById(`dailyRow_${item.dTag}`);
+          if (targetRow) {
+            targetRow.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetRow.classList.remove("heatmap-row-highlight");
+            void targetRow.offsetWidth;
+            targetRow.classList.add("heatmap-row-highlight");
+          }
+        });
+        heatmapGrid.appendChild(tile);
+      });
+      heatmapWrapper.classList.remove("d-none");
+    }
+
+    // C. Filtros rápidos y Ordenamiento
+    if (filterBar) filterBar.classList.remove("d-none");
+    if (filterSihceBtn) {
+      filterSihceBtn.classList.toggle("d-none", !hasSihceDays);
+      if (!hasSihceDays && dailyFilterMode === "sihce") {
+        dailyFilterMode = "all";
+        document.querySelectorAll(".daily-filter-pill").forEach(p => {
+          p.classList.toggle("active", p.dataset.dailyFilter === "all");
+        });
+      }
+    }
+
+    let visibleDays = dayItems.filter(item => {
+      if (dailyFilterMode === "active") return item.hasActivity;
+      if (dailyFilterMode === "sihce") return item.hasSihce;
+      return true;
+    });
+
+    visibleDays.sort((a, b) => {
+      const mult = dailySortDir === "asc" ? 1 : -1;
+      if (dailySortKey === "atc") return (a.atc - b.atc) * mult || (a.d - b.d);
+      if (dailySortKey === "atd") return (a.atd - b.atd) * mult || (a.d - b.d);
+      return (a.d - b.d) * mult;
+    });
+
+    // Actualizar iconos de ordenamiento
+    const sortIconDay = document.getElementById("sortIconDay");
+    const sortIconAtc = document.getElementById("sortIconAtc");
+    const sortIconAtd = document.getElementById("sortIconAtd");
+    [
+      [sortIconDay, "day"],
+      [sortIconAtc, "atc"],
+      [sortIconAtd, "atd"]
+    ].forEach(([iconEl, key]) => {
+      if (!iconEl) return;
+      if (dailySortKey === key) {
+        iconEl.className = `bi ${dailySortDir === "asc" ? "bi-sort-numeric-down" : "bi-sort-numeric-up-alt"} ms-1 small text-primary`;
       } else {
-        detailLabel = `<span class="text-muted opacity-50 small">Sin activ.</span>`;
+        iconEl.className = "bi bi-arrow-down-up ms-1 small opacity-50";
       }
+    });
 
-      const percent = Math.min(100, Math.round((atc / maxATC) * 100));
-
-      const tr = document.createElement("tr");
-      if (hasActivity) {
-        tr.style.backgroundColor = "rgba(59, 130, 246, 0.04)";
+    if (visibleDays.length === 0) {
+      if (dailyTableBody) {
+        dailyTableBody.innerHTML = `
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+              <i class="bi bi-funnel fs-4 d-block mb-1"></i>
+              No hay días que coincidan con este filtro rápido.
+            </td>
+          </tr>
+        `;
       }
+    } else {
+      visibleDays.forEach((item) => {
+        const { dTag, atc, atd, citas, triajes, hasActivity } = item;
+        const hisAtc = Math.max(0, atc - citas - triajes);
 
-      tr.innerHTML = `
-        <td class="text-center">
-          <span class="daily-day-badge ${hasActivity ? 'daily-day-active' : ''}">${dTag}</span>
-        </td>
-        <td class="text-center fw-bold ${atc > 0 ? 'text-primary' : 'text-muted'}">${atc > 0 ? atc.toLocaleString() : '-'}</td>
-        <td class="text-center fw-bold ${atd > 0 ? 'text-success' : 'text-muted'}">${atd > 0 ? atd.toLocaleString() : '-'}</td>
-        <td>
-          <div class="d-flex align-items-center gap-2">
-            <div class="daily-bar-container flex-grow-1">
-              <div class="daily-bar-fill" style="width: ${percent}%;"></div>
+        let detailBadges = [];
+        if (hisAtc > 0) {
+          detailBadges.push(`<span class="badge bg-primary-subtle text-primary border border-primary-subtle me-1" title="Atenciones médicas / asistenciales del sistema HIS">${hisAtc} HIS</span>`);
+        }
+        if (triajes > 0) {
+          detailBadges.push(`<span class="badge bg-success-subtle text-success border border-success-subtle me-1" title="Triajes de enfermería registrados en SIHCE">${triajes} triajes</span>`);
+        }
+        if (citas > 0) {
+          detailBadges.push(`<span class="badge bg-info-subtle text-info border border-info-subtle me-1" title="Citas reservadas registradas en SIHCE Admisión">${citas} citas</span>`);
+        }
+
+        let detailLabel = "";
+        if (detailBadges.length > 0) {
+          detailLabel = detailBadges.join("");
+        } else if (hasActivity) {
+          detailLabel = `<span class="text-muted small">${atc} pac.</span>`;
+        } else {
+          detailLabel = `<span class="text-muted opacity-50 small">Sin activ.</span>`;
+        }
+
+        const percent = Math.min(100, Math.round((atc / maxATC) * 100));
+
+        const tr = document.createElement("tr");
+        tr.id = `dailyRow_${dTag}`;
+        if (hasActivity) {
+          tr.style.backgroundColor = "rgba(59, 130, 246, 0.04)";
+        }
+
+        tr.innerHTML = `
+          <td class="text-center">
+            <span class="daily-day-badge ${hasActivity ? 'daily-day-active' : ''}">${dTag}</span>
+          </td>
+          <td class="text-center fw-bold ${atc > 0 ? 'text-primary' : 'text-muted'}">${atc > 0 ? atc.toLocaleString() : '-'}</td>
+          <td class="text-center fw-bold ${atd > 0 ? 'text-success' : 'text-muted'}">${atd > 0 ? atd.toLocaleString() : '-'}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="daily-bar-container flex-grow-1">
+                <div class="daily-bar-fill" style="width: ${percent}%;"></div>
+              </div>
+              <span class="small d-flex flex-wrap align-items-center" style="min-width: 140px;">
+                ${detailLabel}
+              </span>
             </div>
-            <span class="small d-flex flex-wrap align-items-center" style="min-width: 140px;">
-              ${detailLabel}
-            </span>
-          </div>
-        </td>
-      `;
-      if (dailyTableBody) dailyTableBody.appendChild(tr);
+          </td>
+        `;
+        if (dailyTableBody) dailyTableBody.appendChild(tr);
+      });
     }
 
     let sumTriajesMonth = 0;
@@ -575,6 +768,45 @@ async function initDashboard() {
       updateDailyView();
       const activeAtd = getActiveAtdDataset();
       renderOrUpdateChart(activeAtd);
+    });
+  }
+
+  // Vincular filtros rápidos y cabeceras ordenables de la tabla diaria
+  document.querySelectorAll(".daily-filter-pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      dailyFilterMode = pill.dataset.dailyFilter || "all";
+      document.querySelectorAll(".daily-filter-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      updateDailyView();
+    });
+  });
+
+  document.querySelectorAll("#dailyTable thead th[data-daily-sort]").forEach((th) => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.dailySort;
+      if (dailySortKey === key) {
+        dailySortDir = dailySortDir === "asc" ? "desc" : "asc";
+      } else {
+        dailySortKey = key;
+        dailySortDir = key === "day" ? "asc" : "desc";
+      }
+      updateDailyView();
+    });
+  });
+
+  // Botón Ampliar / Pantalla Completa de Gráficos
+  const btnFullscreenChart = document.getElementById("btnFullscreenChart");
+  const chartContainerCard = document.getElementById("chartContainerCard");
+  if (btnFullscreenChart && chartContainerCard) {
+    btnFullscreenChart.addEventListener("click", () => {
+      const isFs = chartContainerCard.classList.toggle("chart-card-fullscreen");
+      btnFullscreenChart.innerHTML = isFs
+        ? '<i class="bi bi-fullscreen-exit"></i> <span class="d-none d-sm-inline">Salir</span>'
+        : '<i class="bi bi-arrows-fullscreen"></i> <span class="d-none d-sm-inline">Ampliar</span>';
+      setTimeout(() => {
+        if (productionChart) productionChart.resize();
+        if (compositionChart) compositionChart.resize();
+      }, 60);
     });
   }
 
@@ -709,10 +941,12 @@ async function initDashboard() {
         </tr>
       `;
       if (appTableTotal) appTableTotal.textContent = "0";
-      kpiATC.textContent = "0";
-      kpiATD.textContent = "0";
-      kpiAPP.textContent = "0";
+      animateCounter(kpiATC, 0);
+      animateCounter(kpiATD, 0);
+      animateCounter(kpiAPP, 0);
+      updateInsights(activeAtd, 0, 0, 0, 0);
       renderOrUpdateChart(activeAtd);
+      renderOrUpdateCompositionChart(0, 0, 0);
       updateDailyView();
       return;
     }
@@ -848,27 +1082,208 @@ async function initDashboard() {
       appTableTotal.textContent = totalAPP.toLocaleString();
     }
 
-    // 3. Actualizar KPIs
-    kpiATC.textContent = totalATC.toLocaleString();
-    kpiATD.textContent = totalATD.toLocaleString();
-    kpiAPP.textContent = totalAPP.toLocaleString();
+    // 3. Actualizar KPIs con efecto Contador en Vivo
+    animateCounter(kpiATC, totalATC);
+    animateCounter(kpiATD, totalATD);
+    animateCounter(kpiAPP, totalAPP);
 
-    // 4. Actualizar Gráfico Chart.js
+    // 4. Actualizar Insights (Récords Personales) y ambos gráficos
+    const finalHis = hasAnySihce ? sumPeriodHis : totalATC;
+    const finalSihce = sumPeriodTriajes + sumPeriodCitas;
+    updateInsights(activeAtd, totalATC, totalATD, finalHis, finalSihce);
     renderOrUpdateChart(activeAtd);
+    renderOrUpdateCompositionChart(finalHis, finalSihce, totalAPP);
   }
 
-  // Gráfico Interactivo Chart.js
+  // Calcular y mostrar tarjetas de Récords Personales del Período
+  function updateInsights(activeAtd, totalATC, totalATD, totalHis, totalSihce) {
+    const row = document.getElementById("insightsRow");
+    if (!row) return;
+
+    if (!activeAtd || activeAtd.disabled || selectedMonths.length === 0 || (totalATC === 0 && totalATD === 0)) {
+      row.classList.add("d-none");
+      return;
+    }
+
+    const bestMonthEl = document.getElementById("insightBestMonth");
+    const bestDayEl = document.getElementById("insightBestDay");
+    const avgDailyEl = document.getElementById("insightAvgDaily");
+
+    // 1. Mes más productivo entre los seleccionados
+    let bestMKey = selectedMonths[0];
+    let bestMAtc = -1;
+    selectedMonths.forEach((mKey) => {
+      const mAtc = Number(activeAtd?.meses?.[mKey]?.atc) || 0;
+      if (mAtc > bestMAtc) {
+        bestMAtc = mAtc;
+        bestMKey = mKey;
+      }
+    });
+    const bestMObj = CONFIG.MESES.find(m => m.key === bestMKey) || { label: bestMKey };
+    if (bestMonthEl) {
+      bestMonthEl.textContent = `${bestMObj.label} — ${Math.max(0, bestMAtc).toLocaleString()} ATC`;
+    }
+
+    // 2. Día récord y promedio diario activo en los meses con desglose diario
+    let bestDayInfo = null;
+    let totalActiveDays = 0;
+    let totalDailyAtc = 0;
+
+    selectedMonths.forEach((mKey) => {
+      const mDaily = userDailyData && userDailyData[mKey];
+      if (!mDaily || !mDaily.dias) return;
+      for (let d = 1; d <= 31; d++) {
+        const dTag = (d < 10 ? "0" : "") + d;
+        const atcVal = Number(mDaily.dias[dTag]?.atc) || 0;
+        const atdVal = Number(mDaily.dias[dTag]?.atd) || 0;
+        if (atcVal > 0 || atdVal > 0) {
+          totalActiveDays++;
+          totalDailyAtc += atcVal;
+        }
+        if (!bestDayInfo || atcVal > bestDayInfo.atc) {
+          bestDayInfo = { dTag, mKey, atc: atcVal };
+        }
+      }
+    });
+
+    if (bestDayEl) {
+      if (bestDayInfo && bestDayInfo.atc > 0) {
+        const mLabel = selectedMonths.length === 1 ? "" : ` (${bestDayInfo.mKey})`;
+        bestDayEl.textContent = `Día ${bestDayInfo.dTag}${mLabel} — ${bestDayInfo.atc.toLocaleString()} ATC`;
+      } else {
+        bestDayEl.textContent = "Consolidado mensual (sin desglose diario)";
+      }
+    }
+
+    if (avgDailyEl) {
+      if (totalActiveDays > 0) {
+        const avg = Math.round(totalDailyAtc / totalActiveDays);
+        avgDailyEl.textContent = `${avg.toLocaleString()} ATC / día activo (${totalActiveDays} días)`;
+      } else {
+        const avgMonth = Math.round(totalATC / selectedMonths.length);
+        avgDailyEl.textContent = `${avgMonth.toLocaleString()} ATC promedio / mes`;
+      }
+    }
+
+    row.classList.remove("d-none");
+  }
+
+  // Gráfico Interactivo Chart.js (Barras) + Gráfico de Dona de Composición
   let productionChart = null;
+  let compositionChart = null;
+
+  function renderOrUpdateCompositionChart(hisVal, sihceVal, appVal) {
+    const canvas = document.getElementById("compositionChart");
+    const emptyEl = document.getElementById("compositionEmptyState");
+    const badgeEl = document.getElementById("compositionTotalBadge");
+    const legendEl = document.getElementById("compositionLegend");
+    if (!canvas || typeof Chart === "undefined") return;
+
+    const totalSum = hisVal + sihceVal + appVal;
+    if (badgeEl) badgeEl.textContent = `${totalSum.toLocaleString()} total`;
+
+    if (totalSum <= 0 || selectedMonths.length === 0) {
+      if (emptyEl) emptyEl.classList.remove("d-none");
+      if (legendEl) legendEl.innerHTML = "";
+      if (compositionChart) {
+        compositionChart.destroy();
+        compositionChart = null;
+      }
+      return;
+    }
+    if (emptyEl) emptyEl.classList.add("d-none");
+
+    const items = [
+      { label: "Atenciones HIS", val: hisVal, color: "#3b82f6" },
+      { label: "SIHCE (Triaje/Citas)", val: sihceVal, color: "#10b981" },
+      { label: "Promoción (APP)", val: appVal, color: "#6366f1" }
+    ].filter(i => i.val > 0);
+
+    if (legendEl) {
+      legendEl.innerHTML = items.map(i => {
+        const pct = Math.round((i.val / totalSum) * 100);
+        return `<span class="d-inline-flex align-items-center gap-1 text-muted">
+          <span style="width:10px;height:10px;border-radius:50%;background:${i.color};display:inline-block;"></span>
+          <span>${i.label}: <strong class="text-main">${pct}%</strong></span>
+        </span>`;
+      }).join("");
+    }
+
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const borderColor = isDark ? "#1e293b" : "#ffffff";
+
+    if (compositionChart) {
+      compositionChart.data.labels = items.map(i => i.label);
+      compositionChart.data.datasets[0].data = items.map(i => i.val);
+      compositionChart.data.datasets[0].backgroundColor = items.map(i => i.color);
+      compositionChart.data.datasets[0].borderColor = borderColor;
+      compositionChart.update();
+      return;
+    }
+
+    compositionChart = new Chart(canvas, {
+      type: "doughnut",
+      data: {
+        labels: items.map(i => i.label),
+        datasets: [{
+          data: items.map(i => i.val),
+          backgroundColor: items.map(i => i.color),
+          borderColor: borderColor,
+          borderWidth: 2,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "66%",
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            padding: 10,
+            cornerRadius: 8,
+            callbacks: {
+              label: (ctx) => {
+                const v = Number(ctx.raw) || 0;
+                const p = totalSum > 0 ? Math.round((v / totalSum) * 100) : 0;
+                return ` ${ctx.label}: ${v.toLocaleString()} (${p}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   function renderOrUpdateChart(activeAtd) {
     const canvas = document.getElementById("productionChart");
+    const emptyOverlay = document.getElementById("chartEmptyState");
+    const headerTitle = document.getElementById("chartHeaderTitle");
     if (!canvas || typeof Chart === "undefined") return;
 
     if (activeAtd && activeAtd.disabled) {
+      if (emptyOverlay) emptyOverlay.classList.add("d-none");
       if (productionChart) {
         productionChart.destroy();
         productionChart = null;
       }
       return;
+    }
+
+    if (selectedMonths.length === 0) {
+      if (emptyOverlay) emptyOverlay.classList.remove("d-none");
+      if (headerTitle) headerTitle.textContent = "Evolución y Comparativo Mensual (ATC vs ATD)";
+      if (productionChart) {
+        productionChart.destroy();
+        productionChart = null;
+      }
+      return;
+    }
+    if (emptyOverlay) emptyOverlay.classList.add("d-none");
+    if (headerTitle) {
+      headerTitle.textContent = (isDailyModeActive && selectedMonths.length === 1)
+        ? `Producción Día a Día — ${(CONFIG.MESES.find(m => m.key === selectedMonths[0])?.label || selectedMonths[0])}`
+        : "Evolución y Comparativo Mensual (ATC vs ATD)";
     }
 
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -1003,11 +1418,10 @@ async function initDashboard() {
     }
   }
 
-  // Observar cambio de tema para adaptar colores del gráfico
+  // Observar cambio de tema para adaptar colores de los gráficos
   const themeObserver = new MutationObserver(() => {
-    if (productionChart) {
-      const activeAtd = getActiveAtdDataset();
-      renderOrUpdateChart(activeAtd);
+    if (productionChart || compositionChart) {
+      updateTablesAndKPIs();
     }
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -1301,29 +1715,58 @@ async function initDashboard() {
   setupEstablishmentSelector();
   renderMonthSelector();
 
-  // 3. Descarga de PDF
-  downloadPdfBtn.addEventListener("click", async () => {
+  // Destello institucional sutil al completar descarga de PDF
+  function triggerPdfSuccessSparkle(anchorBtn) {
+    if (!anchorBtn) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = anchorBtn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const colors = ["#3b82f6", "#10b981", "#38bdf8", "#f59e0b", "#6366f1"];
+
+    for (let i = 0; i < 16; i++) {
+      const dot = document.createElement("span");
+      dot.className = "pdf-sparkle-dot";
+      const angle = (Math.PI * 2 * i) / 16 + (Math.random() - 0.5) * 0.25;
+      const dist = 36 + Math.random() * 44;
+      dot.style.left = `${cx}px`;
+      dot.style.top = `${cy}px`;
+      dot.style.background = colors[i % colors.length];
+      dot.style.setProperty("--tx", `${Math.round(Math.cos(angle) * dist)}px`);
+      dot.style.setProperty("--ty", `${Math.round(Math.sin(angle) * dist)}px`);
+      document.body.appendChild(dot);
+      setTimeout(() => dot.remove(), 900);
+    }
+  }
+
+  function validatePdfPreconditions() {
     const activeAtd = getActiveAtdDataset();
     if (activeAtd && activeAtd.disabled) {
       alert("No es posible generar ni descargar el reporte en PDF: el establecimiento seleccionado se encuentra temporalmente bloqueado por auditoría de la administración.");
-      return;
+      return null;
     }
-
     if (selectedMonths.length === 0) {
       alert("Por favor selecciona al menos un mes para generar tu reporte.");
-      return;
+      return null;
     }
+    return activeAtd;
+  }
+
+  async function runPdfDownload() {
+    const activeAtd = validatePdfPreconditions();
+    if (!activeAtd) return;
 
     downloadPdfBtn.disabled = true;
-    downloadPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Generando PDF...';
+    downloadPdfBtn.classList.remove("btn-pdf-success");
+    downloadPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Armando PDF...';
 
     const activeApp = getActiveAppDataset();
+    let ok = false;
 
     try {
-      // Registrar log de auditoría
       const estabLabel = selectedEstab === "ALL" ? "Consolidado Red Cusco Sur" : selectedEstab;
       const isDailySingleMonth = isDailyModeActive && selectedMonths.length === 1;
-      const logTipo = isDailySingleMonth 
+      const logTipo = isDailySingleMonth
         ? (selectedEstab === "ALL" ? "PDF_DIARIO_CONSOLIDADO" : "PDF_DIARIO_IPRESS")
         : (selectedEstab === "ALL" ? "PDF_CONSOLIDADO" : "PDF_IPRESS");
 
@@ -1335,7 +1778,6 @@ async function initDashboard() {
         tipo: logTipo
       });
 
-      // Generar PDF Profesional con opción de desglose diario y año seleccionado
       await PdfGenerator.generate(
         currentUser,
         selectedMonths,
@@ -1347,13 +1789,103 @@ async function initDashboard() {
         isDailySingleMonth,
         selectedYear
       );
+      ok = true;
     } catch (err) {
       alert("Hubo un inconveniente al generar el PDF: " + err.message);
     } finally {
-      downloadPdfBtn.disabled = false;
-      downloadPdfBtn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte en PDF';
+      if (ok) {
+        downloadPdfBtn.classList.add("btn-pdf-success");
+        downloadPdfBtn.innerHTML = `
+          <svg class="pdf-svg-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 13l4 4L19 7"/>
+          </svg>
+          ¡PDF Descargado!
+        `;
+        triggerPdfSuccessSparkle(downloadPdfBtn);
+        setTimeout(() => {
+          downloadPdfBtn.classList.remove("btn-pdf-success");
+          downloadPdfBtn.disabled = false;
+          downloadPdfBtn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte en PDF';
+        }, 1800);
+      } else {
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.innerHTML = '<i class="bi bi-file-earmark-pdf-fill"></i> Descargar Reporte en PDF';
+      }
     }
-  });
+  }
+
+  // 3. Descarga de PDF y Vista Previa en Modal
+  downloadPdfBtn.addEventListener("click", runPdfDownload);
+
+  let currentPreviewBlobUrl = null;
+  let pdfPreviewModalInstance = null;
+  const pdfPreviewModalEl = document.getElementById("pdfPreviewModal");
+  const pdfPreviewFrame = document.getElementById("pdfPreviewFrame");
+  const pdfPreviewSubtitle = document.getElementById("pdfPreviewSubtitle");
+  const btnDownloadFromPreview = document.getElementById("btnDownloadFromPreview");
+
+  if (pdfPreviewModalEl) {
+    pdfPreviewModalEl.addEventListener("hidden.bs.modal", () => {
+      if (pdfPreviewFrame) pdfPreviewFrame.src = "about:blank";
+      if (currentPreviewBlobUrl) {
+        URL.revokeObjectURL(currentPreviewBlobUrl);
+        currentPreviewBlobUrl = null;
+      }
+    });
+  }
+
+  if (btnDownloadFromPreview) {
+    btnDownloadFromPreview.addEventListener("click", () => {
+      if (pdfPreviewModalInstance) pdfPreviewModalInstance.hide();
+      runPdfDownload();
+    });
+  }
+
+  if (previewPdfBtn) {
+    previewPdfBtn.addEventListener("click", async () => {
+      const activeAtd = validatePdfPreconditions();
+      if (!activeAtd) return;
+
+      previewPdfBtn.disabled = true;
+      previewPdfBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Preparando...';
+
+      const activeApp = getActiveAppDataset();
+      const isDailySingleMonth = isDailyModeActive && selectedMonths.length === 1;
+
+      try {
+        const result = await PdfGenerator.generate(
+          currentUser,
+          selectedMonths,
+          activeAtd,
+          activeApp,
+          userAtdData,
+          selectedEstab,
+          userDailyData,
+          isDailySingleMonth,
+          selectedYear,
+          { previewOnly: true }
+        );
+
+        if (result && result.blobUrl && pdfPreviewFrame && pdfPreviewModalEl) {
+          if (currentPreviewBlobUrl) URL.revokeObjectURL(currentPreviewBlobUrl);
+          currentPreviewBlobUrl = result.blobUrl;
+          pdfPreviewFrame.src = result.blobUrl;
+          if (pdfPreviewSubtitle) {
+            pdfPreviewSubtitle.textContent = `${result.filename} — (${selectedMonths.join(", ")})`;
+          }
+          if (!pdfPreviewModalInstance) {
+            pdfPreviewModalInstance = new bootstrap.Modal(pdfPreviewModalEl);
+          }
+          pdfPreviewModalInstance.show();
+        }
+      } catch (err) {
+        alert("No se pudo generar la vista previa del PDF: " + err.message);
+      } finally {
+        previewPdfBtn.disabled = false;
+        previewPdfBtn.innerHTML = '<i class="bi bi-eye-fill text-primary"></i> Vista Previa';
+      }
+    });
+  }
 
   // 4. Formulario de Cambio de Contraseña
   const changePasswordForm = document.getElementById("changePasswordForm");

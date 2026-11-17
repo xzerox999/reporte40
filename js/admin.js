@@ -68,14 +68,78 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Helper de Contador en Vivo (Count-Up) para KPIs
+  function animateAdminCounter(el, targetVal, duration = 500) {
+    if (!el) return;
+    const target = Math.max(0, Math.round(Number(targetVal) || 0));
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      el.textContent = target.toLocaleString();
+      return;
+    }
+    const startVal = Number(el.dataset.currentVal || 0);
+    if (startVal === target && el.textContent !== "-") {
+      el.textContent = target.toLocaleString();
+      return;
+    }
+    const startTime = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(startVal + (target - startVal) * eased).toLocaleString();
+      if (p < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.dataset.currentVal = String(target);
+        el.textContent = target.toLocaleString();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function updateAdminStatusBar() {
+    const lastUpdEl = document.getElementById("adminLastUpdatedText");
+    const monthsBadgesEl = document.getElementById("adminDailyMonthsBadges");
+    const d = window.DEMO_DATA || {};
+
+    if (lastUpdEl) {
+      const ts = d.updated_diario_at || d.generated_at || d.generado || "Sin registro reciente";
+      lastUpdEl.textContent = ts;
+    }
+
+    if (monthsBadgesEl) {
+      const MESES_ORDEN = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
+      const dailyMonths = new Set();
+      if (d.diario) {
+        Object.values(d.diario).forEach(mMap => {
+          if (mMap && typeof mMap === "object") {
+            Object.keys(mMap).forEach(m => dailyMonths.add(m));
+          }
+        });
+      }
+      const sorted = Array.from(dailyMonths).sort((a, b) => {
+        const ia = MESES_ORDEN.indexOf(a);
+        const ib = MESES_ORDEN.indexOf(b);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      });
+      if (sorted.length > 0) {
+        monthsBadgesEl.innerHTML = sorted.map(m =>
+          `<span class="badge bg-primary-subtle text-primary border border-primary-subtle">${m}</span>`
+        ).join("");
+      } else {
+        monthsBadgesEl.innerHTML = `<span class="badge bg-secondary-subtle text-secondary">Solo consolidado mensual</span>`;
+      }
+    }
+  }
+
   // 3. Actualizar KPIs
   function updateKPIs() {
-    statTotalUsers.textContent = allUsers.length.toLocaleString();
-    statTotalDownloads.textContent = allLogs.length.toLocaleString();
+    animateAdminCounter(statTotalUsers, allUsers.length);
+    animateAdminCounter(statTotalDownloads, allLogs.length);
 
     // Establecimientos únicos
     const estabs = new Set(allUsers.map(u => u.establecimiento).filter(Boolean));
-    statTotalEstabs.textContent = estabs.size.toLocaleString();
+    animateAdminCounter(statTotalEstabs, estabs.size);
 
     // Descargas de hoy
     const now = new Date();
@@ -91,7 +155,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         str.includes(`${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`)
       );
     }).length;
-    statTodayDownloads.textContent = todayCount.toLocaleString();
+    animateAdminCounter(statTodayDownloads, todayCount);
+    updateAdminStatusBar();
   }
 
   // 4. Renderizar Tabla de Logs
@@ -119,21 +184,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     logsCountText.textContent = `Mostrando ${logs.length} de ${allLogs.length} registros`;
   }
 
-  // Filtro de logs en tiempo real
-  logSearchInput.addEventListener("input", (e) => {
-    const term = e.target.value.toLowerCase().trim();
-    if (!term) {
-      renderLogsTable(allLogs);
-      return;
-    }
-    const filtered = allLogs.filter((l) =>
-      (l.dni && l.dni.toLowerCase().includes(term)) ||
-      (l.personal && l.personal.toLowerCase().includes(term)) ||
-      (l.establecimiento && l.establecimiento.toLowerCase().includes(term)) ||
-      (l.meses && l.meses.toLowerCase().includes(term))
-    );
+  // Filtro avanzado de logs (Búsqueda + Fecha + Tipo)
+  const logDateFilter = document.getElementById("logDateFilter");
+  const logTypeFilter = document.getElementById("logTypeFilter");
+
+  function parseLogDate(ts) {
+    if (!ts) return null;
+    const str = String(ts).trim();
+    // Formato DD/MM/YYYY o YYYY-MM-DD
+    const dmy = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (dmy) return new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
+    const ymd = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (ymd) return new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]));
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function applyLogsFilter() {
+    const term = (logSearchInput ? logSearchInput.value : "").toLowerCase().trim();
+    const dateMode = logDateFilter ? logDateFilter.value : "all";
+    const typeMode = logTypeFilter ? logTypeFilter.value : "all";
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const sevenDaysAgo = new Date(startOfToday.getTime() - 6 * 86400000);
+
+    const filtered = allLogs.filter((l) => {
+      if (term) {
+        const hit =
+          (l.dni && String(l.dni).toLowerCase().includes(term)) ||
+          (l.personal && String(l.personal).toLowerCase().includes(term)) ||
+          (l.establecimiento && String(l.establecimiento).toLowerCase().includes(term)) ||
+          (l.meses && String(l.meses).toLowerCase().includes(term));
+        if (!hit) return false;
+      }
+
+      if (typeMode !== "all") {
+        const t = String(l.tipo || "").toUpperCase();
+        if (typeMode === "DIARIO" && !t.includes("DIARIO")) return false;
+        if (typeMode === "SERUMS" && !t.includes("SERUMS")) return false;
+        if (typeMode === "MENSUAL" && (t.includes("DIARIO") || t.includes("SERUMS"))) return false;
+      }
+
+      if (dateMode !== "all") {
+        const d = parseLogDate(l.timestamp);
+        if (!d) return false;
+        const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        if (dateMode === "today" && dDay.getTime() !== startOfToday.getTime()) return false;
+        if (dateMode === "7d" && dDay.getTime() < sevenDaysAgo.getTime()) return false;
+        if (dateMode === "month" && (d.getMonth() !== now.getMonth() || d.getFullYear() !== now.getFullYear())) return false;
+      }
+
+      return true;
+    });
+
     renderLogsTable(filtered);
-  });
+  }
+
+  if (logSearchInput) logSearchInput.addEventListener("input", applyLogsFilter);
+  if (logDateFilter) logDateFilter.addEventListener("change", applyLogsFilter);
+  if (logTypeFilter) logTypeFilter.addEventListener("change", applyLogsFilter);
 
   // 5. Renderizar Tabla de Personal
   function renderUsersTable(users) {
@@ -2347,10 +2457,143 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // =====================================================================
+  // 14. ANALÍTICA, RANKING TOP 10 IPRESS Y SEMÁFORO DE COBERTURA
+  // =====================================================================
+  let adminTopChart = null;
+  let adminMicroredChart = null;
+
+  function renderAdminAnalytics() {
+    const summary = getEstabsSummary();
+    const zeroListEl = document.getElementById("adminZeroIpressList");
+    const zeroBadgeEl = document.getElementById("adminZeroIpressBadge");
+
+    // 1. Semáforo de IPRESS con 0 atenciones
+    const zeroIpress = summary.filter(e => e.totalATC === 0);
+    if (zeroBadgeEl) {
+      if (zeroIpress.length === 0) {
+        zeroBadgeEl.className = "badge-custom badge-success";
+        zeroBadgeEl.innerHTML = '<i class="bi bi-check-circle-fill"></i> 100% con producción';
+      } else {
+        zeroBadgeEl.className = "badge-custom badge-warning";
+        zeroBadgeEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> ${zeroIpress.length} IPRESS sin registros ATC`;
+      }
+    }
+    if (zeroListEl) {
+      if (zeroIpress.length === 0) {
+        zeroListEl.innerHTML = `<span class="text-success fw-semibold"><i class="bi bi-check2-all me-1"></i> Todas las ${summary.length} IPRESS registran producción asistencial en el sistema.</span>`;
+      } else {
+        zeroListEl.innerHTML = `
+          <p class="mb-2">Los siguientes establecimientos aparecen en el padrón con <strong>0 atenciones (ATC)</strong> acumuladas:</p>
+          <div class="d-flex flex-wrap gap-2">
+            ${zeroIpress.map(e => `<span class="badge bg-warning-subtle text-warning border border-warning-subtle">${e.nombre} (${e.microred})</span>`).join("")}
+          </div>
+        `;
+      }
+    }
+
+    if (typeof Chart === "undefined") return;
+
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const textColor = isDark ? "#cbd5e1" : "#475569";
+    const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+
+    // 2. Gráfico Top 10 IPRESS (Barras horizontales)
+    const topCanvas = document.getElementById("adminTopIpressChart");
+    if (topCanvas) {
+      const top10 = [...summary].sort((a, b) => b.totalATC - a.totalATC).slice(0, 10);
+      if (adminTopChart) adminTopChart.destroy();
+      adminTopChart = new Chart(topCanvas, {
+        type: "bar",
+        data: {
+          labels: top10.map(e => e.nombre),
+          datasets: [{
+            label: "Total Atenciones (ATC)",
+            data: top10.map(e => e.totalATC),
+            backgroundColor: "rgba(59, 130, 246, 0.85)",
+            borderColor: "#2563eb",
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { padding: 10, cornerRadius: 8 }
+          },
+          scales: {
+            x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor } },
+            y: { grid: { display: false }, ticks: { color: textColor, font: { weight: 600, size: 11 } } }
+          }
+        }
+      });
+    }
+
+    // 3. Gráfico Participación por MicroRed (Dona)
+    const mrCanvas = document.getElementById("adminMicroredChart");
+    if (mrCanvas) {
+      const mrTotals = {};
+      summary.forEach(e => {
+        const mr = e.microred || "SIN MICRORED";
+        mrTotals[mr] = (mrTotals[mr] || 0) + e.totalATC;
+      });
+      const mrEntries = Object.entries(mrTotals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+      const palette = ["#3b82f6", "#10b981", "#6366f1", "#f59e0b", "#06b6d4", "#ec4899", "#8b5cf6", "#14b8a6", "#f97316"];
+
+      if (adminMicroredChart) adminMicroredChart.destroy();
+      adminMicroredChart = new Chart(mrCanvas, {
+        type: "doughnut",
+        data: {
+          labels: mrEntries.map(([k]) => k),
+          datasets: [{
+            data: mrEntries.map(([, v]) => v),
+            backgroundColor: mrEntries.map((_, i) => palette[i % palette.length]),
+            borderColor: isDark ? "#151c2c" : "#ffffff",
+            borderWidth: 2,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "58%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { color: textColor, boxWidth: 12, font: { size: 11 } }
+            },
+            tooltip: { padding: 10, cornerRadius: 8 }
+          }
+        }
+      });
+    }
+  }
+
+  function initAdminAnalytics() {
+    const analyticsTabBtn = document.getElementById("tab-analytics-btn");
+    if (analyticsTabBtn) {
+      analyticsTabBtn.addEventListener("shown.bs.tab", () => {
+        renderAdminAnalytics();
+      });
+    }
+    const adminThemeObserver = new MutationObserver(() => {
+      const tabPane = document.getElementById("tab-analytics");
+      if (tabPane && tabPane.classList.contains("active")) {
+        renderAdminAnalytics();
+      }
+    });
+    adminThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    renderAdminAnalytics();
+  }
+
   // Ejecución inicial
   loadInitialData();
   initEstabsControl();
   initYearsControl();
   initSerumsReportControl();
+  initAdminAnalytics();
 });
 

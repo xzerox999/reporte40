@@ -19,7 +19,8 @@ const PdfGenerator = {
    * @param {Object} dailyData - Objeto con datos diarios por mes
    * @param {Boolean} includeDaily - Indica si se debe incluir el desglose día a día
    */
-  async generate(user, selectedMonths, atdData, appData, fullAtdData = null, selectedEstab = "ALL", dailyData = null, includeDaily = false, targetYear = null) {
+  async generate(user, selectedMonths, atdData, appData, fullAtdData = null, selectedEstab = "ALL", dailyData = null, includeDaily = false, targetYear = null, options = {}) {
+    const previewOnly = Boolean(options && options.previewOnly);
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("Error: La librería jsPDF no está cargada.");
       return;
@@ -107,7 +108,8 @@ const PdfGenerator = {
         reportYear,
         primaryColor,
         secondaryColor,
-        accentColor
+        accentColor,
+        previewOnly
       });
     }
 
@@ -828,10 +830,14 @@ const PdfGenerator = {
       doc.text(`Página ${i} de ${totalPages}`, 196, 287, { align: "right" });
     }
 
-    // Guardar archivo
+    // Guardar o devolver vista previa del archivo
     const cleanDni = String(user.dni || "reporte");
     const estabSuffix = isConsolidated ? "Consolidado" : selectedEstab.replace(/[^a-zA-Z0-9]/g, "_");
     const filename = `Reporte40_${cleanDni}_${estabSuffix}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    if (previewOnly) {
+      const blob = doc.output("blob");
+      return { blobUrl: URL.createObjectURL(blob), filename };
+    }
     doc.save(filename);
 
     return true;
@@ -854,7 +860,8 @@ const PdfGenerator = {
     reportYear,
     primaryColor,
     secondaryColor,
-    accentColor
+    accentColor,
+    previewOnly = false
   }) {
     const monthObj = CONFIG.MESES.find((m) => m.key === mKey) || { label: mKey };
     const monthName = monthObj.label.toUpperCase();
@@ -1486,10 +1493,14 @@ const PdfGenerator = {
     doc.text(`Generado: ${nowDateTime}`, 105, 287, { align: "center" });
     doc.text("Página 1 de 1", 196, 287, { align: "right" });
 
-    // Guardar archivo PDF
+    // Guardar o devolver vista previa del archivo PDF
     const cleanDni = String(user.dni || "reporte");
     const estabSuffix = isConsolidated ? "Consolidado" : selectedEstab.replace(/[^a-zA-Z0-9]/g, "_");
     const filename = `Reporte40_${cleanDni}_${monthName}_${estabSuffix}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    if (previewOnly) {
+      const blob = doc.output("blob");
+      return { blobUrl: URL.createObjectURL(blob), filename };
+    }
     doc.save(filename);
 
     return true;
