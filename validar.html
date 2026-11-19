@@ -12,7 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2.2">
   
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
@@ -63,12 +63,16 @@
     </div>
 
     <!-- Estado de Validación -->
-    <div class="text-center my-3 p-3 rounded" style="background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
-      <div class="d-inline-flex align-items-center justify-content-center rounded-circle p-2 mb-2" style="background-color: rgba(16, 185, 129, 0.2); width: 56px; height: 56px;">
-        <i class="bi bi-patch-check-fill text-success fs-2"></i>
+    <div id="valBannerBox" class="text-center my-3 p-3 rounded" style="background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
+      <div id="valSealContainer" class="val-seal-wrap">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <circle cx="32" cy="32" r="26" fill="rgba(16, 185, 129, 0.14)"/>
+          <circle class="val-seal-circle" cx="32" cy="32" r="26" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+          <path class="val-seal-check" d="M21 33L28.5 40.5L43.5 25" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <h2 class="h5 fw-bold text-success mb-1">DOCUMENTO OFICIAL AUTÉNTICO & REGISTRADO</h2>
-      <p class="text-muted small mb-0">Este reporte fue emitido legítimamente desde la base de datos oficial del Sistema Reporte 40.</p>
+      <h2 id="valBannerTitle" class="h5 fw-bold text-success mb-1">DOCUMENTO OFICIAL AUTÉNTICO &amp; REGISTRADO</h2>
+      <p id="valBannerDesc" class="text-muted small mb-0">Este reporte fue emitido legítimamente desde la base de datos oficial del Sistema Reporte 40.</p>
     </div>
 
     <!-- Alerta Crítica para el Auditor / Evaluador -->
@@ -257,10 +261,13 @@
     </div>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/theme.js"></script>
+  <script src="js/config.js?v=2.2"></script>
+  <script src="js/utils.js?v=2.2"></script>
+  <script src="js/theme.js?v=2.2"></script>
+  <script src="js/auth.js?v=2.2"></script>
+  <script src="js/api.js?v=2.2"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const dni = (urlParams.get("dni") || "").trim();
       const personal = urlParams.get("p") || "";
@@ -346,14 +353,75 @@
         document.getElementById("valQ2").textContent = Number(q2 || 0).toLocaleString();
       }
 
-      // Estado Padrón
+      // Estado Padrón + Cotejo real contra la base de datos oficial
       const padronEl = document.getElementById("valStatusPadrón");
       if (dbUser) {
         padronEl.textContent = "Padrón Oficial Verificado";
         padronEl.className = "badge bg-success-subtle text-success border border-success-subtle small";
       } else {
-        padronEl.textContent = "Emitido por Sistema Reporte 40";
-        padronEl.className = "badge bg-primary-subtle text-primary border border-primary-subtle small";
+        padronEl.textContent = "Verificando con servidor...";
+        padronEl.className = "badge bg-info-subtle text-info border border-info-subtle small";
+      }
+
+      if (dni && typeof Api !== "undefined") {
+        try {
+          const res = await Api.callAppsScript("getData", { dni });
+          if (res && res.success && res.atd_atc) {
+            const monthsArr = meses ? meses.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : CONFIG.MESES.map(m => m.key);
+            const isCons = !estabFinal || estabFinal.toUpperCase().includes("CONSOLIDADO");
+            const atdSrc = isCons ? (res.atd_atc.consolidado || res.atd_atc) : (res.atd_atc.por_establecimiento?.[estabFinal] || res.atd_atc.consolidado || res.atd_atc);
+            const appSrc = isCons ? (res.app?.consolidado || res.app) : (res.app?.por_establecimiento?.[estabFinal] || res.app?.consolidado || res.app);
+
+            let dbAtc = 0, dbAtd = 0, dbApp = 0;
+            monthsArr.forEach(mK => {
+              dbAtc += Number(atdSrc?.meses?.[mK]?.atc) || 0;
+              dbAtd += Number(atdSrc?.meses?.[mK]?.atd) || 0;
+              dbApp += Number(appSrc?.meses?.[mK]) || 0;
+            });
+
+            // Permitir margen si el diario local incluyó citas/triajes SIHCE cuando Google Sheets no tenía diario
+            if (res.diario) {
+              let diarioAtc = 0;
+              monthsArr.forEach(mK => {
+                diarioAtc += Number(res.diario?.[mK]?.total_atc) || 0;
+              });
+              if (diarioAtc > dbAtc && isCons) dbAtc = diarioAtc;
+            }
+
+            const matchesExact = (dbAtc === atc && dbAtd === atd && dbApp === app);
+            if (matchesExact) {
+              padronEl.innerHTML = `<i class="bi bi-patch-check-fill me-1"></i> ${res._isLocalFallback ? "Cotejado con Padrón Local" : "Auténtico • Cotejado en Vivo con Google Sheets"}`;
+              padronEl.className = "badge bg-success-subtle text-success border border-success-subtle small";
+            } else {
+              padronEl.innerHTML = `<i class="bi bi-exclamation-octagon-fill me-1"></i> Discrepancia detectada (Base Oficial: ${dbAtc} ATC, ${dbAtd} ATD, ${dbApp} APP)`;
+              padronEl.className = "badge bg-danger-subtle text-danger border border-danger-subtle small";
+              const sealEl = document.getElementById("valSealContainer");
+              const bannerBox = document.getElementById("valBannerBox");
+              const bannerTitle = document.getElementById("valBannerTitle");
+              const bannerDesc = document.getElementById("valBannerDesc");
+              if (sealEl) {
+                sealEl.innerHTML = `
+                  <svg class="val-seal-warn-pulse" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                    <path d="M32 8L54 17V33C54 45.2 44.6 55.8 32 59C19.4 55.8 10 45.2 10 33V17L32 8Z" fill="rgba(239,68,68,0.16)" stroke="#ef4444" stroke-width="3"/>
+                    <path d="M32 22V35" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+                    <circle cx="32" cy="43" r="2.5" fill="#ef4444"/>
+                  </svg>
+                `;
+              }
+              if (bannerBox) {
+                bannerBox.style.backgroundColor = "rgba(239, 68, 68, 0.08)";
+                bannerBox.style.borderColor = "rgba(239, 68, 68, 0.35)";
+              }
+              if (bannerTitle) {
+                bannerTitle.className = "h5 fw-bold text-danger mb-1";
+                bannerTitle.textContent = "ALERTA: DISCREPANCIA EN CIFRAS DEL REPORTE";
+              }
+              if (bannerDesc) {
+                bannerDesc.textContent = "Las cifras del código QR no coinciden con el registro oficial vigente en el sistema.";
+              }
+            }
+          }
+        } catch (e) {}
       }
 
       // Código de seguridad

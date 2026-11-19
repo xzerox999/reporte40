@@ -4,34 +4,43 @@
  * Hecho por xzerox99
  */
 
-const CACHE_NAME = "reporte40-v1.2";
+const CACHE_NAME = "reporte40-v2.2";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./dashboard.html",
   "./admin.html",
   "./validar.html",
-  "./css/styles.css",
-  "./js/config.js",
-  "./js/theme.js",
-  "./js/auth.js",
-  "./js/api.js",
-  "./js/dashboard.js",
-  "./js/admin.js",
-  "./js/pdf-generator.js",
-  "./data/demo_data.js",
+  "./css/styles.css?v=2.2",
+  "./js/config.js?v=2.2",
+  "./js/utils.js?v=2.2",
+  "./js/theme.js?v=2.2",
+  "./js/auth.js?v=2.2",
+  "./js/api.js?v=2.2",
+  "./js/pwa.js?v=2.2",
+  "./js/dashboard.js?v=2.2",
+  "./js/admin.js?v=2.2",
+  "./js/pdf-generator.js?v=2.2",
   "./assets/icon-192.png",
   "./assets/icon-512.png"
 ];
 
-// Instalación
+function isHeavyData(url) {
+  return /\/data\/demo_data\.(js|json)(\?|$)/.test(url);
+}
+
+// Instalación (cache individual para evitar que un recurso fallido aborte todo)
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
-        console.warn("Error al cachear algunos recursos en PWA:", err);
-      });
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS_TO_CACHE.map((asset) =>
+          cache.add(asset).catch((err) => {
+            console.warn("Error al cachear recurso PWA:", asset, err);
+          })
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
@@ -39,28 +48,29 @@ self.addEventListener("install", (event) => {
 // Activación y limpieza de caches antiguos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
+    caches.keys().then((keys) =>
+      Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
         })
-      );
-    })
+      )
+    )
   );
   self.clients.claim();
 });
 
-// Estrategia Network-First con fallback a Cache
+// Estrategia Network-First con fallback a Cache (omitiendo demo_data pesado en CacheStorage)
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const url = event.request.url;
+  if (!url.startsWith(self.location.origin)) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Guardar copia actualizada en cache
-        if (networkResponse && networkResponse.status === 200) {
+        if (networkResponse && networkResponse.status === 200 && !isHeavyData(url)) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
@@ -68,10 +78,6 @@ self.addEventListener("fetch", (event) => {
         }
         return networkResponse;
       })
-      .catch(() => {
-        // Fallback a cache si no hay conexión a internet
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
-

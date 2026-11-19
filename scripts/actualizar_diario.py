@@ -21,11 +21,14 @@ import sys
 import json
 import csv
 import time
+import getpass
 import urllib.request
 import urllib.parse
 from collections import defaultdict
 from datetime import datetime
 import openpyxl
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MONTH_NAME_MAP = {
     'enero': 'ENE', 'febrero': 'FEB', 'marzo': 'MAR', 'abril': 'ABR',
@@ -65,7 +68,7 @@ def seleccionar_archivo_excel():
     except Exception as e:
         print(f"[!] Aviso al abrir selector gráfico: {e}")
 
-    default_path = r"E:\Otros\reporte40\REPORTE 40 2026.xlsx"
+    default_path = os.path.join(BASE_DIR, "REPORTE 40 2026.xlsx")
     if os.path.exists(default_path):
         return os.path.abspath(default_path)
     return None
@@ -73,7 +76,7 @@ def seleccionar_archivo_excel():
 
 def obtener_api_url():
     """Lee la API_URL desde config.js."""
-    config_path = r"E:\Otros\reporte40\js\config.js"
+    config_path = os.path.join(BASE_DIR, "js", "config.js")
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
@@ -89,10 +92,30 @@ def obtener_api_url():
     return "https://script.google.com/macros/s/AKfycbyt8ijYhPLtgBQxiAUNNaUxGvj09un1CjzzrbtL7EkzbMMHy1eNrojbi8Rz27ba3fFI/exec"
 
 
+def autenticar_admin(api_url, admin_dni):
+    """Solicita la clave de administrador y obtiene un token de sesión del servidor."""
+    admin_pass = os.environ.get("R40_ADMIN_PASS")
+    if not admin_pass:
+        admin_pass = getpass.getpass(f"  >>> Contraseña de Administrador (DNI {admin_dni}): ").strip()
+    if not admin_pass:
+        return None
+    req_data = json.dumps({"action": "login", "dni": admin_dni, "password": admin_pass}).encode("utf-8")
+    req = urllib.request.Request(api_url, data=req_data, headers={"Content-Type": "text/plain;charset=utf-8"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            res = json.loads(resp.read().decode("utf-8"))
+            if res.get("success") and res.get("token"):
+                return res["token"]
+            print(f"  [X] Autenticación rechazada: {res.get('message', 'Credenciales inválidas')}")
+    except Exception as e:
+        print(f"  [X] Error de conexión al autenticar: {e}")
+    return None
+
+
 def subir_a_google_sheets(rows_to_upload, mes_key):
     """
     Sube los datos diarios directamente a Google Sheets mediante Google Apps Script.
-    Envía en paquetes de 400 filas para garantizar estabilidad y evitar timeouts.
+    Envía en paquetes de 400 filas usando appendMode=True a partir del paquete 2.
     """
     api_url = obtener_api_url()
     admin_dni = "46638223"
@@ -105,6 +128,11 @@ def subir_a_google_sheets(rows_to_upload, mes_key):
     print(f"  Filas a sincronizar: {len(rows_to_upload)}")
     print("-" * 70)
 
+    token = autenticar_admin(api_url, admin_dni)
+    if not token:
+        print("  [!] No se pudo obtener sesión autorizada. Subida cancelada.")
+        return False
+
     chunk_size = 400
     total_chunks = (len(rows_to_upload) + chunk_size - 1) // chunk_size
 
@@ -116,7 +144,9 @@ def subir_a_google_sheets(rows_to_upload, mes_key):
         payload = {
             "action": "adminSyncDiario",
             "adminDni": admin_dni,
+            "token": token,
             "replaceMonths": [mes_key] if idx == 0 else [],
+            "appendMode": idx > 0,
             "rows": chunk_rows
         }
 
@@ -127,7 +157,7 @@ def subir_a_google_sheets(rows_to_upload, mes_key):
             req = urllib.request.Request(
                 api_url,
                 data=req_data,
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "text/plain;charset=utf-8"}
             )
             with urllib.request.urlopen(req, timeout=60) as resp:
                 resp_text = resp.read().decode("utf-8")
@@ -136,7 +166,8 @@ def subir_a_google_sheets(rows_to_upload, mes_key):
                     if res_json.get("success"):
                         print(" [OK]")
                     else:
-                        print(f" [AVISO: {res_json.get('message', 'Desconocido')}]")
+                        print(f" [ERROR: {res_json.get('message', 'Desconocido')}]")
+                        return False
                 except Exception:
                     print(" [OK (Recibido)]")
         except Exception as e:
@@ -332,7 +363,7 @@ def main():
     print(f"\n[+] Archivo seleccionado: {os.path.basename(excel_path)}")
     print(f"    Ruta: {excel_path}")
 
-    base_dir = r"E:\Otros\reporte40"
+    base_dir = BASE_DIR
     data_dir = os.path.join(base_dir, "data")
     demo_json_path = os.path.join(data_dir, "demo_data.json")
     demo_js_path = os.path.join(data_dir, "demo_data.js")

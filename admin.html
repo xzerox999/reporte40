@@ -10,7 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   
   <!-- Estilos del Sistema -->
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2.2">
 
   <!-- DataTables Bootstrap 5 CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
@@ -36,6 +36,11 @@
       </div>
 
       <div class="d-flex align-items-center gap-2">
+        <button id="btnOpenCmdPalette" type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2" title="Búsqueda rápida de personal (Ctrl + K)">
+          <i class="bi bi-search"></i>
+          <span class="d-none d-lg-inline">Buscar</span>
+          <span class="cmd-kbd-pill d-none d-md-inline">Ctrl+K</span>
+        </button>
         <button class="theme-toggle-btn shadow-sm" type="button" aria-label="Cambiar tema">
           <i class="bi bi-moon-stars-fill text-primary"></i> <span>Oscuro</span>
         </button>
@@ -242,13 +247,19 @@
 
       <!-- PESTAÑA EXTRA: ANALÍTICA Y RANKING IPRESS -->
       <div class="tab-pane fade" id="tab-analytics" role="tabpanel">
+        <!-- Podio Top 3 IPRESS -->
+        <div id="adminPodiumRow" class="row g-3 mb-4"></div>
+
         <div class="row g-4 mb-4">
           <div class="col-lg-7">
             <div class="app-card h-100 fade-in">
-              <div class="app-card-header">
+              <div class="app-card-header d-flex justify-content-between align-items-center gap-2">
                 <h2 class="h6 fw-bold mb-0 text-main">
                   <i class="bi bi-trophy-fill text-warning me-2"></i>Top 10 IPRESS con Mayor Producción (ATC)
                 </h2>
+                <button id="btnDownloadTopIpressPng" type="button" class="btn btn-sm btn-outline-primary py-1 px-2" title="Descargar gráfico Top 10 en PNG">
+                  <i class="bi bi-image"></i> <span class="d-none d-sm-inline">PNG</span>
+                </button>
               </div>
               <div style="position: relative; height: 320px; width: 100%;">
                 <canvas id="adminTopIpressChart"></canvas>
@@ -258,10 +269,13 @@
 
           <div class="col-lg-5">
             <div class="app-card h-100 fade-in">
-              <div class="app-card-header">
+              <div class="app-card-header d-flex justify-content-between align-items-center gap-2">
                 <h2 class="h6 fw-bold mb-0 text-main">
                   <i class="bi bi-pie-chart-fill text-primary me-2"></i>Participación por MicroRed
                 </h2>
+                <button id="btnDownloadMicroredPng" type="button" class="btn btn-sm btn-outline-primary py-1 px-2" title="Descargar gráfico por MicroRed en PNG">
+                  <i class="bi bi-image"></i> <span class="d-none d-sm-inline">PNG</span>
+                </button>
               </div>
               <div style="position: relative; height: 320px; width: 100%;">
                 <canvas id="adminMicroredChart"></canvas>
@@ -816,6 +830,24 @@
     </div>
   </div>
 
+  <!-- Modal Paleta de Comandos (Ctrl+K) -->
+  <div class="modal fade" id="adminCmdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-search"></i></span>
+            <input id="adminCmdInput" type="text" class="form-control border-0 shadow-none" placeholder="Busca por DNI, apellidos o establecimiento..." autocomplete="off">
+            <span class="cmd-kbd-pill align-self-center me-2">ESC</span>
+          </div>
+        </div>
+        <div id="adminCmdResults" class="modal-body p-3" style="max-height: 380px; overflow-y: auto;">
+          <div class="text-muted small text-center py-3">Escribe al menos 2 caracteres para buscar personal de salud...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Pie de Página -->
   <footer class="footer-custom">
     <div class="container-fluid">
@@ -841,13 +873,14 @@
 
   <!-- Scripts del Sistema -->
   <script src="data/demo_data.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/theme.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/pdf-generator.js"></script>
-  <script src="js/pwa.js"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/config.js?v=2.2"></script>
+  <script src="js/utils.js?v=2.2"></script>
+  <script src="js/theme.js?v=2.2"></script>
+  <script src="js/auth.js?v=2.2"></script>
+  <script src="js/api.js?v=2.2"></script>
+  <script src="js/pdf-generator.js?v=2.2"></script>
+  <script src="js/pwa.js?v=2.2"></script>
+  <script src="js/admin.js?v=2.2"></script>
 
 </body>
 </html>

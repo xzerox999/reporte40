@@ -21,11 +21,14 @@ import glob
 from datetime import datetime
 from collections import defaultdict
 
-EXCEL_PATH = r"E:\Otros\reporte40\ARCHIVOS\REPORTE 40 2026.xlsx"
-OUTPUT_DIR = r"E:\Otros\reporte40\data"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXCEL_PATH = os.path.join(BASE_DIR, "REPORTE 40 2026.xlsx")
+if not os.path.exists(EXCEL_PATH):
+    EXCEL_PATH = os.path.join(BASE_DIR, "ARCHIVOS", "REPORTE 40 2026.xlsx")
+OUTPUT_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-MESES_KEYS = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV"]
+MESES_KEYS = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"]
 MONTH_NAME_MAP = {
     'enero': 'ENE', 'febrero': 'FEB', 'marzo': 'MAR', 'abril': 'ABR',
     'mayo': 'MAY', 'junio': 'JUN', 'julio': 'JUL', 'agosto': 'AGO',
@@ -652,8 +655,7 @@ print("8. Generando archivos demo_data...")
 demo_bundle = {
     "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     "admin": {
-        "dni": admin_dni,
-        "password_hash": admin_pass_hash
+        "dni": admin_dni
     },
     "usuarios": usuarios_dict,
     "atd_atc": consolidado_atd,

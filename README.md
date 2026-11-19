@@ -30,7 +30,7 @@ Sistema web moderno, gratuito y responsivo diseñado para la consulta individual
 
 | Rol | Usuario (DNI) | Contraseña |
 |---|---|---|
-| **Administrador** | `46638223` | `...` |
+| **Administrador** | `46638XXX` | `....` |
 | **Personal de Salud** | Su propio número de DNI | Su propio número de DNI |
 
 ---
