@@ -17,7 +17,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <!-- Estilos del Sistema -->
-  <link rel="stylesheet" href="css/styles.css?v=2.2">
+  <link rel="stylesheet" href="css/styles.css?v=2.3">
 
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
@@ -83,6 +83,27 @@
 
       <div class="login-card login-card-glass fade-in" id="loginCardEl">
         <div class="login-header">
+          <div id="medbotAvatar" class="medbot-wrap" data-state="idle" aria-hidden="true">
+            <svg viewBox="0 0 120 120" class="medbot-svg">
+              <circle cx="60" cy="60" r="52" class="medbot-ring"/>
+              <line x1="60" y1="22" x2="60" y2="12" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="60" cy="10" r="4" fill="#10b981"/>
+              <rect x="26" y="24" width="68" height="58" rx="22" class="medbot-head"/>
+              <path d="M58 31h4v8h-4zM56 33h8v4h-8z" fill="#10b981"/>
+              <rect x="35" y="44" width="50" height="24" rx="11" class="medbot-visor"/>
+              <g id="medbotPupils" class="medbot-pupil-wrap">
+                <circle cx="49" cy="56" r="5.5" class="medbot-eye"/>
+                <circle cx="71" cy="56" r="5.5" class="medbot-eye"/>
+              </g>
+              <path d="M53 74 Q60 79 67 74" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round"/>
+              <g class="medbot-hand-l">
+                <rect x="22" y="64" width="22" height="18" rx="9" class="medbot-hand-rect"/>
+              </g>
+              <g class="medbot-hand-r">
+                <rect x="76" y="64" width="22" height="18" rx="9" class="medbot-hand-rect"/>
+              </g>
+            </svg>
+          </div>
           <div class="brand-badge mb-2">
             <i class="bi bi-hospital"></i> RED CUSCO SUR
           </div>
@@ -144,12 +165,12 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/config.js?v=2.2"></script>
-  <script src="js/utils.js?v=2.2"></script>
-  <script src="js/theme.js?v=2.2"></script>
-  <script src="js/auth.js?v=2.2"></script>
-  <script src="js/api.js?v=2.2"></script>
-  <script src="js/pwa.js?v=2.2"></script>
+  <script src="js/config.js?v=2.3"></script>
+  <script src="js/utils.js?v=2.3"></script>
+  <script src="js/theme.js?v=2.3"></script>
+  <script src="js/auth.js?v=2.3"></script>
+  <script src="js/api.js?v=2.3"></script>
+  <script src="js/pwa.js?v=2.3"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -176,8 +197,48 @@
       const loginSubmitBtn = document.getElementById("loginSubmitBtn");
 
       if (loginGreeting && typeof Utils !== "undefined" && typeof Utils.getGreeting === "function") {
-        loginGreeting.textContent = `${Utils.getGreeting()}, profesional de salud`;
+        loginGreeting.textContent = `${Utils.getGreeting()} profesional de salud`;
       }
+
+      const medbotAvatar = document.getElementById("medbotAvatar");
+      const medbotPupils = document.getElementById("medbotPupils");
+
+      function setMedbotState(state) {
+        if (medbotAvatar) medbotAvatar.setAttribute("data-state", state);
+      }
+
+      function updateMedbotGaze() {
+        if (!medbotPupils) return;
+        const len = Math.min(dniInput.value.length, 10);
+        const offsetX = -3.5 + (len / 10) * 7;
+        medbotPupils.style.transform = `translate(${offsetX.toFixed(2)}px, 2.5px)`;
+      }
+
+      function resetMedbotGaze() {
+        if (medbotPupils) medbotPupils.style.transform = "translate(0px, 0px)";
+      }
+
+      dniInput.addEventListener("focus", () => {
+        setMedbotState("dni");
+        updateMedbotGaze();
+      });
+      dniInput.addEventListener("input", updateMedbotGaze);
+      dniInput.addEventListener("blur", () => {
+        resetMedbotGaze();
+        if (document.activeElement !== passwordInput) setMedbotState("idle");
+      });
+
+      passwordInput.addEventListener("focus", () => {
+        resetMedbotGaze();
+        setMedbotState(passwordInput.getAttribute("type") === "text" ? "peek" : "pass");
+      });
+      passwordInput.addEventListener("blur", () => {
+        setTimeout(() => {
+          if (document.activeElement !== passwordInput && document.activeElement !== togglePasswordBtn) {
+            setMedbotState("idle");
+          }
+        }, 120);
+      });
 
       function triggerLoginShake() {
         if (!loginCardEl) return;
@@ -191,6 +252,7 @@
         const isPassword = passwordInput.getAttribute("type") === "password";
         passwordInput.setAttribute("type", isPassword ? "text" : "password");
         togglePasswordBtn.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+        setMedbotState(isPassword ? "peek" : "pass");
       });
 
       // Manejo de Login
@@ -236,6 +298,7 @@
             }
             loginAlert.className = "alert-elegant alert-success-elegant fade-in";
             loginAlert.innerHTML = `<i class="bi bi-check-circle-fill"></i> <span>¡Bienvenido(a), ${Utils.escapeHtml(res.user.nombre)}! Redirigiendo...</span>`;
+            setMedbotState("success");
 
             btnSpinner.classList.add("d-none");
             btnText.classList.remove("d-none");
@@ -251,6 +314,7 @@
           } else {
             loginAlert.className = "alert-elegant alert-danger-elegant fade-in";
             loginAlert.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> <span>${Utils.escapeHtml(res.message || "Credenciales incorrectas")}</span>`;
+            setMedbotState("error");
             triggerLoginShake();
             loginSubmitBtn.disabled = false;
             btnText.classList.remove("d-none");
@@ -259,6 +323,7 @@
         } catch (err) {
           loginAlert.className = "alert-elegant alert-danger-elegant fade-in";
           loginAlert.innerHTML = `<i class="bi bi-exclamation-octagon-fill"></i> <span>Error al conectar con el servidor. Intenta de nuevo.</span>`;
+          setMedbotState("error");
           triggerLoginShake();
           loginSubmitBtn.disabled = false;
           btnText.classList.remove("d-none");
