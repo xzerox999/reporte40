@@ -7,6 +7,7 @@
 
 const Auth = {
   SESSION_KEY: "reporte40_user_session",
+  TOKEN_KEY: "reporte40_session_token",
 
   // Hash SHA-256 usando Web Crypto API nativo del navegador
   async hashPassword(text) {
@@ -27,14 +28,27 @@ const Auth = {
     }
   },
 
-  // Guardar sesión
-  setSession(user) {
+  // Obtener token de sesión emitido por el servidor
+  getToken() {
+    try {
+      return sessionStorage.getItem(this.TOKEN_KEY) || "";
+    } catch (e) {
+      return "";
+    }
+  },
+
+  // Guardar sesión y token opcional
+  setSession(user, token = null) {
     sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(user));
+    if (token) {
+      sessionStorage.setItem(this.TOKEN_KEY, String(token));
+    }
   },
 
   // Cerrar sesión
   logout() {
     sessionStorage.removeItem(this.SESSION_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
     window.location.href = "index.html";
   },
 

@@ -46,14 +46,19 @@ const PdfGenerator = {
     let ipressControlMap = {};
     try {
       const savedIpress = localStorage.getItem("reporte40_ipress_control");
-      if (savedIpress) ipressControlMap = JSON.parse(savedIpress);
+      if (savedIpress) {
+        const parsed = JSON.parse(savedIpress);
+        Object.keys(parsed || {}).forEach(k => {
+          ipressControlMap[String(k).trim().toUpperCase()] = parsed[k];
+        });
+      }
     } catch (e) {}
 
     const activeEstabsInPeriod = [];
     if (fullAtdData && fullAtdData.por_establecimiento) {
       Object.keys(fullAtdData.por_establecimiento).forEach((est) => {
-        // Si el establecimiento está desactivado por auditoría, omitirlo del reporte
-        if (ipressControlMap[est.trim()] === false) return;
+        // Si el establecimiento está desactivado por auditoría, omitirlo del reporte (insensible a mayúsculas)
+        if (ipressControlMap[est.trim().toUpperCase()] === false) return;
 
         const d = fullAtdData.por_establecimiento[est];
         let atcPeriod = 0;
@@ -141,7 +146,7 @@ const PdfGenerator = {
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...secondaryColor);
     const monthsText = selectedMonths.length === CONFIG.MESES.length
-      ? `Período Completo: Enero a Noviembre ${reportYear}`
+      ? `Período Completo: Enero a Diciembre ${reportYear}`
       : `Meses seleccionados: ${selectedMonths.join(", ")} (Año ${reportYear})`;
     doc.text(monthsText, 105, currentY, { align: "center" });
 

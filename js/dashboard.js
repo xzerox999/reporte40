@@ -85,7 +85,7 @@ async function initDashboard() {
       auditBanner.style.borderRadius = "0";
       auditBanner.style.borderBottom = "2px solid #0284c7";
       auditBanner.innerHTML = `
-        <span><i class="bi bi-eye-fill me-2 text-primary fs-5"></i> MODO SIMULACIÓN AUDITOR: Visualizando producción de <u>${targetUser.nombre}</u> (DNI: ${impersonateDni})</span>
+        <span><i class="bi bi-eye-fill me-2 text-primary fs-5"></i> MODO SIMULACIÓN AUDITOR: Visualizando producción de <u>${Utils.escapeHtml(targetUser.nombre)}</u> (DNI: ${Utils.escapeHtml(impersonateDni)})</span>
         <button class="btn btn-sm btn-dark" onclick="sessionStorage.removeItem('impersonate_user_dni'); window.close(); window.location.reload();">
           <i class="bi bi-x-circle me-1"></i> Finalizar Simulación
         </button>
@@ -275,6 +275,14 @@ async function initDashboard() {
   // Mostrar datos del usuario en la interfaz
   navUserName.textContent = currentUser.nombre ? currentUser.nombre.split(" ")[0] : "Personal";
   userNameDisplay.textContent = currentUser.nombre || "Personal de Salud";
+  const userAvatarBadge = document.getElementById("userAvatarBadge");
+  const userGreetingBadge = document.getElementById("userGreetingBadge");
+  if (userAvatarBadge && typeof Utils.getInitials === "function") {
+    userAvatarBadge.textContent = Utils.getInitials(currentUser.nombre || "PS");
+  }
+  if (userGreetingBadge && typeof Utils.getGreeting === "function") {
+    userGreetingBadge.textContent = `• ${Utils.getGreeting()}`;
+  }
   userDniBadge.textContent = `DNI: ${currentUser.dni}`;
   userEstabDisplay.textContent = currentUser.establecimiento || "No especificado";
   userMicroRedDisplay.textContent = currentUser.microred || "-";
@@ -828,6 +836,65 @@ async function initDashboard() {
     monthSelectorContainer.querySelectorAll("input[type='checkbox']").forEach(i => i.checked = false);
     onSelectionChange();
   });
+
+  const selectLastMonthBtn = document.getElementById("selectLastMonthBtn");
+  if (selectLastMonthBtn) {
+    selectLastMonthBtn.addEventListener("click", () => {
+      const activeAtd = getActiveAtdDataset();
+      const activeApp = getActiveAppDataset();
+      const mesesWithData = CONFIG.MESES.filter(m => {
+        const atcVal = Number(activeAtd?.meses?.[m.key]?.atc) || 0;
+        const atdVal = Number(activeAtd?.meses?.[m.key]?.atd) || 0;
+        const appVal = Number(activeApp?.meses?.[m.key]) || 0;
+        return atcVal > 0 || atdVal > 0 || appVal > 0;
+      });
+      const currentMonthIdx = Math.min(new Date().getMonth(), CONFIG.MESES.length - 1);
+      const targetKey = mesesWithData.length > 0
+        ? mesesWithData[mesesWithData.length - 1].key
+        : CONFIG.MESES[currentMonthIdx].key;
+      selectedMonths = [targetKey];
+      monthSelectorContainer.querySelectorAll("input[type='checkbox']").forEach(i => {
+        i.checked = i.value === targetKey;
+      });
+      onSelectionChange();
+      if (typeof Utils.showToast === "function") {
+        const mLabel = (CONFIG.MESES.find(m => m.key === targetKey) || {}).label || targetKey;
+        Utils.showToast(`Mes seleccionado: ${mLabel}`, "info", 2200);
+      }
+    });
+  }
+
+  const btnDownloadBarChart = document.getElementById("btnDownloadBarChart");
+  if (btnDownloadBarChart) {
+    btnDownloadBarChart.addEventListener("click", () => {
+      if (!productionChart || selectedMonths.length === 0) {
+        Utils.showToast("Selecciona al menos un mes para exportar el gráfico.", "warning");
+        return;
+      }
+      Utils.downloadChartPng(productionChart, `Produccion_${currentUser.dni || "reporte"}_${selectedYear}.png`);
+    });
+  }
+
+  const btnDownloadDonutChart = document.getElementById("btnDownloadDonutChart");
+  if (btnDownloadDonutChart) {
+    btnDownloadDonutChart.addEventListener("click", () => {
+      if (!compositionChart || selectedMonths.length === 0) {
+        Utils.showToast("Selecciona al menos un mes para exportar la composición.", "warning");
+        return;
+      }
+      Utils.downloadChartPng(compositionChart, `Composicion_${currentUser.dni || "reporte"}_${selectedYear}.png`);
+    });
+  }
+
+  const btnBackToTop = document.getElementById("btnBackToTop");
+  if (btnBackToTop) {
+    window.addEventListener("scroll", () => {
+      btnBackToTop.classList.toggle("visible", window.scrollY > 360);
+    }, { passive: true });
+    btnBackToTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   // Configurar Selector de Establecimientos (si prestó labores en más de 1 IPRESS)
   function setupEstablishmentSelector() {
@@ -1631,6 +1698,16 @@ async function initDashboard() {
           window.DEMO_DATA.anios_habilitados = res.anios_habilitados;
         }
       }
+
+      // Sincronizar comunicado institucional desde Google Sheets
+      if (res.comunicado && typeof res.comunicado === "object") {
+        try {
+          localStorage.setItem("comunicado_reporte40", JSON.stringify(res.comunicado));
+        } catch (e) {}
+        if (window.DEMO_DATA) {
+          window.DEMO_DATA.comunicado = res.comunicado;
+        }
+      }
     } else {
       userDailyData = localDaily;
       userAtdData = localAtd;
@@ -1699,8 +1776,14 @@ async function initDashboard() {
   // Verificación de Contraseña por defecto (DNI)
   function checkDefaultPasswordAlert() {
     if (!urgentPasswordAlert) return;
-    const hasCustomPass = localStorage.getItem("custom_pass_" + currentUser.dni);
-    if (!hasCustomPass && currentUser.rol !== "admin") {
+    if (currentUser.rol === "admin") {
+      urgentPasswordAlert.classList.add("d-none");
+      return;
+    }
+    const serverFlag = sessionStorage.getItem("reporte40_is_default_pass");
+    const hasCustomPass = serverFlag === "0" || Boolean(localStorage.getItem("custom_pass_" + currentUser.dni));
+    const isDefault = serverFlag === "1" ? true : !hasCustomPass;
+    if (isDefault) {
       urgentPasswordAlert.classList.remove("d-none");
     } else {
       urgentPasswordAlert.classList.add("d-none");
@@ -1742,11 +1825,11 @@ async function initDashboard() {
   function validatePdfPreconditions() {
     const activeAtd = getActiveAtdDataset();
     if (activeAtd && activeAtd.disabled) {
-      alert("No es posible generar ni descargar el reporte en PDF: el establecimiento seleccionado se encuentra temporalmente bloqueado por auditoría de la administración.");
+      Utils.showToast("No es posible generar ni descargar el reporte en PDF: el establecimiento seleccionado se encuentra temporalmente bloqueado por auditoría de la administración.", "warning", 5000);
       return null;
     }
     if (selectedMonths.length === 0) {
-      alert("Por favor selecciona al menos un mes para generar tu reporte.");
+      Utils.showToast("Por favor selecciona al menos un mes para generar tu reporte.", "warning");
       return null;
     }
     return activeAtd;
@@ -1791,7 +1874,7 @@ async function initDashboard() {
       );
       ok = true;
     } catch (err) {
-      alert("Hubo un inconveniente al generar el PDF: " + err.message);
+      Utils.showToast("Hubo un inconveniente al generar el PDF: " + err.message, "danger", 5000);
     } finally {
       if (ok) {
         downloadPdfBtn.classList.add("btn-pdf-success");
@@ -1879,7 +1962,7 @@ async function initDashboard() {
           pdfPreviewModalInstance.show();
         }
       } catch (err) {
-        alert("No se pudo generar la vista previa del PDF: " + err.message);
+        Utils.showToast("No se pudo generar la vista previa del PDF: " + err.message, "danger", 5000);
       } finally {
         previewPdfBtn.disabled = false;
         previewPdfBtn.innerHTML = '<i class="bi bi-eye-fill text-primary"></i> Vista Previa';
@@ -1894,6 +1977,38 @@ async function initDashboard() {
   const newPassInput = document.getElementById("newPassInput");
   const confirmPassInput = document.getElementById("confirmPassInput");
   const savePasswordBtn = document.getElementById("savePasswordBtn");
+  const passStrengthFill = document.getElementById("passStrengthFill");
+  const passStrengthLabel = document.getElementById("passStrengthLabel");
+
+  function updatePassStrengthMeter(val) {
+    if (!passStrengthFill || !passStrengthLabel) return;
+    if (!val) {
+      passStrengthFill.style.width = "0%";
+      passStrengthFill.style.backgroundColor = "transparent";
+      passStrengthLabel.textContent = "";
+      return;
+    }
+    let score = 0;
+    if (val.length >= 4) score += 1;
+    if (val.length >= 8) score += 1;
+    if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score += 1;
+    if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score += 1;
+    const levels = [
+      { w: "25%", color: "#ef4444", text: "Muy débil", cls: "text-danger" },
+      { w: "50%", color: "#f59e0b", text: "Regular", cls: "text-warning" },
+      { w: "75%", color: "#3b82f6", text: "Buena", cls: "text-primary" },
+      { w: "100%", color: "#10b981", text: "Segura", cls: "text-success" }
+    ];
+    const lvl = levels[Math.max(0, Math.min(3, score - 1))];
+    passStrengthFill.style.width = lvl.w;
+    passStrengthFill.style.backgroundColor = lvl.color;
+    passStrengthLabel.textContent = lvl.text;
+    passStrengthLabel.className = `small fw-semibold ${lvl.cls}`;
+  }
+
+  if (newPassInput) {
+    newPassInput.addEventListener("input", () => updatePassStrengthMeter(newPassInput.value));
+  }
 
   changePasswordForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1922,6 +2037,10 @@ async function initDashboard() {
       if (res.success) {
         changePassAlert.className = "alert alert-success py-2 px-3 small";
         changePassAlert.textContent = res.message || "¡Contraseña actualizada exitosamente!";
+        try {
+          sessionStorage.setItem("reporte40_is_default_pass", "0");
+          localStorage.setItem("custom_pass_" + currentUser.dni, "1");
+        } catch (e) {}
         
         // Ocultar de inmediato el banner de advertencia urgente
         if (urgentPasswordAlert) urgentPasswordAlert.classList.add("d-none");

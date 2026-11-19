@@ -43,20 +43,31 @@ const Api = {
 
     if (isLive) {
       try {
+        const sessionToken = (typeof Auth !== "undefined" && typeof Auth.getToken === "function") ? Auth.getToken() : "";
         const payload = { action, ...params };
+        if (sessionToken && !payload.token) {
+          payload.token = sessionToken;
+        }
         const response = await fetch(CONFIG.API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-        return await response.json();
+        const json = await response.json();
+        if (json && typeof json === "object") {
+          return json;
+        }
       } catch (error) {
         console.warn("Fallo al conectar con Google Apps Script, usando fallback local:", error);
       }
     }
 
     // Modo local / Fallback con los datos extraídos del Excel
-    return await this.handleLocalMock(action, params);
+    const mockRes = await this.handleLocalMock(action, params);
+    if (mockRes && typeof mockRes === "object") {
+      mockRes._isLocalFallback = true;
+    }
+    return mockRes;
   },
 
   // Comparador flexible de DNI / Carnet de Extranjería con ceros a la izquierda
@@ -113,7 +124,14 @@ const Api = {
         
         // 1. Chequeo Admin
         if (dni === CONFIG.ADMIN_DEFAULT_DNI) {
-          if (inputHash === data.admin.password_hash) {
+          const adminHash = data.admin && data.admin.password_hash;
+          if (!adminHash) {
+            return {
+              success: false,
+              message: "El acceso de administrador requiere conexión con el servidor oficial."
+            };
+          }
+          if (inputHash === adminHash) {
             return {
               success: true,
               user: {
@@ -144,13 +162,14 @@ const Api = {
         const customPassKeyRaw = "custom_pass_" + dni;
         const savedCustomHash = localStorage.getItem(customPassKey) || localStorage.getItem(customPassKeyRaw);
 
-        // Si nunca cambió clave, su clave inicial es su DNI (aceptando con o sin ceros)
+        // Si ya cambió la clave, SOLO vale la clave nueva; si no, vale su DNI inicial
         const isDefaultPassword = this.matchesDni(rawPass, dni) || this.matchesDni(rawPass, canonicalDni);
-        const expectedHash = savedCustomHash || (await Auth.hashPassword(canonicalDni));
+        const valid = savedCustomHash ? (inputHash === savedCustomHash) : isDefaultPassword;
 
-        if (inputHash === expectedHash || isDefaultPassword) {
+        if (valid) {
           return {
             success: true,
+            isDefaultPassword: !savedCustomHash,
             user: {
               dni: canonicalDni,
               nombre: user.nombre,
@@ -170,11 +189,11 @@ const Api = {
         const canonicalDni = userMatch ? (userMatch.data.dni || userMatch.key) : dni;
         const customPassKey = "custom_pass_" + canonicalDni;
         const savedCustomHash = localStorage.getItem(customPassKey);
-        const expectedHash = savedCustomHash || (await Auth.hashPassword(canonicalDni));
         const oldHash = await Auth.hashPassword(params.oldPassword);
         const isDefaultOld = this.matchesDni(params.oldPassword, dni) || this.matchesDni(params.oldPassword, canonicalDni);
+        const oldOk = savedCustomHash ? (oldHash === savedCustomHash) : isDefaultOld;
 
-        if (oldHash !== expectedHash && !isDefaultOld) {
+        if (!oldOk) {
           return { success: false, message: "La contraseña actual no es correcta." };
         }
 
@@ -261,6 +280,26 @@ const Api = {
           atd_atc: Object.values(data.atd_atc),
           app: Object.values(data.app)
         };
+      }
+
+      case "getNotice": {
+        let com = null;
+        try {
+          const saved = localStorage.getItem("comunicado_reporte40");
+          if (saved) com = JSON.parse(saved);
+        } catch (e) {}
+        return { success: true, comunicado: com || data.comunicado || null };
+      }
+
+      case "adminSaveNotice": {
+        const notice = {
+          activo: params.activo !== false,
+          titulo: params.titulo || "",
+          mensaje: params.mensaje || "",
+          fecha: params.fecha || new Date().toISOString()
+        };
+        localStorage.setItem("comunicado_reporte40", JSON.stringify(notice));
+        return { success: true, message: "Comunicado guardado localmente." };
       }
 
       default:

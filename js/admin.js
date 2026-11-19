@@ -170,13 +170,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     logs.forEach((log) => {
       const tr = document.createElement("tr");
+      const esc = Utils.escapeHtml;
       tr.innerHTML = `
-        <td class="text-muted small"><i class="bi bi-calendar-event me-1"></i>${log.timestamp}</td>
-        <td><span class="badge-custom bg-secondary text-white">${log.dni}</span></td>
-        <td class="fw-semibold text-main">${log.personal || "-"}</td>
-        <td><span class="badge-custom badge-info">${log.establecimiento || "-"}</span></td>
-        <td><span class="text-primary fw-medium small">${log.meses || "Todos"}</span></td>
-        <td><span class="badge-custom badge-success">${log.tipo || "PDF"}</span></td>
+        <td class="text-muted small"><i class="bi bi-calendar-event me-1"></i>${esc(log.timestamp)}</td>
+        <td><span class="badge-custom bg-secondary text-white">${esc(log.dni)}</span></td>
+        <td class="fw-semibold text-main">${esc(log.personal || "-")}</td>
+        <td><span class="badge-custom badge-info">${esc(log.establecimiento || "-")}</span></td>
+        <td><span class="text-primary fw-medium small">${esc(log.meses || "Todos")}</span></td>
+        <td><span class="badge-custom badge-success">${esc(log.tipo || "PDF")}</span></td>
       `;
       logsTableBody.appendChild(tr);
     });
@@ -259,21 +260,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     displayList.forEach((u) => {
       const tr = document.createElement("tr");
+      const esc = Utils.escapeHtml;
       tr.innerHTML = `
-        <td><strong class="text-main">${u.dni}</strong></td>
-        <td>${u.nombre}</td>
-        <td><span class="badge-custom badge-info">${u.establecimiento || "-"}</span></td>
-        <td>${u.microred || "-"}</td>
-        <td class="small text-muted">${u.colegio || "-"}</td>
+        <td><strong class="text-main">${esc(u.dni)}</strong></td>
+        <td>${esc(u.nombre)}</td>
+        <td><span class="badge-custom badge-info">${esc(u.establecimiento || "-")}</span></td>
+        <td>${esc(u.microred || "-")}</td>
+        <td class="small text-muted">${esc(u.colegio || "-")}</td>
         <td class="text-center">
           <div class="d-flex justify-content-center gap-1">
-            <button class="btn btn-sm btn-outline-primary btn-serums-user" data-dni="${u.dni}" title="Generar Reporte Personalizado SERUMS">
+            <button class="btn btn-sm btn-outline-primary btn-serums-user" data-dni="${esc(u.dni)}" title="Generar Reporte Personalizado SERUMS">
               <i class="bi bi-mortarboard-fill"></i> SERUMS
             </button>
-            <button class="btn btn-sm btn-outline-warning btn-reset-pass" data-dni="${u.dni}" data-name="${u.nombre}" title="Restablecer Contraseña">
+            <button class="btn btn-sm btn-outline-warning btn-reset-pass" data-dni="${esc(u.dni)}" data-name="${esc(u.nombre)}" title="Restablecer Contraseña">
               <i class="bi bi-key-fill"></i> Clave
             </button>
-            <button class="btn btn-sm btn-outline-info btn-simulate-user" data-dni="${u.dni}" title="Ver Dashboard como este profesional">
+            <button class="btn btn-sm btn-outline-info btn-simulate-user" data-dni="${esc(u.dni)}" title="Ver Dashboard como este profesional">
               <i class="bi bi-eye"></i> Simular
             </button>
           </div>
@@ -375,7 +377,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 7. Exportar Log a Excel con formato profesional
   btnExportLogsExcel.addEventListener("click", () => {
     if (allLogs.length === 0) {
-      alert("No hay registros en el log para exportar.");
+      Utils.showToast("No hay registros en el log para exportar.", "warning");
       return;
     }
 
@@ -421,16 +423,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!data || data.length === 0) return [];
     if (Array.isArray(data[0])) return data;
 
-    const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV"];
+    const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
     const header = [
       "Establecimiento", "DNI", "Personal",
       "ENE_ATC", "ENE_ATD", "FEB_ATC", "FEB_ATD", "MAR_ATC", "MAR_ATD",
       "ABR_ATC", "ABR_ATD", "MAY_ATC", "MAY_ATD", "JUN_ATC", "JUN_ATD",
       "JUL_ATC", "JUL_ATD", "AGO_ATC", "AGO_ATD", "SET_ATC", "SET_ATD",
-      "OCT_ATC", "OCT_ATD", "NOV_ATC", "NOV_ATD", "Total_ATC", "Total_ATD"
+      "OCT_ATC", "OCT_ATD", "NOV_ATC", "NOV_ATD", "DIC_ATC", "DIC_ATD", "Total_ATC", "Total_ATD"
     ];
     const rows = [header];
-    const colTotals = new Array(24).fill(0);
+    const colTotals = new Array(26).fill(0);
 
     data.forEach(userItem => {
       const porEst = userItem.por_establecimiento || {};
@@ -495,14 +497,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!data || data.length === 0) return [];
     if (Array.isArray(data[0])) return data;
 
-    const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV"];
+    const MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
     const header = [
       "MicroRed", "Establecimiento", "DNI", "Personal",
       "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
-      "JULIO", "AGOSTO", "SETIEMBRE", "OCTUBRE", "NOVIEMBRE", "Total"
+      "JULIO", "AGOSTO", "SETIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE", "Total"
     ];
     const rows = [header];
-    const colTotals = new Array(12).fill(0);
+    const colTotals = new Array(13).fill(0);
 
     data.forEach(userItem => {
       const porEst = userItem.por_establecimiento || {};
@@ -618,7 +620,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       XLSX.writeFile(wb, `REPORTE40_BASE_COMPLETA_${new Date().toISOString().slice(0, 10)}.xlsx`);
     } catch (err) {
-      alert("Hubo un error al exportar la base completa: " + err.message);
+      Utils.showToast("Hubo un error al exportar la base completa: " + err.message, "danger", 5000);
     } finally {
       btnExportAllExcel.disabled = false;
       btnExportAllExcel.innerHTML = '<i class="bi bi-file-earmark-excel-fill text-success"></i> Exportar Toda la Información a Excel';
@@ -642,7 +644,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let com = null;
     const saved = localStorage.getItem("comunicado_reporte40");
     if (saved) {
-      try { com = JSON.parse(saved); } catch (e) {}
+      try { com = JSON.parse(saved); } catch (e) { }
     }
     if (!com && window.DEMO_DATA && window.DEMO_DATA.comunicado) {
       com = window.DEMO_DATA.comunicado;
@@ -696,16 +698,23 @@ document.addEventListener("DOMContentLoaded", async () => {
           const parsed = JSON.parse(override);
           parsed.comunicado = noticeData;
           localStorage.setItem("DEMO_DATA_OVERRIDE", JSON.stringify(parsed));
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // Enviar a Apps Script si está conectado
+      let cloudMsg = "";
       try {
-        await Api.callAppsScript("adminSaveNotice", noticeData);
-      } catch (err) {}
+        const res = await Api.callAppsScript("adminSaveNotice", {
+          adminDni: currentAdmin.dni,
+          ...noticeData
+        });
+        if (res && res.success && res.message) {
+          cloudMsg = " " + res.message;
+        }
+      } catch (err) { }
 
       noticeAlert.className = "alert alert-success py-2 px-3 small";
-      noticeAlert.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Comunicado guardado y publicado exitosamente! El personal lo verá reflejado en su pantalla.';
+      noticeAlert.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> ¡Comunicado guardado y publicado!${Utils.escapeHtml(cloudMsg)}`;
       setTimeout(() => {
         noticeAlert.className = "alert d-none";
       }, 4000);
@@ -1342,8 +1351,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       admin: (window.DEMO_DATA && window.DEMO_DATA.admin) || {
         dni: CONFIG.ADMIN_DEFAULT_DNI,
         nombre: "ADMINISTRADOR DEL SISTEMA",
-        rol: "admin",
-        password_hash: "3b08e5e1a1208a0d0cbfa239d6ff5421da1d3e864ee055376c3e9863459c5d3d"
+        rol: "admin"
       },
       usuarios: structuredUsuarios,
       atd_atc: structuredAtd,
@@ -1515,6 +1523,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           allUsers = Object.values(baseData.usuarios);
           updateKPIs();
           renderUsersTable(allUsers);
+          renderAdminAnalytics();
 
           showExcelAlert(`¡Producción de ${parsedExcelData.sihceLabel} incorporada y reemplazada con éxito! Se sincronizaron ${parsedExcelData.totalItems.toLocaleString()} registros para ${Object.keys(sData).length} trabajadores en el mes de ${parsedExcelData.months.join(", ")}.`, "success");
           excelPreviewCard.classList.add("d-none");
@@ -1552,6 +1561,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         allUsers = Object.values(parsedExcelData.usuarios);
         updateKPIs();
         renderUsersTable(allUsers);
+        renderAdminAnalytics();
 
         showExcelAlert("¡Base de datos actualizada con éxito!" + (syncMsg || " La nueva información ya está activa en todo el sistema para todos los trabajadores."), "success");
         excelPreviewCard.classList.add("d-none");
@@ -1570,7 +1580,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnDownloadDemoDataJs.addEventListener("click", () => {
       const dataToSave = parsedExcelData || window.DEMO_DATA;
       if (!dataToSave) {
-        alert("No hay datos disponibles para exportar.");
+        Utils.showToast("No hay datos disponibles para exportar.", "warning");
         return;
       }
       const fileContent = `/**\n * DATOS DEL SISTEMA REPORTE 40 — GENERADOS AUTOMÁTICAMENTE\n * Fecha: ${new Date().toISOString()}\n */\nwindow.DEMO_DATA = ${JSON.stringify(dataToSave, null, 2)};\n`;
@@ -1588,13 +1598,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Botón Restaurar Base de Datos Original
   if (btnResetOriginalData) {
-    btnResetOriginalData.addEventListener("click", () => {
-      if (!confirm("¿Estás seguro de restaurar los datos al Excel original del sistema? Esto eliminará cualquier archivo cargado previamente en el navegador.")) {
-        return;
-      }
+    btnResetOriginalData.addEventListener("click", async () => {
+      const ok = await Utils.showConfirmModal({
+        title: "Restaurar datos originales",
+        message: "¿Estás seguro de restaurar los datos al Excel original del sistema? Esto eliminará cualquier archivo cargado previamente en el navegador.",
+        confirmText: "Sí, restaurar",
+        variant: "danger"
+      });
+      if (!ok) return;
       localStorage.removeItem("DEMO_DATA_OVERRIDE");
-      alert("Se restauraron los datos originales. La página se recargará ahora.");
-      window.location.reload();
+      Utils.showToast("Se restauraron los datos originales. Recargando...", "success", 2000);
+      setTimeout(() => window.location.reload(), 900);
     });
   }
 
@@ -1844,7 +1858,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#btnActivateMicrored").off("click").on("click", function () {
       const selectedMr = $(microredFilterSelect).val();
       if (!selectedMr) {
-        alert("Por favor selecciona primero una MicroRed en el desplegable.");
+        Utils.showToast("Por favor selecciona primero una MicroRed en el desplegable.", "warning");
         return;
       }
       allEstabsData.forEach(e => {
@@ -1858,13 +1872,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Desactivar MicroRed seleccionada
-    $("#btnDeactivateMicrored").off("click").on("click", function () {
+    $("#btnDeactivateMicrored").off("click").on("click", async function () {
       const selectedMr = $(microredFilterSelect).val();
       if (!selectedMr) {
-        alert("Por favor selecciona primero una MicroRed en el desplegable.");
+        Utils.showToast("Por favor selecciona primero una MicroRed en el desplegable.", "warning");
         return;
       }
-      if (!confirm(`¿Bloquear la producción de todos los establecimientos de la MicroRed ${selectedMr}?`)) return;
+      const ok = await Utils.showConfirmModal({
+        title: "Bloquear MicroRed",
+        message: `¿Bloquear la producción de todos los establecimientos de la MicroRed ${selectedMr}?`,
+        confirmText: "Bloquear",
+        variant: "warning"
+      });
+      if (!ok) return;
       allEstabsData.forEach(e => {
         if (e.microred === selectedMr) {
           estabsStatusMap[e.nombre.trim().toUpperCase()] = false;
@@ -1885,8 +1905,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Botón Desactivar Todas
-    $("#btnDeactivateAllEstabs").off("click").on("click", function () {
-      if (!confirm("¿Deseas bloquear la producción de TODOS los 71 establecimientos? Los usuarios verán un aviso de conciliación.")) return;
+    $("#btnDeactivateAllEstabs").off("click").on("click", async function () {
+      const ok = await Utils.showConfirmModal({
+        title: "Bloqueo total de establecimientos",
+        message: "¿Deseas bloquear la producción de TODOS los 71 establecimientos? Los usuarios verán un aviso de conciliación.",
+        confirmText: "Bloquear todos",
+        variant: "danger"
+      });
+      if (!ok) return;
       allEstabsData.forEach(e => {
         estabsStatusMap[e.nombre.trim().toUpperCase()] = false;
       });
@@ -1957,7 +1983,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function initYearsControl() {
@@ -2008,7 +2034,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           localStorage.setItem("reporte40_anios_habilitados", JSON.stringify(Array.from(activeYearsSet)));
           renderYearsTable();
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     fetchCloudYears();
 
@@ -2020,7 +2046,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         activeYearsSet.add(yr);
       } else {
         if (activeYearsSet.size === 1 && activeYearsSet.has(yr)) {
-          alert("Debe haber al menos un año habilitado para que los usuarios puedan consultar el sistema.");
+          Utils.showToast("Debe haber al menos un año habilitado para que los usuarios puedan consultar el sistema.", "warning");
           $(this).prop("checked", true);
           return;
         }
@@ -2032,12 +2058,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Agregar nuevo año
     if (btnAddNewYear) {
-      btnAddNewYear.addEventListener("click", () => {
-        const nextYear = prompt("Ingresa el nuevo año a configurar (ejemplo: 2027 o 2028):");
+      btnAddNewYear.addEventListener("click", async () => {
+        const nextYear = await Utils.showPromptModal({
+          title: "Agregar nuevo año",
+          message: "Ingresa el nuevo año a configurar (ejemplo: 2027 o 2028):",
+          placeholder: "2027",
+          confirmText: "Agregar"
+        });
         if (!nextYear) return;
         const cleanYr = nextYear.trim();
         if (!/^\d{4}$/.test(cleanYr)) {
-          alert("Por favor ingresa un año válido de 4 dígitos (ejemplo: 2027).");
+          Utils.showToast("Por favor ingresa un año válido de 4 dígitos (ejemplo: 2027).", "warning");
           return;
         }
         if (!allConfiguredYears.includes(cleanYr)) {
@@ -2202,7 +2233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         userAtd = res.atd_atc;
         userApp = res.app;
       }
-    } catch (e) {}
+    } catch (e) { }
 
     if (!userAtd && window.DEMO_DATA) {
       const atdMatch = Api.findInMapByDni(dni, window.DEMO_DATA.atd_atc);
@@ -2416,7 +2447,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnDownload) {
       btnDownload.addEventListener("click", async () => {
         if (!currentSerumsUser || !currentSerumsMonthsList || currentSerumsMonthsList.length === 0) {
-          alert("Por favor selecciona un profesional y un rango válido.");
+          Utils.showToast("Por favor selecciona un profesional y un rango válido.", "warning");
           return;
         }
 
@@ -2448,7 +2479,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             totals: currentSerumsTotals
           });
         } catch (err) {
-          alert("Error al generar reporte SERUMS: " + err.message);
+          Utils.showToast("Error al generar reporte SERUMS: " + err.message, "danger", 5000);
         } finally {
           btnDownload.disabled = false;
           btnDownload.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar Reporte SERUMS (PDF)';
@@ -2498,10 +2529,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     const textColor = isDark ? "#cbd5e1" : "#475569";
     const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
 
-    // 2. Gráfico Top 10 IPRESS (Barras horizontales)
+    // 2. Podio Top 3 IPRESS y Gráfico Top 10 IPRESS
+    const top10 = [...summary].sort((a, b) => b.totalATC - a.totalATC).slice(0, 10);
+    const podiumRow = document.getElementById("adminPodiumRow");
+    if (podiumRow) {
+      const top3 = top10.slice(0, 3);
+      if (top3.length === 0) {
+        podiumRow.innerHTML = "";
+      } else {
+        const medals = ["1°", "2°", "3°"];
+        podiumRow.innerHTML = top3.map((e, idx) => `
+          <div class="col-md-4">
+            <div class="podium-card podium-rank-${idx + 1}">
+              <div class="podium-medal">${medals[idx]}</div>
+              <div class="min-w-0 flex-grow-1">
+                <div class="small text-muted text-truncate">${Utils.escapeHtml(e.microred || "Red Cusco Sur")}</div>
+                <div class="fw-bold text-main text-truncate" title="${Utils.escapeHtml(e.nombre)}">${Utils.escapeHtml(e.nombre)}</div>
+                <div class="small fw-semibold text-primary">${e.totalATC.toLocaleString()} ATC</div>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
     const topCanvas = document.getElementById("adminTopIpressChart");
     if (topCanvas) {
-      const top10 = [...summary].sort((a, b) => b.totalATC - a.totalATC).slice(0, 10);
       if (adminTopChart) adminTopChart.destroy();
       adminTopChart = new Chart(topCanvas, {
         type: "bar",
@@ -2586,7 +2639,115 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
     adminThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    const btnDownloadTop = document.getElementById("btnDownloadTopIpressPng");
+    if (btnDownloadTop) {
+      btnDownloadTop.addEventListener("click", () => {
+        if (!adminTopChart) return;
+        Utils.downloadChartPng(adminTopChart, "Top10_IPRESS_ATC.png");
+      });
+    }
+
+    const btnDownloadMicro = document.getElementById("btnDownloadMicroredPng");
+    if (btnDownloadMicro) {
+      btnDownloadMicro.addEventListener("click", () => {
+        if (!adminMicroredChart) return;
+        Utils.downloadChartPng(adminMicroredChart, "Participacion_MicroRed.png");
+      });
+    }
+
     renderAdminAnalytics();
+  }
+
+  function initCommandPalette() {
+    const cmdModalEl = document.getElementById("adminCmdModal");
+    const cmdInput = document.getElementById("adminCmdInput");
+    const cmdResults = document.getElementById("adminCmdResults");
+    const btnOpenCmd = document.getElementById("btnOpenCmdPalette");
+    if (!cmdModalEl || !cmdInput || !cmdResults || typeof bootstrap === "undefined") return;
+
+    const cmdModal = new bootstrap.Modal(cmdModalEl);
+
+    function openCmd() {
+      cmdModal.show();
+    }
+
+    cmdModalEl.addEventListener("shown.bs.modal", () => {
+      cmdInput.value = "";
+      renderCmdResults("");
+      cmdInput.focus();
+    });
+
+    if (btnOpenCmd) {
+      btnOpenCmd.addEventListener("click", openCmd);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        openCmd();
+      }
+    });
+
+    function renderCmdResults(query) {
+      const q = (query || "").trim().toLowerCase();
+      if (q.length < 2) {
+        cmdResults.innerHTML = '<div class="text-muted small text-center py-3">Escribe al menos 2 caracteres para buscar personal de salud...</div>';
+        return;
+      }
+      const source = (allUsers && allUsers.length > 0) ? allUsers : ((window.DEMO_DATA && window.DEMO_DATA.personal) || []);
+      const matches = source.filter(u =>
+        String(u.dni || "").toLowerCase().includes(q) ||
+        String(u.nombre || "").toLowerCase().includes(q) ||
+        String(u.establecimiento || "").toLowerCase().includes(q)
+      ).slice(0, 12);
+
+      if (matches.length === 0) {
+        cmdResults.innerHTML = '<div class="text-muted small text-center py-3">No se encontraron coincidencias.</div>';
+        return;
+      }
+
+      cmdResults.innerHTML = matches.map(u => {
+        const dniEsc = Utils.escapeHtml(u.dni);
+        const nameEsc = Utils.escapeHtml(u.nombre);
+        const estabEsc = Utils.escapeHtml(u.establecimiento || "-");
+        return `
+          <div class="cmd-result-item">
+            <div class="min-w-0">
+              <div class="fw-bold text-main text-truncate">${nameEsc}</div>
+              <div class="small text-muted text-truncate">DNI: ${dniEsc} • ${estabEsc}</div>
+            </div>
+            <div class="d-flex gap-1 flex-shrink-0">
+              <button type="button" class="btn btn-sm btn-outline-primary cmd-act-sim" data-dni="${dniEsc}" title="Simular sesión"><i class="bi bi-eye"></i> Simular</button>
+              <button type="button" class="btn btn-sm btn-outline-success cmd-act-serums" data-dni="${dniEsc}" title="Constancia SERUMS"><i class="bi bi-award"></i> SERUMS</button>
+              <button type="button" class="btn btn-sm btn-outline-warning cmd-act-reset" data-dni="${dniEsc}" data-name="${nameEsc}" title="Restablecer clave"><i class="bi bi-key"></i> Clave</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    cmdInput.addEventListener("input", () => renderCmdResults(cmdInput.value));
+
+    cmdResults.addEventListener("click", (e) => {
+      const simBtn = e.target.closest(".cmd-act-sim");
+      const serumsBtn = e.target.closest(".cmd-act-serums");
+      const resetBtn = e.target.closest(".cmd-act-reset");
+      if (simBtn) {
+        const dni = simBtn.getAttribute("data-dni");
+        cmdModal.hide();
+        simulateUser(dni);
+      } else if (serumsBtn) {
+        const dni = serumsBtn.getAttribute("data-dni");
+        cmdModal.hide();
+        if (typeof openSerumsModalForDni === "function") openSerumsModalForDni(dni);
+      } else if (resetBtn) {
+        const dni = resetBtn.getAttribute("data-dni");
+        const name = resetBtn.getAttribute("data-name");
+        cmdModal.hide();
+        openResetPassModal(dni, name);
+      }
+    });
   }
 
   // Ejecución inicial
@@ -2595,5 +2756,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   initYearsControl();
   initSerumsReportControl();
   initAdminAnalytics();
+  initCommandPalette();
 });
 

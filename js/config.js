@@ -32,7 +32,8 @@ const CONFIG = {
     { key: "AGO", label: "Agosto" },
     { key: "SET", label: "Setiembre" },
     { key: "OCT", label: "Octubre" },
-    { key: "NOV", label: "Noviembre" }
+    { key: "NOV", label: "Noviembre" },
+    { key: "DIC", label: "Diciembre" }
   ],
 
   // Admin por defecto
