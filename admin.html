@@ -10,7 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   
   <!-- Estilos del Sistema -->
-  <link rel="stylesheet" href="css/styles.css?v=2.3">
+  <link rel="stylesheet" href="css/styles.css?v=2.4">
 
   <!-- DataTables Bootstrap 5 CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
@@ -234,7 +234,8 @@
                 </tr>
               </thead>
               <tbody id="logsTableBody">
-                <tr><td colspan="6" class="text-center text-muted py-4">Cargando registros de auditoría...</td></tr>
+                <tr><td><div class="skeleton-line" style="width:110px;"></div></td><td><div class="skeleton-line" style="width:70px;"></div></td><td><div class="skeleton-line" style="width:160px;"></div></td><td><div class="skeleton-line" style="width:120px;"></div></td><td><div class="skeleton-line" style="width:90px;"></div></td><td><div class="skeleton-line" style="width:80px;"></div></td></tr>
+                <tr><td><div class="skeleton-line" style="width:110px;"></div></td><td><div class="skeleton-line" style="width:70px;"></div></td><td><div class="skeleton-line" style="width:140px;"></div></td><td><div class="skeleton-line" style="width:130px;"></div></td><td><div class="skeleton-line" style="width:80px;"></div></td><td><div class="skeleton-line" style="width:80px;"></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -329,7 +330,8 @@
                 </tr>
               </thead>
               <tbody id="usersTableBody">
-                <tr><td colspan="6" class="text-center text-muted py-4">Cargando lista de personal...</td></tr>
+                <tr><td><div class="skeleton-line" style="width:70px;"></div></td><td><div class="skeleton-line" style="width:180px;"></div></td><td><div class="skeleton-line" style="width:130px;"></div></td><td><div class="skeleton-line" style="width:100px;"></div></td><td><div class="skeleton-line" style="width:90px;"></div></td><td><div class="skeleton-line" style="width:140px;margin:auto;"></div></td></tr>
+                <tr><td><div class="skeleton-line" style="width:70px;"></div></td><td><div class="skeleton-line" style="width:160px;"></div></td><td><div class="skeleton-line" style="width:120px;"></div></td><td><div class="skeleton-line" style="width:110px;"></div></td><td><div class="skeleton-line" style="width:80px;"></div></td><td><div class="skeleton-line" style="width:140px;margin:auto;"></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -848,6 +850,81 @@
     </div>
   </div>
 
+  <!-- Barra Flotante de Cambios Pendientes (Control IPRESS) -->
+  <div id="estabsPendingBar" class="admin-pending-bar" aria-live="polite">
+    <span class="small fw-bold text-main d-flex align-items-center gap-2">
+      <i class="bi bi-cloud-upload text-primary"></i>
+      <span id="estabsPendingText">Cambios pendientes por sincronizar</span>
+    </span>
+    <button id="btnFloatingSaveEstabs" type="button" class="btn btn-sm btn-primary-custom py-1 px-3">
+      <i class="bi bi-floppy-fill me-1"></i> Guardar en Nube
+    </button>
+  </div>
+
+  <!-- Offcanvas Vista Rápida de Personal -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="userQuickDrawer" aria-labelledby="userQuickDrawerLabel">
+    <div class="offcanvas-header border-bottom">
+      <div class="d-flex align-items-center gap-2">
+        <div id="drawerUserAvatar" class="user-avatar-badge" style="width:42px;height:42px;font-size:0.95rem;">--</div>
+        <div>
+          <h5 class="offcanvas-title h6 fw-bold text-main mb-0" id="userQuickDrawerLabel">Ficha del Profesional</h5>
+          <small id="drawerUserDni" class="text-muted">DNI: -</small>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="p-3 rounded mb-3" style="background: var(--bg-card-subtle); border: 1px solid var(--border-color);">
+        <div class="small text-muted">Establecimiento Sede</div>
+        <div id="drawerUserEstab" class="fw-bold text-main mb-2">-</div>
+        <div class="row g-2 small">
+          <div class="col-6">
+            <span class="text-muted d-block">MicroRed</span>
+            <strong id="drawerUserMicrored" class="text-main">-</strong>
+          </div>
+          <div class="col-6">
+            <span class="text-muted d-block">Colegio Prof.</span>
+            <strong id="drawerUserColegio" class="text-main">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-2 text-center mb-3">
+        <div class="col-4">
+          <div class="p-2 rounded border">
+            <div id="drawerKpiAtc" class="fw-bold fs-6 text-primary">0</div>
+            <div class="text-muted" style="font-size:0.72rem;">Total ATC</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded border">
+            <div id="drawerKpiAtd" class="fw-bold fs-6 text-success">0</div>
+            <div class="text-muted" style="font-size:0.72rem;">Total ATD</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded border">
+            <div id="drawerKpiApp" class="fw-bold fs-6 text-primary">0</div>
+            <div class="text-muted" style="font-size:0.72rem;">Total APP</div>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="small fw-bold text-muted text-uppercase mb-2">Acciones Rápidas</h6>
+      <div class="d-grid gap-2">
+        <button id="drawerBtnSimulate" type="button" class="btn btn-outline-info btn-sm text-start">
+          <i class="bi bi-eye me-2"></i> Simular sesión de este profesional
+        </button>
+        <button id="drawerBtnSerums" type="button" class="btn btn-outline-primary btn-sm text-start">
+          <i class="bi bi-mortarboard-fill me-2"></i> Generar Reporte SERUMS
+        </button>
+        <button id="drawerBtnReset" type="button" class="btn btn-outline-warning btn-sm text-start">
+          <i class="bi bi-key-fill me-2"></i> Restablecer Contraseña
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Pie de Página -->
   <footer class="footer-custom">
     <div class="container-fluid">
@@ -873,14 +950,14 @@
 
   <!-- Scripts del Sistema -->
   <script src="data/demo_data.js"></script>
-  <script src="js/config.js?v=2.3"></script>
-  <script src="js/utils.js?v=2.3"></script>
-  <script src="js/theme.js?v=2.3"></script>
-  <script src="js/auth.js?v=2.3"></script>
-  <script src="js/api.js?v=2.3"></script>
-  <script src="js/pdf-generator.js?v=2.3"></script>
-  <script src="js/pwa.js?v=2.3"></script>
-  <script src="js/admin.js?v=2.3"></script>
+  <script src="js/config.js?v=2.4"></script>
+  <script src="js/utils.js?v=2.4"></script>
+  <script src="js/theme.js?v=2.4"></script>
+  <script src="js/auth.js?v=2.4"></script>
+  <script src="js/api.js?v=2.4"></script>
+  <script src="js/pdf-generator.js?v=2.4"></script>
+  <script src="js/pwa.js?v=2.4"></script>
+  <script src="js/admin.js?v=2.4"></script>
 
 </body>
 </html>

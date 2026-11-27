@@ -11,7 +11,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <!-- Estilos del Sistema -->
-  <link rel="stylesheet" href="css/styles.css?v=2.1">
+  <link rel="stylesheet" href="css/styles.css?v=2.4">
 
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
@@ -357,6 +357,7 @@
           <div>
             <div id="kpiATC" class="stat-number">0</div>
             <div class="stat-label">Total Atenciones (ATC)</div>
+            <div id="kpiAtcTrend" class="kpi-trend-pill d-none"></div>
           </div>
         </div>
       </div>
@@ -377,6 +378,7 @@
           <div>
             <div id="kpiATD" class="stat-number">0</div>
             <div class="stat-label">Total Atendidos (ATD)</div>
+            <div id="kpiAtdTrend" class="kpi-trend-pill d-none"></div>
           </div>
         </div>
       </div>
@@ -398,6 +400,7 @@
           <div>
             <div id="kpiAPP" class="stat-number">0</div>
             <div class="stat-label">Actividades Promoción (APP)</div>
+            <div id="kpiAppTrend" class="kpi-trend-pill d-none"></div>
           </div>
         </div>
       </div>
@@ -723,6 +726,22 @@
 
   </main>
 
+  <!-- Barra de Acción Flotante en Móviles -->
+  <div id="mobileStickyBar" class="mobile-sticky-bar d-lg-none" aria-live="polite">
+    <div class="min-w-0">
+      <div class="small fw-bold text-main text-truncate" id="mobileSelectedBadge">0 meses</div>
+      <div class="text-muted" style="font-size: 0.72rem;">Listo para exportar</div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+      <button id="mobilePreviewBtn" type="button" class="btn btn-sm btn-secondary-custom py-1 px-2" title="Vista Previa">
+        <i class="bi bi-eye-fill text-primary"></i>
+      </button>
+      <button id="mobileDownloadBtn" type="button" class="btn btn-sm btn-primary-custom py-1 px-3">
+        <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+      </button>
+    </div>
+  </div>
+
   <button id="btnBackToTop" type="button" class="btn-back-to-top" title="Volver arriba" aria-label="Volver arriba">
     <i class="bi bi-arrow-up fs-5"></i>
   </button>
@@ -883,6 +902,19 @@
             </div>
           </div>
 
+          <div class="manual-step-item">
+            <div class="manual-step-num"><i class="bi bi-play-fill"></i></div>
+            <div class="w-100">
+              <h6 class="fw-bold text-main mb-2">
+                <i class="bi bi-camera-video-fill text-primary me-1"></i> Video Tutorial Rápido
+              </h6>
+              <video controls preload="none" class="w-100 rounded-3 border" style="max-height: 280px; background: #0f172a;">
+                <source src="TUTORIAL_USUARIO_REPORTE40.mp4" type="video/mp4">
+                Tu navegador no soporta la reproducción de video HTML5.
+              </video>
+            </div>
+          </div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">
@@ -942,14 +974,14 @@
 
   <!-- Scripts del Sistema -->
   <script src="data/demo_data.js"></script>
-  <script src="js/config.js?v=2.1"></script>
-  <script src="js/utils.js?v=2.1"></script>
-  <script src="js/theme.js?v=2.1"></script>
-  <script src="js/auth.js?v=2.1"></script>
-  <script src="js/api.js?v=2.1"></script>
-  <script src="js/pwa.js?v=2.1"></script>
-  <script src="js/pdf-generator.js?v=2.1"></script>
-  <script src="js/dashboard.js?v=2.1"></script>
+  <script src="js/config.js?v=2.4"></script>
+  <script src="js/utils.js?v=2.4"></script>
+  <script src="js/theme.js?v=2.4"></script>
+  <script src="js/auth.js?v=2.4"></script>
+  <script src="js/api.js?v=2.4"></script>
+  <script src="js/pwa.js?v=2.4"></script>
+  <script src="js/pdf-generator.js?v=2.4"></script>
+  <script src="js/dashboard.js?v=2.4"></script>
 
 </body>
 

@@ -4,23 +4,23 @@
  * Hecho por xzerox99
  */
 
-const CACHE_NAME = "reporte40-v2.3";
+const CACHE_NAME = "reporte40-v2.4";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
   "./dashboard.html",
   "./admin.html",
   "./validar.html",
-  "./css/styles.css?v=2.3",
-  "./js/config.js?v=2.3",
-  "./js/utils.js?v=2.3",
-  "./js/theme.js?v=2.3",
-  "./js/auth.js?v=2.3",
-  "./js/api.js?v=2.3",
-  "./js/pwa.js?v=2.3",
-  "./js/dashboard.js?v=2.3",
-  "./js/admin.js?v=2.3",
-  "./js/pdf-generator.js?v=2.3",
+  "./css/styles.css?v=2.4",
+  "./js/config.js?v=2.4",
+  "./js/utils.js?v=2.4",
+  "./js/theme.js?v=2.4",
+  "./js/auth.js?v=2.4",
+  "./js/api.js?v=2.4",
+  "./js/pwa.js?v=2.4",
+  "./js/dashboard.js?v=2.4",
+  "./js/admin.js?v=2.4",
+  "./js/pdf-generator.js?v=2.4",
   "./assets/icon-192.png",
   "./assets/icon-512.png"
 ];

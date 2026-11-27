@@ -12,13 +12,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/styles.css?v=2.3">
+  <link rel="stylesheet" href="css/styles.css?v=2.4">
   
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
 
-  <script src="data/demo_data.js"></script>
+  <script src="data/demo_data.js" defer></script>
   <style>
     @media print {
       body { background: #ffffff !important; padding: 0 !important; }
@@ -79,7 +79,7 @@
     <div class="alert alert-warning d-flex align-items-start gap-2 mb-3 py-2 px-3 small border-start border-4 border-warning shadow-sm">
       <i class="bi bi-exclamation-triangle-fill text-warning fs-5 flex-shrink-0 mt-1"></i>
       <div>
-        <div class="fw-bold text-dark">INSTRUCCIÓN AL EVALUADOR / AUDITOR (CONTROL DE CALIDAD):</div>
+        <div class="fw-bold text-main">INSTRUCCIÓN AL EVALUADOR / AUDITOR (CONTROL DE CALIDAD):</div>
         <div class="text-muted">Coteje que las cifras impresas en la <strong>hoja física presentada</strong> coincidan <strong>exactamente</strong> con los registros oficiales que se muestran a continuación. Cualquier enmendadura, tachadura o discordancia numérica invalida inmediatamente el documento presentado.</div>
       </div>
     </div>
@@ -120,14 +120,17 @@
 
     <!-- TABLA DETALLADA DE COTEJO DE PRODUCCIÓN -->
     <div class="mb-3">
-      <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
         <h3 class="h6 fw-bold text-main mb-0"><i class="bi bi-table text-primary me-1"></i> Cotejo Oficial de Producción Asistencial</h3>
-        <span class="badge bg-primary-subtle text-primary small">Datos Oficiales en Sistema</span>
+        <div class="d-flex align-items-center gap-2">
+          <span id="valCotejoProgress" class="badge bg-secondary-subtle text-secondary border small no-print">0 / 7 cotejados</span>
+          <span class="badge bg-primary-subtle text-primary small">Datos Oficiales en Sistema</span>
+        </div>
       </div>
 
       <div class="table-responsive">
         <table class="table table-sm table-bordered align-middle mb-0" style="font-size: 0.85rem;">
-          <thead class="table-light">
+          <thead>
             <tr>
               <th scope="col" style="width: 45%;">Concepto / Fuente Oficial</th>
               <th scope="col" class="text-center" style="width: 30%;">Registro Oficial en Sistema</th>
@@ -142,7 +145,7 @@
               </td>
               <td class="text-center fw-bold fs-6 text-primary" id="valHis">0</td>
               <td class="text-center text-muted small">
-                <span>Coincide</span> <span class="val-check-box"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span>Coincide</span> <span class="val-check-box"></span></button>
               </td>
             </tr>
             <tr>
@@ -152,7 +155,7 @@
               </td>
               <td class="text-center fw-bold fs-6 text-success" id="valATD">0</td>
               <td class="text-center text-muted small">
-                <span>Coincide</span> <span class="val-check-box"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span>Coincide</span> <span class="val-check-box"></span></button>
               </td>
             </tr>
             <tr id="rowTriajes">
@@ -163,7 +166,7 @@
               </td>
               <td class="text-center fw-bold fs-6" id="valTri">0</td>
               <td class="text-center text-muted small">
-                <span>Coincide</span> <span class="val-check-box"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span>Coincide</span> <span class="val-check-box"></span></button>
               </td>
             </tr>
             <tr id="rowCitas">
@@ -174,17 +177,17 @@
               </td>
               <td class="text-center fw-bold fs-6" id="valCit">0</td>
               <td class="text-center text-muted small">
-                <span>Coincide</span> <span class="val-check-box"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span>Coincide</span> <span class="val-check-box"></span></button>
               </td>
             </tr>
-            <tr class="table-primary-subtle" style="background-color: rgba(37, 99, 235, 0.08);">
+            <tr style="background-color: rgba(37, 99, 235, 0.08);">
               <td>
                 <div class="fw-bold text-primary">TOTAL ATENCIONES (ATC)</div>
                 <div class="text-muted" style="font-size: 0.72rem;">Consolidado de Atenciones Asistenciales (HIS + SIHCE)</div>
               </td>
               <td class="text-center fw-bold fs-5 text-primary" id="valATC">0</td>
               <td class="text-center text-muted small">
-                <span class="fw-bold text-primary">Coincide</span> <span class="val-check-box border-primary"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span class="fw-bold text-primary">Coincide</span> <span class="val-check-box border-primary"></span></button>
               </td>
             </tr>
             <tr>
@@ -195,17 +198,17 @@
               </td>
               <td class="text-center fw-bold fs-6 text-warning" id="valAPP">0</td>
               <td class="text-center text-muted small">
-                <span>Coincide</span> <span class="val-check-box"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span>Coincide</span> <span class="val-check-box"></span></button>
               </td>
             </tr>
-            <tr class="table-light" style="font-weight: 700; background-color: var(--bg-card-subtle);">
+            <tr style="font-weight: 700; background-color: var(--bg-card-subtle);">
               <td>
-                <div class="fw-bold text-dark">PRODUCCIÓN TOTAL CONSOLIDADA</div>
+                <div class="fw-bold text-main">PRODUCCIÓN TOTAL CONSOLIDADA</div>
                 <div class="text-muted" style="font-size: 0.72rem;">Suma global de Atenciones (ATC) + Actividades (APP)</div>
               </td>
-              <td class="text-center fw-bold fs-5 text-dark" id="valTotalGeneral">0</td>
+              <td class="text-center fw-bold fs-5 text-main" id="valTotalGeneral">0</td>
               <td class="text-center text-muted small">
-                <span class="fw-bold text-dark">Coincide</span> <span class="val-check-box border-dark"></span>
+                <button type="button" class="val-check-btn" aria-pressed="false"><span class="fw-bold text-main">Coincide</span> <span class="val-check-box border-primary"></span></button>
               </td>
             </tr>
           </tbody>
@@ -236,7 +239,13 @@
     <div class="p-3 rounded text-muted small" style="background-color: var(--bg-card-subtle); border: 1px solid var(--border-color); font-size: 0.8rem;">
       <div class="row g-2">
         <div class="col-sm-7">
-          <div><i class="bi bi-key-fill text-primary me-1"></i> Código de Autenticidad: <code id="valCode" class="text-main fw-bold">REP40-VERIFIED</code></div>
+          <div class="d-flex align-items-center flex-wrap gap-2">
+            <i class="bi bi-key-fill text-primary"></i> Código de Autenticidad:
+            <code id="valCode" class="text-main fw-bold">REP40-VERIFIED</code>
+            <button id="btnCopyValCode" type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 no-print" title="Copiar código">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
           <div class="mt-1"><i class="bi bi-clock-history me-1"></i> Consultado: <span id="valTimestamp" class="text-main">-</span></div>
         </div>
         <div class="col-sm-5 text-sm-end">
@@ -261,11 +270,11 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2.3"></script>
-  <script src="js/utils.js?v=2.3"></script>
-  <script src="js/theme.js?v=2.3"></script>
-  <script src="js/auth.js?v=2.3"></script>
-  <script src="js/api.js?v=2.3"></script>
+  <script src="js/config.js?v=2.4"></script>
+  <script src="js/utils.js?v=2.4"></script>
+  <script src="js/theme.js?v=2.4"></script>
+  <script src="js/auth.js?v=2.4"></script>
+  <script src="js/api.js?v=2.4"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -364,8 +373,11 @@
       }
 
       if (dni && typeof Api !== "undefined") {
+        const bannerBox = document.getElementById("valBannerBox");
+        if (bannerBox) bannerBox.classList.add("val-scanning");
         try {
           const res = await Api.callAppsScript("getData", { dni });
+          if (bannerBox) bannerBox.classList.remove("val-scanning");
           if (res && res.success && res.atd_atc) {
             const monthsArr = meses ? meses.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : CONFIG.MESES.map(m => m.key);
             const isCons = !estabFinal || estabFinal.toUpperCase().includes("CONSOLIDADO");
@@ -421,7 +433,41 @@
               }
             }
           }
-        } catch (e) {}
+        } catch (e) {
+          if (bannerBox) bannerBox.classList.remove("val-scanning");
+        }
+      }
+
+      // Cotejo interactivo en pantalla
+      const checkBtns = document.querySelectorAll(".val-check-btn");
+      const progressBadge = document.getElementById("valCotejoProgress");
+      function updateCotejoProgress() {
+        const checkedCount = document.querySelectorAll(".val-check-btn.is-checked").length;
+        if (progressBadge) {
+          progressBadge.textContent = `${checkedCount} / ${checkBtns.length} cotejados`;
+          progressBadge.className = checkedCount === checkBtns.length
+            ? "badge bg-success-subtle text-success border border-success-subtle small no-print"
+            : "badge bg-secondary-subtle text-secondary border small no-print";
+        }
+      }
+      checkBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const checked = btn.classList.toggle("is-checked");
+          btn.setAttribute("aria-pressed", String(checked));
+          const box = btn.querySelector(".val-check-box");
+          if (box) box.innerHTML = checked ? '<i class="bi bi-check-lg"></i>' : "";
+          updateCotejoProgress();
+        });
+      });
+
+      const btnCopyValCode = document.getElementById("btnCopyValCode");
+      if (btnCopyValCode) {
+        btnCopyValCode.addEventListener("click", () => {
+          const codeText = document.getElementById("valCode")?.textContent || "";
+          if (typeof Utils !== "undefined" && typeof Utils.copyToClipboard === "function") {
+            Utils.copyToClipboard(codeText, "Código de autenticidad copiado");
+          }
+        });
       }
 
       // Código de seguridad
